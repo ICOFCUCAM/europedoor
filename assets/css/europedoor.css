@@ -2271,7 +2271,15 @@ a .kicker { color: var(--ink-3); }
             display: flex; flex-wrap: wrap; gap: var(--s3) var(--s5); }
 .sublinks a { text-decoration: none; color: var(--door); font-weight: 600; }
 .sublinks a:hover { text-decoration: underline; }
-.sublinks a span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+/* THE COUNT IS THE SAME MEASUREMENT WHETHER OR NOT THE SUB HAS A PAGE, so
+   it is typeset the same. A sub under FACET_MIN keeps its figure and loses
+   its link — the map dot the page cannot name, one family over — and the
+   only difference a reader should see is that one is not interactive. Split
+   into two rules rather than one `:is()` because `.nopage` also needs the
+   ink that says "not a link", and stating both in one selector would set
+   the link's colour twice. */
+.sublinks :is(a, .nopage) span { font-family: var(--mono); color: var(--ink-3); font-weight: 400; }
+.sublinks .nopage { color: var(--ink-2); font-weight: 600; }
 /* THE SHAPE OF A CATEGORY, drawn from its own sub-counts. Column, so the
    bar sits under the name it measures; a fixed track width so four bars are
    comparable, which is the entire point of drawing them at all. */
@@ -2579,6 +2587,29 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .mappopup p:last-child { margin-bottom: 0; }
 .mappopup-close { position: absolute; top: var(--s2); right: var(--s3); border: 0; background: none; font-size: var(--t-lg); line-height: 1; cursor: pointer; color: var(--ink-3); }
 .mappopup-close:hover { color: var(--door); }
+/* THE PHOTOGRAPH IN A DESTINATION POPUP, AND ITS CREDIT IS VISIBLE RATHER
+   THAN REVEALED.
+
+   `.credit` is `opacity: 0` until `picture:hover` or `picture:focus-within`,
+   which is right on a page-sized photograph a reader is already looking at
+   and WRONG here twice. This markup is a `<figure>`, not a `<picture>`, so
+   neither selector can ever match it — the credit would have been present,
+   placed, sized, on its measured scrim and painted at zero alpha on every
+   desktop, which is `.doorgo` exactly, and this time the invisible thing is
+   a LICENCE OBLIGATION rather than a link. And a popup is opened and closed
+   in a few seconds: a credit a reader has to hover to find is a credit
+   nobody sees. /stories reached the same conclusion from the other side —
+   moving the credit out of the anchor "is also more visible than a credit
+   revealed on hover".
+
+   The scrim underneath is `.credit`'s own 72%, which composites to
+   rgb(71,71,71) and carries white at 9.2:1 whatever the photograph turns out
+   to be. Reused rather than restated, because a second number would be a
+   second decision about one thing. */
+.mapshot { position: relative; margin: 0 0 var(--s3); }
+.mapshot img { display: block; width: 100%; height: auto; border-radius: var(--radius); }
+.mapshot .credit { opacity: 1; }
+
 .europemap .placedot circle { fill: var(--door); opacity: .5; }
 .europemap .placedot:hover circle { opacity: 1; }
 
@@ -12450,3 +12481,41 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      are in one column. */
   .molist { border-top: 0; }
 }
+
+/* THE PAID BAND, AND IT IS THE ONE COMPOSITION HERE THAT MAY SAY "SEPARATE
+   OBJECT, PLACED BY A SYSTEM", BECAUSE THAT IS WHAT IT IS. Border, fill,
+   radius and shadow are refused everywhere else on this site for exactly
+   that reason — and an advertisement is a separate object placed by a
+   system, so the reading a reader must get is the true one. It takes the
+   smallest of the four: a rule above and a hairline below, so the band is
+   bounded, and no fill, because a filled panel is a banner and a banner is
+   what §33 refuses.
+   The disclosure is `--door-dark`, the accent AS TEXT rather than as a
+   mark, which is the split this stylesheet already records for the
+   signature: a colour that gets drawn and a colour that gets read are
+   different requirements, and a kicker is text.
+   Nothing here renders today — `render.ad_slot()` emits zero bytes with
+   nothing serving, so these rules are written for a code path the empty
+   registry never runs, which is the state that produced five dead `display`
+   declarations on photograph containers. The dead-rule scan will name them
+   for exactly as long as that is true, and that is the correct report. */
+/* THE BAND IS FULL-BLEED AND PADS ITSELF BACK TO THE COLUMN, which is the
+   one geometry that is identical on all nine surfaces. The first version
+   was a bare `<aside>` at the end of the body and rendering it found the
+   fault in one look: on a plate page `main` has no padding and the band ran
+   to x=0, edge to edge, while on a destination page it would have taken
+   `main`'s gutter and sat at a different inset from the same band one page
+   over. Padding it with `--page-gutter` alone doubles the gutter on every
+   padded family, which is *a page has one gutter and a component layer
+   quietly added a second* — measured on this stylesheet once already, at
+   75px against 24. `margin-inline: calc(50% - 50vw)` is the escape
+   `ed_bleed` already uses, and leaving the column is also the right
+   reading: a paid band is a change of movement, not another section. */
+.adband { margin: var(--s8) calc(50% - 50vw) var(--s7);
+          padding: var(--s5) var(--page-gutter);
+          border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.adband-in { display: grid; gap: var(--s3); max-width: 60rem; }
+.adband > .adband-in > :is(h2, h3) { margin: 0; }
+.adband p { margin: 0; max-width: 54ch; }
+.adband p:not(.addisc) { color: var(--ink-2); }
+.addisc { color: var(--door-dark); }

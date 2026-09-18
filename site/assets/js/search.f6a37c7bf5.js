@@ -213,10 +213,36 @@
    * so backspacing to nothing returns the page you arrived on. */
   var AT_REST = out.innerHTML;
 
+  /* AND RESTORING IT WHEN IT IS ALREADY THERE IS NOT FREE. `run("")` fires
+   * once on load, so the band was rewritten with BYTE-IDENTICAL markup every
+   * time this page opened: twelve links and every piece of DOM state on them
+   * destroyed and recreated for no change at all.
+   *
+   * The browser suite found it the moment the loading placeholder came out,
+   * and the way it found it is the interesting half. The sweep enumerates
+   * every link on the page at `load`, focuses each one and asks whether it
+   * paints — and with the placeholder in place there were no browse links AT
+   * LOAD to enumerate, because the band had already been replaced by one grey
+   * line. So the placeholder was hiding those twelve links from the
+   * INSTRUMENT as well as from the reader, and removing it reported them as
+   * twelve links that paint nothing: `checkVisibility()` is false on a
+   * detached node, and the walk up the ancestors finds no transparent parent
+   * because there is no longer a chain to the document.
+   *
+   * A reader never saw that, because the replacement is identical and
+   * instant. What a reader COULD see is focus lost from a row they had
+   * tabbed into while the index was still arriving. Either way the write is
+   * the fault: the band is restored only when it is not already the thing on
+   * screen. */
+  var showing = "rest";
+
   function run(qraw) {
     var q = norm(qraw.trim());
     if (q.length < 2) {
-      out.innerHTML = AT_REST;
+      if (showing !== "rest") {
+        out.innerHTML = AT_REST;
+        showing = "rest";
+      }
       return;
     }
     var mods = parseQuery(q);
@@ -355,6 +381,7 @@
           }).join("") + "</div>";
       });
 
+    showing = "hits";
     out.innerHTML = "<h2>" + hits.length + (hits.length === 1 ? " result" : " results") +
       (hits.length > shown.length ? " — showing the first " + shown.length : "") +
       "</h2>" + body;
@@ -379,7 +406,25 @@
   form.addEventListener("submit", function (e) { e.preventDefault(); schedule(); });
   input.addEventListener("input", schedule);
 
-  out.innerHTML = '<p class="small">Loading the index…</p>';
+  /* AND THE LINE THE COMMENT ABOVE SAYS WAS REMOVED WAS STILL HERE, 168
+   * LINES BELOW IT. `AT_REST` captures the band and restores it, which is
+   * the half that got written; this line threw it away first, so the page
+   * rendered its full 1,185-pixel index breakdown, replaced it with one
+   * grey line on load, and put it back when the fetch resolved. Measured
+   * in Chromium: `#results` 25px at 72ms with `readyState` already
+   * complete, 1,185px the instant /api/search.json arrived, **CLS 0.3025**
+   * on the one page of thirty that shifts at all — and delaying the index
+   * by 400ms moved the jump to 448ms, which is what proves the fetch is
+   * the trigger rather than parsing.
+   *
+   * A LOADING STATE OVER A COMPLETE PAGE IS A REGRESSION DRESSED AS
+   * FEEDBACK. It is honest only where the reader is actually waiting for
+   * something they asked for, which is the `?q=` arrival: there the band
+   * is not the answer to their question and saying so beats showing it. */
+  var pending = new URLSearchParams(location.search).get("q");
+  if (pending) {
+    out.innerHTML = '<p class="small">Searching for ' + escape_(pending) + '…</p>';
+  }
   fetch("/api/search.json")
     .then(function (r) { return r.json(); })
     .then(function (j) {

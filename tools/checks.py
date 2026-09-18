@@ -18,6 +18,7 @@ from __future__ import annotations
 import glob
 import importlib
 import hashlib
+import html
 import html.parser
 import colorsys
 import json
@@ -30,6 +31,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from lib import ads as ADS
 from lib import data as D
 from lib import pages as P
 from lib import score as S
@@ -46,6 +48,51 @@ OUT = os.path.join(ROOT, "site")
 VOID = {"meta", "link", "br", "img", "input", "hr", "source", "col", "area", "base", "wbr"}
 FAILURES = []
 CHECKS = []
+
+
+def bare_js(js):
+    """A script with its comments removed.
+
+    THE SEVENTH TIME AN INSTRUMENT HERE HAS READ THE DOCUMENTATION OF CODE
+    AS CODE, and the first where the check and the comment it tripped over
+    were written in the same commit. `c_plan_reports_what_it_ran` asserts
+    that every constraint `planner.js` computes for a reader is also read
+    back — `opts.geoTooNarrow` was set once and consumed nowhere — and the
+    paragraph explaining that failure says the words `opts.geoTooNarrow`.
+    So the scan counted the comment as the missing read and went green on
+    the state it exists to refuse. Proved by mutation: deleting the real
+    read left the check passing.
+
+    `bare_css` already carries this argument for the stylesheet. Strings are
+    stepped over rather than stripped, because `https://` inside one is not
+    the start of a comment and a URL in a quoted string is ordinary code.
+    """
+    out = []
+    i, n = 0, len(js)
+    quote = None
+    while i < n:
+        c = js[i]
+        if quote:
+            out.append(c)
+            if c == "\\" and i + 1 < n:
+                out.append(js[i + 1]); i += 2; continue
+            if c == quote:
+                quote = None
+            i += 1
+            continue
+        if c in "\"'`":
+            quote = c; out.append(c); i += 1; continue
+        if c == "/" and i + 1 < n and js[i + 1] == "*":
+            j = js.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+            out.append(" ")
+            continue
+        if c == "/" and i + 1 < n and js[i + 1] == "/":
+            j = js.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        out.append(c); i += 1
+    return "".join(out)
 
 
 def bare_css(css):
@@ -414,6 +461,180 @@ def c_plan_constants():
     return n
 
 
+@check("the day and party bounds the planner enforces are the bounds the form publishes")
+def c_plan_bounds_published():
+    """THE BOUNDS THE PLANNER ENFORCES MUST BE THE BOUNDS THE CONTROL
+    PUBLISHES.
+
+    `planner.js` clamps the day count and the party size in two places
+    each, and the form publishes its own `min` and `max` on the two number
+    fields — four typed copies of two decisions. That is the dispatch cap
+    exactly: three of four copies were raised to sixty and the one that was
+    a gate was left at thirty, and the whole sitting was spent before
+    anything said no.
+
+    Asserted between the DECLARATION and the ATTRIBUTE rather than between
+    the copies, because comparing the copies to each other goes green the
+    moment somebody types the same number twice. The attribute is what a
+    reader's own browser enforces before any script runs, so it is the half
+    that cannot be argued with.
+    """
+    n = 0
+    js = bare_js(open(os.path.join(ROOT, "assets", "js", "planner.js"),
+                      encoding="utf-8").read())
+    want = {}
+    for name in ("DAY_MIN", "DAY_MAX", "PARTY_MIN", "PARTY_MAX"):
+        m = re.search(r"\b%s\s*=\s*(\d+)" % name, js)
+        if not m:
+            fail("planner.js no longer declares %s, so the day and party "
+                 "bounds are typed numbers again and nothing compares them "
+                 "with the form the reader actually uses" % name)
+        else:
+            want[name] = int(m.group(1))
+    # Every clamp OF THESE TWO QUANTITIES must read the declaration. Scoped
+    # to the statements that clamp a day count or a party size, because the
+    # first version matched any nested Math.max/Math.min and flagged
+    # `Math.max(1, Math.min(14, r[i].nights + by))` — the per-leg nights
+    # nudge, a real clamp of a different quantity. An instrument that
+    # reports a true thing about the wrong subject is the fault this file
+    # records about a caption it could not tell from a credit.
+    for label, pat, names in (
+            ("the day count", r"(?:form\.days\.value\s*=|\bdays:)[^;\n]*",
+             ("DAY_MIN", "DAY_MAX")),
+            ("the party size", r"(?:form\.travellers\.value\s*=|\btravellers:)"
+                               r"(?:[^;]|\n)*?\)\)", ("PARTY_MIN", "PARTY_MAX"))):
+        for stmt in re.findall(pat, js):
+            if "Math.max" not in stmt and "Math.min" not in stmt:
+                continue
+            n += 1
+            bare = re.findall(r"Math\.(?:max|min)\(\s*(\d+)", stmt)
+            if bare:
+                fail("planner.js clamps %s with the literal %s where it "
+                     "should read %s or %s. A number typed beside the "
+                     "declaration is the copy that gets left behind: %s"
+                     % (label, ", ".join(bare), names[0], names[1],
+                        " ".join(stmt.split())[:90]))
+            elif not any(nm in stmt for nm in names):
+                fail("planner.js clamps %s without reading %s or %s, so the "
+                     "bound the form publishes and the bound the script "
+                     "enforces are two decisions again: %s"
+                     % (label, names[0], names[1],
+                        " ".join(stmt.split())[:90]))
+    if len(want) == 4:
+        html = open(os.path.join(ROOT, "site", "plan", "index.html"),
+                    encoding="utf-8").read()
+        for field, lo, hi in (("days", "DAY_MIN", "DAY_MAX"),
+                              ("travellers", "PARTY_MIN", "PARTY_MAX")):
+            m = re.search(r'<input[^>]*name="%s"[^>]*>' % field, html)
+            n += 1
+            if not m:
+                fail("/plan no longer ships a %s field, so the planner's "
+                     "%s/%s bounds are enforced by script only and a reader "
+                     "cannot see them" % (field, lo, hi))
+                continue
+            tag = m.group(0)
+            for attr, key in (("min", lo), ("max", hi)):
+                a = re.search(r'\b%s="(\d+)"' % attr, tag)
+                n += 1
+                if not a:
+                    fail("/plan's %s field publishes no %s, while planner.js "
+                         "clamps to %s=%d. A clamp a reader cannot see is the "
+                         "silent-adjustment fault this page is written against"
+                         % (field, attr, key, want[key]))
+                elif int(a.group(1)) != want[key]:
+                    fail("/plan's %s field publishes %s=%s and planner.js "
+                         "clamps at %s=%d. The control and the code disagree "
+                         "about what this planner will build."
+                         % (field, attr, a.group(1), key, want[key]))
+    return n
+
+
+@check("the planner reports the plan it ran, not the sentence it read")
+def c_plan_reports_what_it_ran():
+    """A READBACK THAT REPORTS THE PARSE RATHER THAN THE PLAN IS NOT A
+    READBACK, AND THIS PAGE'S WHOLE CLAIM IS THAT IT IS ONE.
+
+    /plan ships the sentence: it "shows you exactly what it understood,
+    naming anything it could not take account of rather than quietly
+    dropping it". `readbackHtml` was handed `got` — the parse — while
+    `plan()` was handed `opts`, what actually ran, and `goFromSentence`
+    calls the plan FOUR LINES BEFORE it composes the readback, so every
+    disagreement was already known and thrown away. Three of them shipped:
+
+        you typed        the page said       the plan did
+        for 4 people     "for 4"             priced one person
+        2 days           "2 days"            built 3
+        in Slovakia      "within Slovakia"   planned all of Europe
+
+    The party size was the expensive one. `applyAsk` never set
+    `form.travellers`, so `costOf` multiplied food, transport and
+    activities by the control's default of one: measured on "Ten days in
+    Italy starting in Rome for 4 people", the total was EUR 1,491 against a
+    real EUR 4,958 — 70% under, on the one number in this product a reader
+    could act on and be wrong about.
+
+    The geography was the dishonest one, because it was not silence but a
+    false statement, and `opts.geoTooNarrow` was set for exactly this and
+    read NOWHERE — `kindfilters` and `data-rotate` again, a constraint
+    computed on every run and discarded.
+
+    Asserted at the SOURCE, because none of it is in the shipped HTML: the
+    readback is composed at runtime, and a page that reports its plan and a
+    page that reports its parse are the same bytes until somebody types a
+    sentence. The browser suite drives the three sentences; this asserts the
+    wiring that makes them possible, so the two cannot drift apart.
+    """
+    n = 0
+    # Comments stripped: the paragraph in planner.js explaining that
+    # `opts.geoTooNarrow` was read NOWHERE contains those words, and the
+    # first version of this scan counted that sentence as the read and went
+    # green on the exact state it refuses. See bare_js.
+    js = bare_js(open(os.path.join(ROOT, "assets", "js", "planner.js"),
+                      encoding="utf-8").read())
+    # 1. The readback has to be given the plan's own object, and be called
+    #    with it.
+    n += 1
+    if not re.search(r"function readbackHtml\(\s*got\s*,\s*opts\s*\)", js):
+        fail("planner.js's readbackHtml no longer takes the plan's opts, so "
+             "it can only report what the sentence said and not what the "
+             "route below it actually is")
+    n += 1
+    if not re.search(r"readbackHtml\(\s*got\s*,\s*opts\s*\)", js):
+        fail("planner.js composes the readback without handing it the opts "
+             "the plan ran on: the argument exists and the call site does "
+             "not use it, which is the parsed-echoed-and-dropped fault in "
+             "the instrument written to catch it")
+    # 2. Every constraint the plan computes for the reader must be read.
+    #    `opts.geoTooNarrow` was assigned once and consumed nowhere.
+    for flag in sorted(set(re.findall(r"opts\.(\w+)\s*=\s*true", js))):
+        n += 1
+        reads = len(re.findall(r"(?:ran|opts)\.%s\b" % flag, js))
+        if reads < 2:
+            fail("planner.js sets opts.%s and never reads it. A constraint "
+                 "computed on every run and discarded is the kindfilters "
+                 "failure, and on this page it is worse: the reader is told "
+                 "the constraint was honoured." % flag)
+    # 3. The party size must reach the plan, or the cost is for somebody
+    #    else. THIS HALF IS A WIRING CLAIM AND NOT THE PROMISE: a mutation
+    #    proved it — replacing applyAsk's condition with `if (false)` left
+    #    the words `form.travellers` in place and this check green, which is
+    #    pinning a shape rather than a promise, in a check written against
+    #    that. What the party size actually has to do is change the money,
+    #    and only a browser can see that: `browser-checks.js` types the same
+    #    sentence with and without "for 4 people" and asserts the total
+    #    moves by the factor the cost model declares. Kept here because a
+    #    field applyAsk does not set is a fault a second later, and the
+    #    message says which instrument owns the rest.
+    n += 1
+    m = re.search(r"function applyAsk\(got\) \{(.*?)\n  \}", js, re.S)
+    if not m or "form.travellers" not in m.group(1):
+        fail("planner.js's applyAsk does not set form.travellers, so a party "
+             "size the sentence understood cannot reach readForm and the "
+             "cost is computed for one person while the page says otherwise. "
+             "The behavioural half of this is in browser-checks.js.")
+    return n
+
+
 @check("the dataset loads and validates")
 def c_data():
     d = D.load()
@@ -442,7 +663,12 @@ def c_built():
     expect += 1 + len(d["stories"])
     expect += 2                                   # /plan, /search
     expect += 1 + len(d["taxonomy"]["experience_kinds"]) + 1 + 1   # experiences, kinds, join, business
-    expect += len(d["categories"]) + sum(len(c.get("subs", [])) for c in d["categories"])
+    # A sub earns its page the way a destination facet does, so this term
+    # re-derives the rule rather than counting every declared sub — the same
+    # shape as the `facets_for` term four lines up. Counting declarations
+    # would report a stale build as correct and a correct build as stale.
+    expect += len(d["categories"]) + sum(len(P.subs_with_a_page(d, c))
+                                         for c in d["categories"])
     expect += 1 + len(d["fund"])
     expect += 6                                   # map, events, quiet, my-europe, method, about
     expect += len(d["taxonomy"]["months"])        # /events/<month>
@@ -502,7 +728,23 @@ def c_head():
 def c_brand():
     # docs/brand-lock.md exists because incoming strategy documents keep
     # arriving with a different name on them. This is the enforcement.
-    banned = ["Europe Atlas ·", "Europia", "Via Europa", "Eurovia", "Europe Unbound",
+    # AND THE FIRST ENTRY WAS A GUARD ON A PUNCTUATION MARK. It read
+    # "Europe Atlas ·" — the name plus the middot a page title happens to
+    # put after it — so a page shipping the bare phrase as a NAME passed,
+    # and one did: /how-it-works listed a built feature as
+    # `<h3>Europe Atlas</h3>`, which is the exact string this check exists
+    # to refuse, on a shipped page, for the life of that band. That is the
+    # `fetch.py` blocked-list failure in the brand lock: **a guard on a
+    # label is a guard whoever renames the product gets to choose**, and
+    # here the choice was whether to type a middot after it.
+    #
+    # The bare phrase is refused now, because the site calls this dataset
+    # "the Atlas" 597 times and had exactly one place where it spelled it
+    # as a product name. A naming DISCUSSION belongs in
+    # docs/brand-lock.md, which is not a page and is not scanned — and a
+    # page that needs to explain the name can say "the name proposed by
+    # an incoming strategy document", which is what it means.
+    banned = ["Europe Atlas", "Europia", "Via Europa", "Eurovia", "Europe Unbound",
               "europedoor.example",
               # One word, always. The space turns a product name into a
               # generic phrase, and a generic phrase is unregistrable — which
@@ -2453,15 +2695,60 @@ def c_schema():
                 if kind in ids and ident not in ids[kind]:
                     fail(f"/api/graph.json: {kind} {ident!r} does not exist")
             n += 1
-        floors = {"part_of": 400, "located_in": 400, "near": 1500, "includes": 100,
-                  "serves": 200, "gathers": 50, "about": 20, "happens_in": 40,
-                  "available_at": 10}
-        for rel, floor in floors.items():
-            got = g["relationships"].get(rel, 0)
-            if got < floor:
+        # THE FLOOR USED TO BE NINE RELATIONSHIPS TYPED HERE, and it was a
+        # second declaration of which relationships exist — written from the
+        # ones that happened to be non-zero the day it was written. So
+        # `stops_at` had no floor, shipped at 0 for the life of the graph and
+        # was absent from the counts block rather than showing as a zero. A
+        # floor over the keys that are PRESENT is blind to exactly the case a
+        # floor exists for. `pages.GRAPH_RELATIONSHIPS` is the one
+        # declaration; this reads it, and asserts both directions.
+        declared = P.GRAPH_RELATIONSHIPS
+        for rel, spec in declared.items():
+            n += 1
+            got = g["relationships"].get(rel)
+            if got is None:
+                fail(f"/api/graph.json declares the relationship {rel!r} and "
+                     f"publishes no count for it — a relationship at zero must "
+                     f"read as 0 rather than be absent, which is how this one "
+                     f"stayed invisible")
+                continue
+            floor = spec.get("floor")
+            if floor is None:
+                # A relationship with no floor must say what would create it,
+                # and must not have quietly started working: the day it does,
+                # this goes red and asks for a floor.
+                if not spec.get("awaiting"):
+                    fail(f"the relationship {rel!r} declares neither a floor nor "
+                         f"the authored field that would create it, so nothing "
+                         f"can tell a deliberate zero from a broken derivation")
+                elif got:
+                    fail(f"the relationship {rel!r} is declared as awaiting "
+                         f"{spec['awaiting'][:60]}… and now emits {got} edges — "
+                         f"it needs a floor rather than a trigger")
+            elif got < floor:
                 fail(f"/api/graph.json has {got} {rel!r} edges and this atlas has "
                      f"{floor}+ — a relationship that drops to zero is what nobody notices")
+        # A FLOOR IS A PROXY AND THIS ONE HAS AN EXACT FORM. Every recurring
+        # fixture is held on a country, so every fixture must produce a
+        # country edge — where a round number below the current count would
+        # go on passing if half of them stopped being drawn. 94 of the 150
+        # were invisible to this document for the life of the graph because
+        # the edge was only emitted inside the per-destination loop.
+        fixtures = sum(len(c.get("festivals", [])) for c in d["countries"].values())
+        drawn = sum(1 for e in g["edges"]
+                    if e[2] == "happens_in" and e[3] == "country")
+        n += 1
+        if drawn != fixtures:
+            fail(f"/api/graph.json draws {drawn} event-to-country edges and this "
+                 f"atlas holds {fixtures} recurring fixtures — a fixture that is "
+                 f"not on a destination is still on a country")
+        for rel in g["relationships"]:
             n += 1
+            if rel not in declared:
+                fail(f"/api/graph.json publishes the relationship {rel!r} and "
+                     f"pages.GRAPH_RELATIONSHIPS does not declare it: it has no "
+                     f"floor and no trigger")
         # A weight is a measurement or it is absent. There is no relevance
         # score, because nobody computed one from anything.
         for row in g["edges"]:
@@ -7843,6 +8130,365 @@ def c_unique_ids():
     if not n:
         fail("no page carries an id at all — this check has stopped finding "
              "the thing it is about")
+    return n
+
+
+
+@check("a page relates a journey to the thing the graph actually relates it to")
+def c_journey_claim_subject():
+    """A PLACE PAGE SAID "Journeys that stop here" AND THE EDGE WAS ABOUT THE TOWN.
+
+    `back[cid]["journeys"]` is every journey with a leg in this destination.
+    On a place page that became a claim about the place: the Alpine Grand
+    Tour has a night in Chamonix and says nothing about the Mer de Glace, and
+    96 of the 255 place pages asserted the route stops at a glacier on the
+    strength of it visiting the valley. Nothing could see it — the links were
+    right, the journeys were right, and only the heading was wrong, which is
+    the half no count reads.
+
+    `graph_api` already refuses to manufacture that edge: `stops_at` exists
+    in the vocabulary, is published at 0, and waits on a `places` list being
+    written on a journey leg. So the promise here is one sentence — **a page
+    may name a place as the subject of a journey relation only when the graph
+    holds an edge from a journey to a place** — and it is checked against the
+    published count rather than against a heading this check happens to know,
+    because a check that greps for the old wording is satisfied by any new
+    wording that makes the same claim.
+    """
+    n = 0
+    gpath = os.path.join(OUT, "api", "graph.json")
+    with open(gpath, encoding="utf-8") as fh:
+        stops = json.load(fh)["relationships"].get("stops_at", 0)
+    from lib import urls as U
+    d = D.load()
+    for cid, node in d["cities"].items():
+        c, r, t = node["country"], node["region"], node["city"]
+        for pl in t.get("places", []):
+            path = os.path.join(OUT, *U.place(c, r, t, pl).strip("/").split("/"),
+                                "index.html")
+            if not os.path.exists(path):
+                continue
+            body = open(path, encoding="utf-8").read()
+            if "/journeys/" not in body:
+                continue
+            n += 1
+            # The heading that stands over the journey links. A place page
+            # linking journeys must name the DESTINATION in it while the
+            # graph holds no journey-to-place edge; the day `stops_at` is
+            # real, the place's own name becomes available and this relaxes
+            # by itself rather than by somebody editing the check.
+            m = re.findall(r"<h2[^>]*>([^<]*[Jj]ourney[^<]*)</h2>", body)
+            if not m:
+                fail(f"{U.place(c, r, t, pl)} links a journey under no heading "
+                     f"naming one, so nothing says what the relation is")
+                continue
+            # ONE NORMALISER, BOTH SIDES — this repository's most repeated
+            # rule, and the first draft of this check broke it. "Ortisei &
+            # the Dolomites" is `&amp;` in the shipped HTML and `&` in the
+            # record, so five correct pages were reported as making the claim
+            # the check exists to refuse. The heading is unescaped rather
+            # than the name escaped, because what a reader gets is the
+            # unescaped form and that is the thing being judged.
+            head = html.unescape(" ".join(m))
+            if stops == 0 and t["name"] not in head:
+                fail(f"{U.place(c, r, t, pl)} heads its journeys "
+                     f"{head.strip()!r} — the edge behind them runs to "
+                     f"{t['name']}, and /api/graph.json holds {stops} "
+                     f"journey-to-place edges, so the place cannot be the "
+                     f"subject of that sentence")
+    if n == 0:
+        fail("no place page links a journey — this check has stopped "
+             "examining the family it was written for")
+    return n
+
+
+@check("no image ships without its intrinsic size")
+def c_img_dimensions():
+    """An `<img>` with no width and height reserves nothing until it loads.
+
+    THE STATIC HALF OF A LAYOUT SHIFT. §49 of Build Package v1 asks for
+    "excellent Core Web Vitals" and nothing in this repository had ever
+    measured one: `weight.home_kb` and `weight.max_page_kb` are ceilings on
+    BYTES, and bytes say nothing about whether a page throws its own content
+    down the screen after painting. The browser suite measures the effect
+    now — every family at 1280, and twenty-nine of thirty are exactly
+    0.0000 — and this is the cause: a box whose size the browser can compute
+    from the markup cannot move when its bytes arrive.
+
+    It is asserted here as well as there because the two are different
+    questions. This one is true of a page nobody has rendered, costs
+    milliseconds, and names the file; the browser's answer costs a browser
+    and catches the shifts an attribute cannot prevent — the one that
+    motivated it was a script replacing a complete 1,185-pixel band with a
+    one-line loading state and putting it back.
+    """
+    bad, n = [], 0
+    for f in site_files():
+        body = open(f, encoding="utf-8").read()
+        for m in re.finditer(r"<img\b[^>]*>", body):
+            n += 1
+            t = m.group(0)
+            if "width=" not in t or "height=" not in t:
+                bad.append(f"{rel(f)}: {t[:90]}")
+    if bad:
+        fail(f"{len(bad)} of {n} images ship with no intrinsic size, so the "
+             f"page reflows when they arrive: {bad[0]}")
+    # A FLOOR DERIVED FROM THE REGISTER, BECAUSE THE FIRST ONE WAS A CLAIM
+    # ABOUT THE PRODUCT'S CONTENTS WEARING A CLAIM ABOUT THIS CHECK'S REACH.
+    # It read `if n < 100`, which is true of the site as it ships and false
+    # of the site `photo-tests.py` builds: that suite frees purposes and
+    # acquires against a stub, so its build legitimately carries eighteen
+    # images, and the gate suite that guards photographs went red on the
+    # commit that added this floor. That is the *empty-register fault* for
+    # the fifth time on this record, and the same shape as the desk suite's
+    # `reg_now == {}`.
+    #
+    # What a floor here can honestly say is that every registered photograph
+    # reaches a page, which is a quantity the register decides: an empty
+    # register means no images, and a check with no subject is not a check
+    # that has stopped working.
+    rows = len(json.load(open(os.path.join(ROOT, "data", "images.json"),
+                              encoding="utf-8"))["images"])
+    if n < rows:
+        fail(f"{n} images on the site against {rows} registered photographs "
+             f"— either this check has stopped finding them or a licensed "
+             f"photograph reaches no page")
+    return n
+
+
+@check("time-based media carries captions, and today there is none")
+def c_captions():
+    """§57 asks for "captions where appropriate" and nothing here is
+    appropriate: the built site contains no `<video>` and no `<audio>`.
+
+    A requirement satisfied by absence is the easiest kind to lose, because
+    the day somebody embeds a clip there is nothing to go red — the same
+    shape as every "code path nothing exercises" failure on this record,
+    written in advance for once rather than after. So the guard is here
+    while the count is zero, and it fails on the first media element that
+    ships without a captions track.
+
+    It counts PAGES rather than media, because a check reporting `(0)` looks
+    exactly like the two this repository found examining nothing.
+    """
+    n = 0
+    for path in site_files():
+        n += 1
+        h = open(path, encoding="utf-8").read()
+        for tag in ("<video", "<audio"):
+            i = h.find(tag)
+            while i != -1:
+                end = h.find(">" if tag + ">" in h[i:i + 400] else "</", i)
+                block_ = h[i:h.find("</" + tag[1:] + ">", i) + 8] if ("</" + tag[1:] + ">") in h[i:] else h[i:i + 400]
+                if 'kind="captions"' not in block_ and 'kind="subtitles"' not in block_:
+                    fail(f"{canonical_of(path)}: a {tag[1:]} element with no captions "
+                         f"track. WCAG 2.2 AA asks for captions on time-based "
+                         f"media, and this site had none at all until now")
+                i = h.find(tag, i + 1)
+    return n
+
+
+@check("nothing on this site is advertising, and nothing looks as though it is waiting to be")
+def c_ads_off():
+    """§2, §11, §28, §29 and §33 of the advertising specification, measured.
+
+    THE MARKER IS WHAT IS TESTED, NEVER THE WORDS. /for-businesses publishes
+    the whole disclosure vocabulary — it is the page an advertiser reads — and
+    the Stay layer's own disclosure carries the word *sponsored* on 319
+    destination pages because a referral under a partner credential has to. A
+    check greping for "Sponsored" would therefore fail on two surfaces that
+    are correct and could never be made to pass, which is the shape of guard
+    somebody deletes. `class="adband` and `data-placement=` are emitted by
+    `render.ad_slot()` and by nothing else, so they are the honest subject.
+
+    AND ZERO BYTES IS THE ASSERTION rather than "hidden". A hidden container
+    still reserves markup, still ships a class a stylesheet can size, and
+    still gives the next person somewhere to put a height. The brief asks
+    that the normal layout close the space; an empty string is the only
+    version of that a static check can hold, and `browser-checks.js`
+    measures the other half — every family at 0.0000 of layout shift.
+    """
+    marked = [rel(f) for f in site_files()
+              if 'class="adband' in open(f, encoding="utf-8").read()
+              or "data-placement=" in open(f, encoding="utf-8").read()]
+    if marked:
+        fail(f"{len(marked)} page(s) carry an advertising slot while the "
+             f"registry says nothing is serving: {marked[:3]}")
+    # §32's launch checklist, as fourteen assertions rather than a paragraph.
+    # Nine things must EXIST and five must be FALSE, and the five are what
+    # makes this more than a feature flag: one flag is never the whole gate,
+    # which is the sister repository's own recorded lesson about a `status`
+    # field that went inert.
+    reg = ADS.load()
+    if ADS.entity():
+        fail("data/advertising.json names an operating entity, and "
+             "docs/legal-position.md records that none is incorporated")
+    if reg["serving"].get("enabled"):
+        fail("serving.enabled is true: switching advertising on is a pull "
+             "request, not a field somebody flips")
+    on = [k for k, v in ADS.flags().items() if v]
+    if on:
+        fail(f"advertising flags are set: {on}")
+    live = [p["slug"] for p in ADS.placements() if p.get("enabled")]
+    if live:
+        fail(f"placements are enabled: {live}")
+    lit = [x["slug"] for x in ADS.surfaces() if x.get("enabled")]
+    if lit:
+        fail(f"surfaces are enabled: {lit}")
+    if reg["events"].get("firing"):
+        fail("events.firing is true, and there is no analytics pipeline in "
+             "this product to receive an impression")
+    if reg["planner"].get("may_influence"):
+        fail("the registry says advertising may influence the Guide, which "
+             "is the one separation §9 exists for")
+    if reg["revenue_models"]["implemented"]:
+        fail(f"a revenue model is implemented: "
+             f"{reg['revenue_models']['implemented']}")
+    if reg["revenue_models"].get("payment_provider"):
+        fail("a payment provider is declared, which is out of scope in the "
+             "brief and behind the entity gate here")
+    for table in ("advertisers", "campaigns", "creatives"):
+        if reg[table]:
+            fail(f"{table} is not empty while nothing may serve")
+    if ADS.may_serve():
+        fail("ads.may_serve() is true with no campaign, which means the "
+             "five conditions have stopped being conditions")
+    if ADS.served():
+        fail(f"{len(ADS.served())} campaign(s) would render")
+    # The nine that must EXIST, because a registry that has quietly lost its
+    # tables reports the same green as one that is correctly switched off —
+    # which is this file's own *a green run that has stopped counting*.
+    if len(ADS.placements()) != 9:
+        fail(f"{len(ADS.placements())} placements declared, and §5 names nine")
+    if len(ADS.statuses()) != 9:
+        fail(f"{len(ADS.statuses())} campaign statuses, and §4 names nine")
+    if len(reg["targeting"]["dimensions"]) != 6:
+        fail("§6 names six targeting dimensions")
+    if len(ADS.flags()) != 5:
+        fail("§26 names five feature flags")
+    if len(reg["phases"]) != 4:
+        fail("§26 names four phases")
+    if len(reg["events"]["names"]) != 5:
+        fail("§16 names five analytics events")
+    if len(reg["revenue_models"]["supported_later"]) != 6:
+        fail("§20 names six revenue models")
+    if not ADS.disclosures():
+        fail("no disclosure vocabulary, so nothing constrains what a paid "
+             "band may call itself")
+    if not ADS.refused_networks():
+        fail("the third-party network refusal has emptied itself")
+    # And the write methods refuse rather than returning a falsy value
+    # nobody checks: a write that quietly does nothing is a write somebody
+    # builds a UI on top of.
+    for fn, what in ((ADS.create_campaign, "create"),
+                     (ADS.approve_campaign, "approve")):
+        try:
+            fn("x") if what == "approve" else fn(slug="x")
+        except PermissionError:
+            pass
+        else:
+            fail(f"ads.{what}_campaign() did not refuse")
+    return len(site_files())
+
+
+@check("the wall between editorial and commerce says the same thing on the page and in the mechanism")
+def c_ads_wall():
+    """/for-businesses' own procedure: if the wall moves, it moves in public.
+
+    BOTH DIRECTIONS, because either drifting alone is the failure. A page can
+    keep a promise the mechanism has stopped keeping — which is what the
+    sentence *paid tiers buy presentation on directory surfaces* became the
+    moment nine editorial placements were declared — and a mechanism can be
+    quietly stricter than the page a reader is reading, which is worse,
+    because then the published position is the looser of the two.
+
+    It also asserts the page states the sentence it REPLACED. A wall that
+    moves without saying what it used to say has not moved in public.
+    """
+    h = open(os.path.join(OUT, "for-businesses", "index.html"),
+             encoding="utf-8").read()
+    # AND THE TYPOGRAPHIC APOSTROPHE IS THE THIRD NORMALISER THIS COMPARISON
+    # NEEDED. The data loader curls every possessive — 2,165 of them, and a
+    # check already fails when one ships straight — so *a destination's
+    # score* in the registry reaches the page as *destination\u2019s*, and the
+    # two would never meet. One representation, both sides: this reads the
+    # page's own form back to the registry's.
+    def flatten(t):
+        return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", t))
+                      ).lower().replace("\u2019", "'").replace("\u2014", "-")
+
+    flat = flatten(h)
+    w = ADS.wall()
+    n = 0
+    for field in ("position", "surfaces", "replaced"):
+        n += 1
+        want = flatten(w[field]).strip().rstrip(".")
+        if want not in flat:
+            fail(f"/for-businesses does not state the wall's {field}: "
+                 f"{want[:70]!r}")
+    if w["published_on"] != "/for-businesses":
+        fail(f"the registry says the wall is published on "
+             f"{w['published_on']!r} and this check reads /for-businesses")
+    # AND EVERY PLACEMENT IS NAMED ON THAT PAGE, because a declared slot
+    # nobody can read about is an architecture with no disclosure.
+    for pl in ADS.placements():
+        n += 1
+        if flatten(pl["name"]) not in flat:
+            fail(f"/for-businesses does not name the placement "
+                 f"{pl['name']!r}, so the architecture is unpublished")
+    return n
+
+
+@check("a paid placement may never wear an editorial word, and no ad network is named anywhere")
+def c_ads_separation():
+    """§8, §17, §18, §21 and §25's separation, asserted where it can be.
+
+    Three promises with three different subjects. **The disclosure
+    vocabulary is closed**, so a campaign cannot invent one — and the four
+    words §17 refuses by name are refused in the registry rather than in a
+    comment, because the guard has to be the thing `creative_problems()`
+    reads. **No third-party ad host may be named** in any page or any
+    script, which is the same form as the commercial-map-host refusal this
+    repository already runs: adopting one changes the security posture of
+    every page, so it cannot arrive as a tag somebody added. **And
+    `planner.js` may not know the registry exists** — §9 asks that the Guide
+    and the commercial layer be independent, and independence is
+    demonstrated by the recommendation code having no reference to reach.
+    """
+    reg = ADS.load()
+    n = 0
+    for word in reg["disclosure_refused"]:
+        n += 1
+        if word in ADS.disclosures():
+            fail(f"{word!r} is both a refused word and a declared "
+                 f"disclosure, which is the vocabulary agreeing with nobody")
+    for key in ADS.refused_campaign_keys():
+        n += 1
+        if f'"{key}"' in json.dumps(reg["entities"]["campaigns"]):
+            fail(f"the campaign entity declares {key!r}, which §8 refuses: "
+                 f"a field a ranking could read is a ranking waiting to be "
+                 f"written")
+    hosts = [h.lower() for h in ADS.refused_networks()]
+    for path in site_files() + [os.path.join(ROOT, "assets", "js", f)
+                                for f in sorted(os.listdir(
+                                    os.path.join(ROOT, "assets", "js")))]:
+        body = open(path, encoding="utf-8").read().lower()
+        n += 1
+        for host in hosts:
+            if host in body:
+                fail(f"{rel(path) if path.startswith(OUT) else path} names "
+                     f"the advertising host {host!r}. An external network "
+                     f"needs a script origin and an image origin, so "
+                     f"adopting one is an owner's decision about all "
+                     f"{len(site_files())} pages rather than a build step")
+    js = bare_js(open(os.path.join(ROOT, "assets", "js", "planner.js"),
+                      encoding="utf-8").read())
+    n += 1
+    for token in ("advertising", "adslot", "sponsor", "campaign"):
+        if token in js.lower():
+            fail(f"planner.js refers to {token!r}. §9 asks that the Guide "
+                 f"and the commercial layer be independent, and a "
+                 f"recommendation engine that can see a campaign is not")
     return n
 
 

@@ -6096,6 +6096,541 @@ eight categories keep one flat list under it (nature 11/15/**2**, history
 18/11/**1**, luxury one band) and keep the band on the row, because there it
 distinguishes.
 
+
+**A READBACK THAT REPORTS THE PARSE RATHER THAN THE PLAN IS NOT A READBACK,
+AND THIS PAGE'S WHOLE CLAIM IS THAT IT IS ONE.** /plan ships the sentence
+that it *"shows you exactly what it understood, naming anything it could not
+take account of rather than quietly dropping it"*, and `section-audit.py`
+published the matching verdict: *ten of the eleven inputs are taken and every
+one of them moves the answer.* True of the FORM and false of the sentence box
+in three places. `goFromSentence` calls `plan(opts)` **four lines before** it
+composes `readbackHtml(got)`, so every disagreement was already known and the
+readback was handed the wrong object:
+
+| you typed | the page said | the plan did |
+|---|---|---|
+| `for 4 people` | "for 4" | priced one person |
+| `2 days in Vienna` | "2 days" | built three |
+| `A week in Slovakia` | "within Slovakia" | planned the whole continent |
+
+**The party size was the expensive one.** `applyAsk` set days, budget, month,
+style, pace, start and interests and never `form.travellers`, so `readForm`
+read the control's default of one. The cost model is careful — a double is not
+twice a single, so the second traveller adds 55% of a room and everything else
+scales linearly — and all of it was spent on the wrong number: measured in
+Chromium on one sentence with and without four people, **€1,491 against
+€4,958**, accommodation ×2.65 exactly and food, transport and activities ×4. A
+party of four saw a total **70% under its own cost**, on the one number in this
+product a reader could act on and be wrong about.
+
+**The geography was the dishonest one, because it was not silence but a false
+statement.** `plan()` honours a named country only where four destinations sit
+inside it, and **12 of the 47 countries in the planner index hold fewer** —
+Monaco, San Marino and Vatican City one; Slovakia, Montenegro, Cyprus, Kosovo,
+North Macedonia and Azerbaijan three. `opts.geoTooNarrow` was set for exactly
+this and **read nowhere**, which is `kindfilters` and `data-rotate` again.
+
+**And the browser suite already asserted the party size — through the FORM,
+with the same cost band.** *A code path nothing exercises is a code path
+nothing checks*, and here the exercised path was right and the unexercised one
+was wrong, in the same function. `DAY_MIN`, `DAY_MAX`, `PARTY_MIN` and
+`PARTY_MAX` are declared once and asserted against **the `min` and `max` the
+form actually ships**, because comparing four typed copies to each other goes
+green the moment somebody types the same number twice — the dispatch cap
+exactly. See `docs/plan-redesign.md`.
+
+**AND TWO OF THE THREE NEW CHECKS WERE GREEN ON THE STATE THEY EXIST TO
+REFUSE, BOTH FOUND BY MUTATION.** The flag scan asserts that every constraint
+the planner computes is read back — and the paragraph in `planner.js`
+explaining that `opts.geoTooNarrow` was *read nowhere* contains those words, so
+deleting the real read left it passing. **Seventh occurrence of an instrument
+reading the documentation of code as code, and the first where the check and
+the comment that defeated it were written in the same commit.** `bare_js()`
+now does for a script what `bare_css()` does for the stylesheet, stepping over
+string literals rather than stripping them because `https://` inside one is not
+a comment, and its output is asserted to still parse. The other: replacing
+`applyAsk`'s condition with `if (false)` left the words `form.travellers` in
+place and the check green — a shape rather than a promise, in a check written
+against that, so the static half says only what it can and its message names
+the instrument that owns the rest. **A check is not proved by passing; it is
+proved by failing on the thing it is about.**
+
+**AND A SPECIFICATION ARRIVING AGAIN IS AN AUDIT RATHER THAN A BUILD.** §1–13
+of the product specification are already absorbed and asserted section by
+section — `tools/section-audit.py` tracks every one of them with a published
+verdict and its own assertions, and CI fails when one stops being true —
+run `python3 tools/section-audit.py --check` for the totals, which is the
+rule this sentence broke on its first draft by copying them here. So the
+answer to "what is the gap" is generated rather than argued: §5's navigation is
+the specified nine items in the specified order, §11's essential information is
+every field on its list except visa and emergency, **which are refused as
+unverified** with `docs/legal-position.md` behind them, and the traveller types
+are seven with a route, two derived by published rule, and accessibility needs
+held nowhere at all. **The gap the audit did NOT know was the one above**,
+because §10's assertions proved the arithmetic exists — `bedFactor` is in the
+file — which is not the claim that the input reaches it.
+
+**AND ONE CONTENT GAP IS RECORDED RATHER THAN INVENTED: NO JOURNEY HERE IS
+SHORTER THAN A FORTNIGHT.** The seventeen run 14 to 34 days, median 19, and the
+specification asks for a seven-day one by name. The data does not agree with
+the shape of the index: **282 of 319 destinations are a complete trip in three
+nights or fewer** and 181 in a single night, every one authored per destination
+in `nights`. A journey is an authored editorial record — legs, nights, a
+summary and a route — so four short journeys are a writing task and not a
+derivation, and inventing them would be authoring a measurement. The planner
+answers a weekend today ("weekend" parses to three days, "long weekend" to
+four), and the trigger for the index is somebody writing them.
+
+
+**THE INSTRUMENT HAD FIVE OF THE POPUP'S SIX FIELDS AND NONE OF ITS
+PICTURES.** /map's popup prints a destination's name, country, region,
+summary and link off the baked `mapinfo` block, and the register holds a
+photograph for **105 of the 319** — which the one page whose whole job is
+opening a destination showed none of. The three fields are the derivative
+URL, the photographer's own alt and the fragment `render.credit_html`
+composes: **46,505 raw bytes and 10,045 over the wire**, measured by gzipping
+the page with the fields and without, and `weight.max_page_kb` moved 444 →
+489 with that arithmetic in the register. **The credit is carried rather than
+composed in the browser** because it is a licence obligation with exactly one
+implementation here — the same reason the planner receives
+`cities.shotCredit` — and it is shown at `opacity: 1` rather than revealed on
+hover, because a popup is transient and a credit nobody can reach is not a
+credit. Reading it out of `/api/atlas.json` instead would trade 10 KB against
+a 350 KB fetch to show one picture.
+
+**/search PRINTED 550 AND SHIPPED 1,064.** The head was a hand-assembled sum
+of SEVEN collections and `search_api` writes TWELVE kinds, so the page
+understated its own index by **514 records** — all 255 places, all 197
+experiences, the seventeen interests, the thirty-six categories and the nine
+corners of Europe — on the one page whose entire subject is the extent of an
+index. The resting state listed the same seven under a sentence promising
+"every kind is browsable without searching at all", which is the `pop_line`
+shape: a list that omits part of its own set reads as a policy. Both are
+derived from the rows the browser filters now.
+
+**AND THE REPAIR PUT THE PAGE OVER THE MONOTONY CEILING — 56% AGAINST 52,
+twelve rows of one component on a 1,783-pixel page.** Shortening the list is
+the one fix this page cannot take. What the count-sorted list threw away is
+that the twelve are not flat: five of them NEST — nine corners of Europe, 50
+countries, 130 regions, 319 destinations, 255 places — and seven cut ACROSS
+that. Sorting by size put Places above Countries, which is arithmetically
+true and says the wrong thing about a nested atlas. Two bands, **56% →
+31%**, and the chain is a classification while every count beside it is a
+measurement. **And taking the plural verbatim matters on exactly one row**:
+lower-casing a heading and re-capitalising its first letter printed *"Regions
+of europe"*, which is pluralising-by-adding-an-s one fault over.
+
+**`stops_at` WAS DERIVED, COUNTED AND DROPPED FOR THE LIFE OF THE GRAPH, AND
+THE FLOOR WRITTEN TO CATCH EXACTLY THAT COULD NOT SEE IT.** `gathers` shipped
+at zero once and the repair was a count per relationship in
+`/api/graph.json` and a floor on each in `checks.py`. That floor was **a
+hand-typed list of the NINE relationships that happened to be non-zero the
+day it was written** — and `journey stops_at place` reads `leg.get("places")`,
+a field **none of the 121 legs in this dataset has ever carried**, so it
+emitted nothing, and the counts block could not show it because it was built
+from the edges that were EMITTED. **A floor over the keys that are PRESENT is
+blind to exactly the case a floor exists for.** `pages.GRAPH_RELATIONSHIPS` is
+the one declaration now: `graph_api` seeds its counts from it so a zero is
+published rather than absent, raises on an edge type the table does not
+declare, and `checks.py` reads that table rather than naming nine
+relationships a second time. Each row carries a `floor` or an `awaiting`
+sentence naming the authored field that would create it. Proved red five
+ways, including the two that are about the instrument: a relationship at zero
+omitted rather than published, and one declared as awaiting that starts
+emitting.
+
+**AND IT IS NOT DERIVED FROM THE LEG'S DESTINATION, WHICH IS THE AVAILABLE
+SHORTCUT.** A journey passing through Vienna does not stop at the
+Kunsthistorisches. Asserting it does would author an editorial claim out of a
+containment fact, which is the Data Integrity Rule, and it is why this
+relationship waits on somebody writing the field rather than being filled in.
+
+**AND 96 PLACE PAGES HAD ALREADY MADE THAT CLAIM IN PROSE.** `back[cid]
+["journeys"]` is every journey with a leg in the TOWN, and the place page
+headed it **"Journeys that stop here"** — so the Alpine Grand Tour, which has
+a night in Chamonix and says nothing about the Mer de Glace, was published as
+stopping at a glacier. The links were right, the journeys were right, and
+only the heading was wrong, which is the half no count reads; `section-audit`
+asserted the literal string, so the audit was green ON the defect. The
+heading names the destination now — *"Journeys through Chamonix"*, the form
+the region page has always used for the same relation one level up — with a
+lede saying what is not held. `c_journey_claim_subject` is on the **promise
+rather than the wording**: a page may name a place as the subject of a
+journey relation only when the graph holds a journey-to-place edge, read off
+the published count, so it relaxes by itself the day `stops_at` is real.
+Proved red on all 96.
+
+**94 OF 150 RECURRING FIXTURES WERE INVISIBLE TO THE KNOWLEDGE GRAPH.** A
+festival is held on the COUNTRY and 56 of them name a city, and the edge was
+only emitted inside the per-destination loop — so /events published 150 and
+the graph knew 56, which is the `pop_line` shape arriving in an index rather
+than in a sentence. Both edges are drawn now, because both are true and they
+answer different questions; `part_of` and `located_in` already target two
+entity types each, so one relationship with two targets is this document's
+own idiom. `happens_in` 56 → 206. **And the guard is the exact form rather
+than the floor**: every fixture must produce a country edge, because a round
+number below the current count goes on passing when half of them stop being
+drawn.
+
+**NINE ASSERTIONS IN THE SECTION AUDIT READ `x in SPEC or True`.** §36's
+subject is whether the specification's thirty-two entities exist in the
+model, and nine of its assertions were True whatever the model held — the
+`c_photo_safe_area`-matching-nothing failure with the tell written into the
+source. Each entity is counted off the running data now, or named as held
+under another shape, or named as refused **against the promise that refuses
+it** — and three of those refusals were pointed at the wrong file or the
+wrong wording on the first run, which is the point of asserting them. 12
+assertions → 28. §37 read **BUILT** while its own summary named place →
+journey; it is PARTIAL, and its assertions read the published graph rather
+than a page heading. 4 → 13.
+
+**AND EIGHT OF THE NINE STORIES HAD A DERIVABLE JOURNEY AND LINKED NONE.**
+§34 asks an article record for "Related journeys"; measured, the nine stories
+have one to six journeys with a leg in a destination they are written about,
+and every story page linked zero. **Both ends of this relation are
+destinations** — a story's `places` and a journey's legs — so nothing is
+manufactured by drawing it, which is exactly what separates it from the edge
+the graph publishes at zero. The heading was written honestly the first time
+for once: *"Journeys through these places … They are not about the story."*
+And an authored **SEO title is refused** rather than added: the headline, the
+tab title and the og:title are one string, and a second name for one thing is
+two names waiting to disagree.
+
+**A CHECK APPENDED AFTER `main()` IS DEFINED AND NEVER REGISTERED, AND THE
+RUN STILL SAYS EVERY CHECK PASSED.** Sixty lines of new check went on the end
+of `checks.py`, below `if __name__ == "__main__": main()`, so the decorator
+ran after the suite had finished: the run reported every check passing on the
+same total as before, with no error anywhere. That is *a green run that
+has stopped counting* arriving through the file's own layout rather than
+through a shadowed variable. **Read the total, not the word.**
+
+**AND THE CHECK'S FIRST DRAFT BROKE THIS FILE'S MOST REPEATED RULE.** "Ortisei
+& the Dolomites" is `&amp;` in the shipped HTML and `&` in the record, so five
+correct pages were reported as making the claim the check exists to refuse.
+*One normaliser, both sides* — fifth occurrence, and the first inside a check
+written in the same hour as the paragraph recording the fourth. The heading is
+unescaped rather than the name escaped, because what a reader gets is the
+unescaped form and that is the thing being judged.
+
+
+**A PAGE CALLED FJORDS HELD MARSEILLE, AND THE FLOOR THAT WOULD HAVE REFUSED
+IT WAS ONE FAMILY OVER.** `FACET_MIN` is three, and the reason written above
+it is that below three a page is a heading over a list a reader could have
+seen in full on the page they came from. That is exactly true of a
+sub-category — `/experiences/<cat>` lists every invitation the category holds
+— and **the sub-categories never got a floor at all**, so two of the
+twenty-eight shipped a single row. The smaller was worse than thin:
+`/experiences/nature/fjords` declares five keywords, **no experience in this
+atlas mentions a fjord**, and the page matched one thing on `calanque` — so a
+reader arriving from a search for fjords got a French Mediterranean inlet.
+The keyword is not the fault and is kept, because a calanque is a drowned
+valley and the classification is editorial; the fault is publishing a page
+for a subject the atlas holds nothing of. `/experiences/history/renaissance`
+was the other, one entry, Lucca.
+
+**THE FLOOR IS `FACET_MIN` READ RATHER THAN A THIRD THREE TYPED** — the
+dispatch cap's own lesson, where four copies of one number disagreed and a
+whole sitting was spent before anything said so. **And it had to reach four
+callers, of which the check found the third and the fourth found itself**:
+the build loop emits the pages, the category page links them, `search_api`
+indexes them, and `checks.py` re-derives the expected page count. The search
+index was caught by an existing check — *"points at a page which is not
+built"* — and the count check by the rebuild after it. A fifth caller
+inherits the rule for free.
+
+**AND A SUB WITH NO PAGE KEEPS ITS COUNT AND LOSES ITS LINK**, which is this
+atlas's own answer to a map dot the page cannot name: the measurement is real
+and the navigation is not. Dropping the row would hide the very figure that
+explains why there is no page, so the bar and the number stay and one derived
+sentence says which sub, how many it selects, and against what floor — the
+alternative being a row that reads as a broken link. `routes.count` 1,034 →
+1,032 and `routes.hash` moved, which is the deliberate act those rows exist
+to make visible.
+
+**A VERDICT CAN CONTRADICT A LIVE CHECK AND THE AUDIT STAY GREEN, BECAUSE THE
+ASSERTION PINNED A FUNCTION NAME.** §47 published *"distance and mode are
+computed and stated for every hop"* — and `hop_note` REMOVED the mode, with
+its own docstring recording why ("69 km — a local train or a short drive" for
+a leg that is about 170 km round a mountain range), and `checks.py` carries
+`MODE_CLAIMS`, which fails on any page claiming one. Two sentences in this
+repository, in direct contradiction, both true when written. The assertions
+were `"hop_note" in src(...)` and `"hopNote" in src(...)`: symbols that still
+exist, so nothing could see that their behaviour had reversed. **The
+thirteenth assertion here to pin a shape rather than a promise, and the first
+where the shape was a function's NAME.**
+
+Measured, the honest distinction is clean and checkable both ways: **all
+seventeen journeys carry an authored `transport` list** — rail, ferry, bus,
+cable car, postbus, river boat, bicycle, flight, car, on foot — **and none of
+the 121 legs carries one.** A journey's transport is editorial record; a
+hop's mode is refused because a great circle cannot support it. That is the
+Data Integrity Rule stated as a page family. Proved red by putting a `mode`
+on one leg.
+
+**AND §40's TWELVE URL SHAPES ARE ONE LITERAL MATCH AND ELEVEN EQUIVALENTS,
+WHICH THE VERDICT HAD TO SAY.** The specification writes
+`/europe/norway/bergen`; this atlas writes
+`/europe/norway/fjord-norway/bergen`, because **the region is a real level
+with a page of its own** and the breadcrumb a check already validates names
+it — a URL that skips a level the hierarchy has a page at strands every one
+of those pages off the path and makes the path disagree with the breadcrumb. Measured,
+a two-level URL would collide **zero** times today, which is a fact about
+today and not a reason. The other two are a bare `/europe/` prefix, and
+`routes.hash` exists precisely so a URL cannot move without somebody deciding
+to. Of its four experience routes, `castles` has no surface and should not:
+**one experience in this atlas mentions a castle.**
+
+**AND §41 WAS CHECKED FOR THE FAULT THE LAST ROUND FOUND AND DOES NOT HAVE
+IT.** A destination linking a journey it has no leg from was the suspicion —
+Bergen links none — and the measurement says the atlas is right and the
+suspicion was wrong: **journeys derivable on 76 destinations and linked on
+76, themes 88 of 88, stories 32 of 32, and all 100 facet pages linked from
+their own destination.** Every destination carries at least nine inbound
+links and the median is 26. Bergen has no journey because **no journey in
+this dataset visits western Norway at all** — the three Norwegian routes are
+Tromsø and Lofoten — which is the seven-day-journey content gap one family
+over, and inventing a Norwegian Fjord Journey to satisfy a diagram would be
+authoring an editorial record.
+
+
+**EIGHTEEN VERDICTS CHECKED AND EIGHTEEN SURVIVED, WHICH IS WORTH RECORDING
+BECAUSE THE LAST TWO ROUNDS DID NOT.** §53–70 of the specification is mostly
+a backend: an admin dashboard, moderation, fraud prevention, eleven user
+roles, analytics, a contributor programme. Every one is already tracked with
+a verdict that says what needs an account, a server or a socket — so the work
+was falsifying the ones that make a positive claim rather than building.
+
+**§59's was the falsifiable one and it is exactly true.** "Local currency
+alongside euros on every country page, from a dated, rounded, hand-recorded
+table" — measured, all fifty carry a euro figure and the pairing reads
+*"Typical day €115–260 per person ≈ kr1,320–2,990 indicative"*. The table
+declares all ten currencies the specification names plus fourteen more, with
+`as_of` and a note saying a bank's rate will be worse and the date will get
+older; `planner.js` spends it. **The table is read rather than computed and
+discarded**, which was the suspicion worth checking, because this repository
+has now found that shape four times.
+
+**§57 NAMES SEVEN REQUIREMENTS AND THE AUDIT ASSERTED FIVE.** Keyboard
+navigation was measured in the browser and simply never claimed here. And
+**"captions where appropriate" was satisfied by there being no time-based
+media at all** — zero `<video>` and zero `<audio>` on the built site — which
+is the easiest kind of requirement to lose, because absence goes red on
+nothing and the day somebody embeds a clip there is no subject for a check.
+So the guard exists while the count is still zero, written in advance for
+once rather than after the fifth occurrence: it fails on the first media
+element that ships without a captions track, and it counts PAGES rather than
+media, because a check reporting `(0)` looks exactly like the two this
+repository found examining nothing. Proved red on an injected `<video>`.
+
+**§58 SHIPS ONE LANGUAGE OF ELEVEN AND THAT IS THE MECHANISM WORKING.**
+`SHIP_THRESHOLD` is 1.0 and `fr.json` holds 16 of the 57 interface strings,
+so French is a demonstration rather than a locale and the build will not emit
+it. A half-translated language is worse than an untranslated one, and the
+threshold is what makes that a rule rather than an intention. The
+specification's *"do not hard-code text"* applies to the interface chrome,
+which is in `data/strings/`; editorial copy stays beside the thing it
+describes.
+
+**AN AUDIT CAN DISAGREE WITH ITS OWN EVIDENCE AND STAY GREEN, AND §71–99 HAD
+THAT TWICE.** Twenty-nine sections of the specification arrived and
+twenty-seven of their verdicts survived being re-measured — §76 and §77 are
+absorbed with their refusals published on the pages themselves (/method's
+*"Two dimensions this refuses to compute"* for Accessibility and Romance, and
+/plan's *"it carries the specification's popularity weight as well, because we
+hold no visitor numbers for anywhere"*), §79's peak/shoulder is authored on all
+fifty countries with **off derived as the complement**, and §80 is this atlas's
+own published position rather than an unbuilt feature. What did not survive was
+the arithmetic of two sections against their own assertions.
+
+**§97 PUBLISHED "TWELVE OF THE FOURTEEN PASS" AND ALL FOURTEEN ASSERTIONS WERE
+GREEN.** The two that do not pass are the account, and the audit had no way to
+say so: `saveplan` exists and `routeFromParams` exists, which is true of a
+product with an account and true of one without. Both halves are observable —
+the mechanism is browser storage and **the page has to SAY so** — so the
+criteria now also read /my-europe's own *"lives in your browser and nowhere
+else … there is no account"* and its *"Sync across devices · an account, a
+backend and a data controller"*. A criterion met locally on a page that implies
+an account is the failure worth catching; the missing backend was already
+recorded.
+
+**AND §98 NAMED TWELVE MODULES, EXAMINED ELEVEN, AND THE ONE IT NEVER EXAMINED
+WAS AUTHENTICATION — one of the two its own verdict says do not ship.** That is
+§36's nine `or True` assertions arriving as an *omission* rather than as a
+literal, and an omission is the harder of the two to see: nothing reads as
+wrong, the section simply says less than it claims. The refusal is asserted
+against the promise that refuses it, exactly as §36's are — /how-it-works'
+Accounts row and `docs/legal-position.md`'s entity gap. And module 12 read
+`bool(src("docs/content-report.md"))`, which cannot tell *the figures ship as a
+committed report* from *the dashboard shipped*: **a file existing is not a claim
+about what stands in for what.**
+
+**TWO ASSERTIONS WERE THE LITERAL `yield True`, AND ONE OF THEM CARRIED THE
+STRONGEST SECURITY CLAIM IN THE AUDIT.** §55 asserted *"no user-generated
+content exists to moderate"* and §61 *"no secret is committed"*. Both claims
+are measurable and both measurements are stronger than the sentences: **nothing
+on this site accepts a submission** — zero `method="post"` anywhere, one
+`action` on the whole built site and it is a GET to /plan, which is navigation
+— so there is no route by which content could arrive; and the security promise
+is not that nobody typed a key, which is a hope and is what three real
+acquisitions were already stopped by, but that a **registered** gate refuses a
+committed credential and the key reaches the workflow only as
+`${{ secrets.PEXELS_API_KEY }}`. Proved red four ways: an injected `<form
+method="POST">`, a literal key in the workflow, /my-europe claiming an account,
+and /how-it-works renaming its Accounts row — because *a check is not proved by passing; it is proved by failing on the thing it is about*.
+
+**AND A NEEDLE MAY NOT SPAN AN ELEMENT.** `has()` collapses whitespace and
+does not strip tags — the right trade, and the reason is written on it — so
+*"Needs an account, a backend and a data controller"* failed on a row whose
+markup puts *Needs* and what it needs in different elements. Two needles, not
+one sentence.
+
+**BUILD PACKAGE v1 ARRIVED AGAIN AND ITS FIRST SENTENCE IS THE ONE THING THAT
+CANNOT BE TAKEN.** It proposes freezing the product as *Europe Atlas*, with
+the name provisional pending domain and trademark checks. The caution is
+right and the conclusion is already this repository's: `docs/brand-lock.md`
+locks EuropeDoor, the section audit has carried §1.1 as **LOCKED** since the
+first specification proposed the same rename, and the trademark position is
+recorded rather than assumed — EUROPEDOOR is in use in the doors trade, so no
+®, no ™, nothing announced. **A later document does not get to rename a
+product.** Its §2 was already audited field by field in
+`docs/schema-mapping.md`; its §18, §27, §35–36 and §38–39 are
+`docs/frontend-architecture.md`, `docs/api-architecture.md`, §40 and §60–61.
+
+**AND THE CHECK THAT REFUSES THAT NAME WAS A GUARD ON A PUNCTUATION MARK.**
+`c_brand`'s banned list read **`"Europe Atlas ·"`** — the name plus the middot
+a page title happens to put after it — so the bare phrase passed, and
+/how-it-works shipped `<h3>Europe Atlas</h3>` as the name of a built feature,
+on a page listing what is built, for the life of that band. That is the
+`fetch.py` blocked-list failure inside the brand lock: **a guard on a label is
+a guard whoever renames the product gets to choose**, and here the choice was
+whether to type a middot. The bare phrase is refused now — the site calls this
+dataset *the Atlas* 597 times and had exactly one place where it spelled it as
+a product name — and a naming discussion belongs in `docs/brand-lock.md`,
+which is not a page and is not scanned. Proved red on the string that was
+shipping.
+
+**NOTHING HERE HAD EVER MEASURED A LAYOUT SHIFT, AND ONE PAGE OF THIRTY WAS
+AT 0.3025.** §49 asks for "excellent Core Web Vitals"; the only performance
+gates in this repository are ceilings on BYTES, and **bytes are not
+movement** — a page can be 26 KB and still throw its own content down the
+screen after it has painted. Measured across every family at 1280,
+twenty-nine of thirty are **exactly 0.0000**, which is what a static site
+with `width`/`height` on all 1,617 of its images and 64 `aspect-ratio`
+declarations should be. /search was **0.3025**, past the 0.25 that reads as
+poor.
+
+`search.js` replaced the build's own 1,185-pixel index breakdown with
+`<p class="small">Loading the index…</p>` and put it back when the fetch
+resolved: `#results` 25px at 72ms **with `readyState` already complete**,
+1,185px the instant `/api/search.json` arrived, 266 pixels of push that sent
+the footer off the fold. **Delaying the index by 400ms moved the jump to
+448ms, which is what proves the fetch is the trigger rather than the parse.**
+
+**And the line that did it sat 168 lines below a comment saying it had been
+removed.** `AT_REST` captures the band and restores it — the half that got
+written — and the assignment that threw it away first was left standing, which
+is `.picstory` exactly: the repair addressed the cousin and left the cause.
+**A loading state over a complete page is a regression dressed as feedback**,
+and it is honest only where the reader is waiting for something they asked
+for, which is the `?q=` arrival. 0.3025 → 0.0000.
+
+**THE CEILING IS 0.02 RATHER THAN GOOGLE'S 0.1**, because a threshold a site
+is nowhere near is a threshold that admits a real regression: every family
+here is at zero, so the honest ceiling is *essentially zero*. The sweep takes
+its own page — `buffered: true` reports whatever that page already loaded,
+which is the dead-rule scan's recorded failure — carries a reach floor, and
+names the ELEMENT that moved with its box before and after, because a CLS
+figure with no element in it cannot be diagnosed. The cause is asserted
+statically beside it: **no image ships without its intrinsic size**, 1,617 of
+1,617, with its own floor because an assertion about an empty set counts
+exactly like one about a page.
+
+**AND §53 STATES THE SEED AS A DENSITY WHERE THE REPORT WAS COUNTING SUMS.**
+10–30 places and 5–15 experiences *per destination*, against 0.80 and 0.62
+measured. `docs/content-report.md` reported only totals, so *places: 26% of
+MVP* was true and read as most of the way there on the wrong axis — **a sum
+divided by a met denominator reads as progress**, and the destination count
+met its target while the place count did not. On the seed's own floor places
+are **8%** and experiences **12%**. **And the specification disagrees with
+itself**: §67 asks for 1,000 places over 150 destinations, which is 6.7 each
+and under §53's own floor of ten, so this repository had been reporting
+against the looser of two numbers one document publishes. Both framings are
+now in the report, and neither is a code change.
+
+**THE COMMERCIAL LAYER IS BUILT AND NOTHING IS SERVING, AND THE NUMBER OF
+GATES BETWEEN A CAMPAIGN AND A READER WAS TYPED IN THREE PLACES AND WRONG IN
+ALL THREE.** The advertising specification's thirty-three sections are mapped
+in `docs/advertising.md` — twenty-six built, four declared and off with an
+objection or a trigger attached, one partial, one a measured departure. The
+registry is `data/advertising.json`, the service is `tools/lib/ads.py`, the
+seam into a page is `render.ad_slot(path)`, and **an off slot emits zero
+bytes**: no container, no placeholder, no reserved height, which is the
+OPPOSITE of `ed_slot()` and for the opposite reason — there the reader is an
+editor and the declared photograph surface IS the acquisition list, here the
+reader is a traveller and a reserved advertising box on a page with no
+advertiser is this product advertising that it would like to carry
+advertising. The marker is what `checks.py` tests and never the words,
+because /for-businesses publishes the whole disclosure vocabulary and the
+Stay layer's own disclosure carries *sponsored* on every destination page
+that has one: a guard on the word would fail two surfaces that are correct
+and could never be made to pass.
+
+`ads.py`'s docstring said **five conditions**, /for-businesses' lede said
+"five separate conditions" and listed five, and `may_serve()` tested
+**eight** — the two per-placement flags and the campaign's own status were in
+the mechanism and in neither sentence. That is the dispatch cap exactly, and
+`/map` printing the old projection's name for a year. `ads.conditions()` is
+the one declaration now, `may_serve()` is `all()` over it, the page prints
+the LIST rather than a count, and `tools/ad-tests.py` reads that list and
+proves **each entry alone refuses** — so a condition added tomorrow is
+proved tomorrow, where a typed five would quietly stop covering the set.
+
+**A BRAND TOKEN IS NOT A HOSTNAME, AND `readForm` CONTAINS `adform`.** The
+third-party network refusal was declared as twenty-one bare tokens and the
+check reading them required a dot, so **nineteen of the twenty-one were never
+tested** and appending `doubleclick.net` to a script left it green — the
+mutation that proved the guard was caught by the OUTBOUND-LINK check
+instead, on a page, where this one has no reach. Removing the filter then
+failed `planner.js` on `readForm`, which is `cell` catching `cellar` one
+family over. `checks.py`'s commercial-map-host refusal settled this years ago
+and says why on its own list: *hostnames rather than a vague substring,
+because a page that says "the map" is not a violation and a check that cannot
+tell the difference gets switched off.* Twenty-six hostnames now, proved red
+on a script.
+
+**AND TWO OF THE SIX TARGETING DIMENSIONS RETURNED NO MATCH IN SILENCE.**
+`context_for()` reads a path, so it answers country, region, destination and
+experience category. `travel_interest` is a property of the destination
+record rather than of the path and `language` needs a second locale reaching
+`SHIP_THRESHOLD`, so a campaign targeting either returned False from
+`_targets_match` — correct behaviour, and indistinguishable from a target
+that simply did not match this page, which is `opts.geoTooNarrow` computed
+and read nowhere. Both stay declared because the brief's vocabulary is right;
+both raise with their own trigger named now.
+
+**The simulated ON state lives in memory and never on disk.** A suite that
+edits the registry it is testing can leave the repository in the state its
+own failure produced — the Media Desk's suite learned the harder version,
+renaming two licensed originals aside and having a later run overwrite them.
+`ad-tests.py` swaps `ads._cache`, so there is nothing to restore, and its
+last block asserts the registry's bytes and the built site are unchanged by
+the run. **Nothing to restore is stronger than restoring carefully.**
+
+**And the wall moved, in public, on the page whose own sentence is the
+procedure.** /for-businesses has published *if that wall ever moves, it moves
+in public, on this page* since before the registry existed, and the brief's
+nine placements are every one of them editorial. So the position is now
+*paid placement buys a declared slot*, the page states the sentence it
+replaced, and `checks.py` asserts the page and the registry agree **in both
+directions** — a page can keep a promise the mechanism has stopped keeping,
+and a mechanism can be quietly stricter than the page a reader is reading,
+which is worse, because then the published position is the looser of the two.
+The substance did not move: ranking, weighting, curation, scores, result
+order and editorial copy were never for sale and are not now.
+`tools/monotony.js` read /for-businesses at 51% before this and reads 27%
+after, because the page gained three bands that are not its provider list.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -6114,6 +6649,8 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     node tools/monotony.js --check           no page is one component and little else
+    python3 tools/ad-tests.py                 the commercial layer: the OFF state,
+                                              and a simulated ON in memory
     python3 tools/photo-tests.py              the acquisition pipeline
                                               its batch loop and its fill planner,
                                               against a stub provider

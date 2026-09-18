@@ -8,6 +8,11 @@ node_modules/
 # Neither is a gate and neither belongs in the repository.
 contact-sheet.png
 recognition.png
+# And the third: the simulated paid bands, shot inside the real pages.
+# A page carrying an advertisement must never be mistaken for something
+# the build produced, which is why they are written here rather than
+# into site/.
+ad-preview-*.png
 
 # The scratch directories the acquisition instruments write into. A search
 # cache and a contact sheet of candidates nobody has chosen: somebody else's

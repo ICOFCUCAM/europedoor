@@ -92,7 +92,10 @@ def build():
         emit(P.experience_kind_page(d, kind, name))
     for cat in d["categories"]:
         emit(P.category_page(d, cat))
-        for sub in cat.get("subs", []):
+        # A SUB EARNS ITS PAGE, which is `FACET_MIN` applied one family over.
+        # Two of the twenty-eight shipped a single row, and the smaller held
+        # none of what its heading names. See pages.subs_with_a_page.
+        for sub in P.subs_with_a_page(d, cat):
             emit(P.category_page(d, cat, sub))
     emit(P.join_page(d))
     emit(P.business_page(d))

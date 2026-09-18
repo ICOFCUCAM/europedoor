@@ -2135,3 +2135,80 @@ def ed_declare(images, key, *, statement, alt, seed=None, motif=None,
     return (f'<figure class="ed-declare">{inner}'
             f'<figcaption class="ed-declare-say"><p>{esc(statement)}</p>'
             f"</figcaption></figure>")
+
+
+# ── the commercial layer's one seam into a page ───────────────────────────
+#
+# TWO FUNCTIONS RATHER THAN THE BRIEF'S TEN COMPONENTS, and the reason is
+# this repository's own rule: no new primitive until repeated structure has
+# actually emerged. The ten differ in what they TARGET and what they SAY,
+# which is data, and not in their box. Ten components is ten places for one
+# disclosure to differ, which is the fourteen-call-sites-forgot-the-motif
+# failure written into a commercial layer, where the cost of two of them
+# disagreeing is a paid band a reader cannot tell from editorial.
+
+def ad_disclosure(label):
+    """The word that says this was bought, inseparable from the thing.
+
+    The Stay layer already settled the principle — *a disclosure that only
+    appears once we are paid is an advertisement with a conscience* — and the
+    vocabulary is closed in `data/advertising.json`, so a campaign cannot
+    invent "Recommended". `ads.creative_problems()` refuses a label that is
+    not in it, and `checks.py` refuses the four ranking words on any page
+    carrying a placement.
+    """
+    from . import ads as _ads
+    if label not in _ads.disclosures():
+        raise ValueError(
+            f"{label!r} is not a declared disclosure: {_ads.disclosures()}")
+    return f'<p class="kicker addisc">{esc(label)}</p>'
+
+
+def ad_slot(path):
+    """Everything bought on this page, in document order. Today: nothing.
+
+    AN OFF SLOT EMITS ZERO BYTES — no container, no placeholder, no reserved
+    height, no class a stylesheet could give a height to. That is the
+    OPPOSITE of `ed_slot()` and for the opposite reason: there the reader is
+    an editor and the declared photograph surface IS the acquisition list,
+    here the reader is a traveller and a reserved advertising box on a page
+    with no advertiser is this product advertising that it would like to
+    carry advertising. §33 asks that nothing look as though ads are waiting
+    to be inserted, and an empty string is the only version of that a check
+    can hold: `checks.py` reads the built site for the marker and requires
+    zero across all 1,032 pages, and the layout-shift sweep measures that
+    nothing was reserved.
+
+    A page builder calls this and does not decide anything. It cannot choose
+    how many appear (the placement's `max_items` does), which surface it is
+    (the path does), or whether anything appears at all (five conditions in
+    the registry do) — because a selection rule spread across forty-seven
+    builders is forty-seven chances for one page to carry two bands.
+    """
+    from . import ads as _ads
+    ctx = _ads.context_for(path)
+    out = []
+    for c in _ads.get_eligible_ads(ctx):
+        pl = _ads.placement(c.get("placement")) or {}
+        cr = c.get("creative") or {}
+        bad = _ads.creative_problems(cr)
+        if bad:
+            # A CREATIVE THAT FAILS VALIDATION IS NOT DRAWN AND NOT SILENT.
+            # The build stops, because the alternative is shipping an
+            # advertiser's unvalidated text to every reader of this page —
+            # and this is the one family where the thing being refused
+            # arrived from outside the repository.
+            raise ValueError(
+                f"campaign {c.get('slug')!r} has an invalid creative: "
+                + "; ".join(bad))
+        href = cr["destination_url"]
+        out.append(
+            f'<aside class="adband" data-placement="{esc(pl["slug"])}">'
+            + '<div class="adband-in">'
+            + ad_disclosure(cr["disclosure_label"])
+            + f'<h2 class="mini">{esc(cr["headline"])}</h2>'
+            + f'<p>{esc(cr.get("description") or "")}</p>'
+            + f'<p><a href="{esc(href)}" rel="sponsored nofollow noopener" '
+              f'target="_blank">{esc(cr.get("cta_label") or "Visit")}</a></p>'
+            + "</div></aside>")
+    return "".join(out)

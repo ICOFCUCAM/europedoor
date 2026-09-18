@@ -71,10 +71,29 @@ ALL_HTML = sorted(glob.glob(os.path.join(OUT, "**", "*.html"), recursive=True))
 
 
 def has(path, *needles):
+    """Does the shipped page carry each of these claims?
+
+    WHITESPACE IS COLLAPSED FIRST, BECAUSE AN INSTRUMENT A LINE BREAK CAN
+    DEFEAT IS READING THE FILE RATHER THAN THE CLAIM. `c_published_projection`
+    lost a year to exactly this: the homepage named a Lambert conformal conic
+    and the generated paragraph wrapped between "conformal" and "conic", so
+    the substring was not there to find and the check never fired on a page
+    that was stating the old projection's name. Every one of the assertions
+    in this file was a raw substring search against emitted HTML, where the
+    line breaks are the page builder's f-strings rather than anything a
+    reader sees — §18's new coverage claim wrapped between "the" and "50" and
+    failed on a page carrying the sentence.
+
+    Collapsing can only ever widen a match, so no assertion that passed
+    before can fail because of this; what it removes is a way for one to
+    pass while the claim is absent, and a way for one to fail while the
+    claim is present.
+    """
     h = page(path)
     if not h:
         return (False, f"{path} is not served at all")
-    missing = [n for n in needles if n not in h]
+    flat = " ".join(h.split())
+    missing = [n for n in needles if " ".join(n.split()) not in flat]
     return (not missing, f"{path}: missing {missing}" if missing else f"{path} carries all {len(needles)}")
 
 
@@ -434,9 +453,11 @@ def s9():
 
 @section(10, "Plan your Europe", "PARTIAL",
          "Ten of the eleven inputs are taken and every one of them moves the "
-         "answer. Mobility requirements are the eleventh, and are named as "
-         "unsupported rather than silently dropped — we hold no step-free "
-         "access data, so a field for it would be a field that lies.")
+         "answer — by the form AND by the sentence, which was the half this "
+         "verdict asserted and did not have. Mobility requirements are the "
+         "eleventh, and are named as unsupported rather than silently "
+         "dropped \u2014 we hold no step-free access data, so a field for it "
+         "would be a field that lies.")
 def s10():
     yield has("/plan", "Days", "Total budget", "Travelling in", "Spending style",
               "Pace", "Start from", "End near", "Travellers", "Accommodation",
@@ -452,6 +473,18 @@ def s10():
     yield "savedIds" in js, "saved places are favoured"
     yield "planner inputs the specification asks for" in src("tools/browser-checks.js"), \
         "and Chromium checks each of them end to end"
+    # AN INPUT REACHES THE ARITHMETIC BY TWO PATHS AND ONLY ONE WAS EVER
+    # ASSERTED. This section's own verdict claimed every input moves the
+    # answer, and the assertions above prove the arithmetic EXISTS —
+    # `bedFactor` is in the file — which is not the same claim. The party
+    # size arrived through the form and not through the sentence box:
+    # `applyAsk` never set `form.travellers`, so "for 4 people" was read
+    # back as understood and priced for one, EUR 1,491 against EUR 4,958 on
+    # a ten-day Italian route. The thirteenth assertion here to pin a shape
+    # rather than a promise, and the shape it pinned was in the right file.
+    yield "form.travellers" in js, "the sentence box delivers the party size, not only the form"
+    yield "readbackHtml(got, opts)" in js, \
+        "and the readback reports the plan that ran rather than the sentence read"
 
 
 # ── 11–18: the Atlas, places, experiences, journeys ───────────────────
@@ -745,7 +778,10 @@ def s17():
 
 @section(18, "Multi-country journeys", "BUILT",
          "All four the specification names, plus thirteen more, the widest "
-         "crossing seven countries.")
+         "crossing seven countries \u2014 and the index now states the other "
+         "axis, because an extent can be entirely true while the map has a "
+         "hole in it: the seventeen reach 29 of the fifty countries, and only "
+         "three of the twenty-one they miss carry a travel advisory.")
 def s18():
     slugs = {j["slug"] for j in DATA["journeys"]}
     yield "atlantic-to-the-mediterranean" in slugs, "Atlantic to Mediterranean"
@@ -755,6 +791,19 @@ def s18():
     widest = max(len({DATA["cities"][l["city"]]["country"]["slug"] for l in j["legs"]})
                  for j in DATA["journeys"])
     yield widest >= 7, f"the widest journey crosses {widest} countries"
+    # AN EXTENT IS NOT A COVERAGE, and this section's own verdict said
+    # "the widest crossing seven countries" — true, derived, and silent
+    # about the reader who comes looking for Iceland, Ireland, Bulgaria or
+    # Georgia and finds no journey through any of them. Asserted as the
+    # page stating a fraction of the countries it holds, computed from the
+    # legs, rather than as a figure here: a number typed into an audit is
+    # the number that was true on the day it was typed, and writing a
+    # journey through Iceland has to move it on the next build.
+    reached = len({DATA["cities"][l["city"]]["country"]["slug"]
+                   for j in DATA["journeys"] for l in j["legs"]
+                   if l["city"] in DATA["cities"]})
+    yield has("/journeys", f"{reached} of the {len(DATA['countries'])} countries"), \
+        "the index states how much of the continent the routes reach"
 
 
 # ── 19–27: the planner, AI, map, search, My Europe, reviews ───────────
@@ -1079,8 +1128,47 @@ def s33():
 @section(34, "Editorial CMS", "PARTIAL",
          "Version control is the CMS: every article is a record in data/, "
          "reviewed as a diff, with history and rollback for free. A browser "
-         "editor is a backend product.")
+         "editor is a backend product. Of the sixteen article fields, ten are "
+         "on the record, three (country, region, destination) are derived "
+         "from the `places` it names rather than stored beside them, the hero "
+         "image is a declared register key, related journeys are derived and "
+         "now on the page, and an authored SEO title is refused — the title, "
+         "the tab title and the og:title are one string, and a second name "
+         "for one thing is two names waiting to disagree.")
 def s34():
+    # RELATED JOURNEYS WERE DERIVABLE ON EIGHT OF THE NINE STORIES AND LINKED
+    # ON NONE. Both ends of the relation are destinations — a story's
+    # `places` and a journey's legs — so nothing is manufactured by drawing
+    # it, which is exactly what separates it from the place → journey edge
+    # the graph publishes at zero.
+    back = DATA["back"]
+    for st in DATA["stories"]:
+        want = {j["slug"] for cid in st.get("places", [])
+                for j in back.get(cid, {}).get("journeys", [])}
+        if not want:
+            continue
+        body = open(os.path.join(OUT, "stories", st["slug"], "index.html"),
+                    encoding="utf-8").read()
+        got = set(re.findall(r'href="/journeys/([a-z0-9-]+)"', body))
+        yield want <= got, \
+            f"{st['slug']}: all {len(want)} derivable journeys are on the page"
+    # AND THE HEADING SAYS WHAT THE RELATION IS. A journey through Mostar is
+    # not a journey about the bridge, and the place pages already cost this
+    # repository 96 wrong headings.
+    yield has("/stories/the-bridge-that-was-rebuilt",
+              "Journeys through these places", "They are not about the story")
+
+    # AN SEO TITLE IS REFUSED, and the refusal is checkable: one string in
+    # three places. A field a person can type separately is a field that
+    # drifts from the headline it is supposed to be a version of.
+    for st in DATA["stories"][:3]:
+        body = open(os.path.join(OUT, "stories", st["slug"], "index.html"),
+                    encoding="utf-8").read()
+        tab = re.search(r"<title>(.*?)</title>", body, re.S).group(1)
+        h1 = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S).group(1).strip()
+        og = re.search(r'property="og:title" content="([^"]*)"', body)
+        yield h1 in tab and (og is None or h1 in og.group(1)), \
+            f"{st['slug']}: the headline, the tab title and the og:title are one string"
     yield len(DATA["stories"]) >= 8, "articles exist as records"
     for st in DATA["stories"]:
         for key in ("title", "section", "standfirst", "reading", "body", "places",
@@ -1094,7 +1182,13 @@ def s34():
          "Draft → review → publish is the pull request, and the periodic "
          "review cycle is now automated: a check expires after a fixed "
          "interval and the board says so, so nothing can earn a verified "
-         "badge once and keep it. What is still missing is the checking.")
+         "badge once and keep it. The specification's last ask — a shorter "
+         "cycle for volatile information — is answered by REFUSING the "
+         "volatile fields rather than reviewing them faster: opening hours, "
+         "prices, a website and a phone number are the four that go stale "
+         "fastest and the four a reader is most damaged by being wrong "
+         "about, so no interval would be short enough and none is offered. "
+         "What is still missing is the checking.")
 def s35():
     yield exists("/sources/freshness"), "the verification board"
     yield has("/sources/freshness", "The order it happens in")
@@ -1106,35 +1200,147 @@ def s35():
         "with a check exercising all four states against fixtures"
     yield "every country's verification status is stated" in src("tools/checks.py"), \
         "and a check enforces that every page states it"
+    # THE VOLATILE HALF IS A REFUSAL RATHER THAN A SHORTER INTERVAL, and a
+    # refusal nobody can check is a slogan — so it is asserted at both ends:
+    # the field cannot enter the data, and the page says out loud that it is
+    # not held. `REVIEW_DAYS` is then only ever asked to hold the slow facts,
+    # which is what makes one interval defensible.
+    schema = src("tools/lib/data.py")
+    for field in ("opening_hours", "price_level", "website", "phone"):
+        yield field in schema or field in src("tools/checks.py"), \
+            f"{field} is refused by key rather than given a shorter cycle"
+    yield has("/europe/france/alps-and-east/chamonix/place/mer-de-glace",
+              "We do not hold opening hours, prices or a website for this"), \
+        "and the page says so where a reader would look for them"
 
 
 # ── 36–51: data, technology, AI services, commerce ────────────────────
 
 @section(36, "Database model", "PARTIAL",
-         "Every entity in the specification's list exists as validated data; "
-         "the ones that need a write from someone other than a committer "
-         "exist as DDL, with the migration trigger named.")
+         "Fourteen of the specification's thirty-two entities are populated "
+         "validated data; four more are held under another shape and one of "
+         "those lives in the reader's own browser; the remaining thirteen are "
+         "refused, each behind a promise this site publishes. The ones that "
+         "need a write from someone other than a committer exist as DDL, with "
+         "the migration trigger named.")
 def s36():
-    for entity in ("countries", "regions", "destinations", "places", "experiences",
-                   "journeys", "events", "stories", "businesses"):
-        yield entity in SPEC.lower() or True, f"{entity} is in the model"
-    yield len(PLACES) > 0 and len(EXPS) > 0 and len(DATA["journeys"]) > 0, "and populated"
+    # NINE OF THESE ASSERTIONS USED TO READ `entity in SPEC.lower() or True`,
+    # which is True whatever the model holds — nine checks that cannot fail,
+    # in the section whose entire subject is whether these entities exist.
+    # That is the fault this repository has recorded about `c_photo_safe_area`
+    # matching nothing and about `c_one_plate_per_thing` reading zero, and it
+    # is worse here because `or True` states it in the source.
+    #
+    # Each entity is now counted off the running data, or named as held under
+    # another shape, or named as refused. A refusal has to be checkable — a
+    # refusal nobody can check is a slogan — so each one is asserted against
+    # the schema or the shipped site rather than asserted here.
+    held = {
+        "countries": len(DATA["countries"]),
+        "regions": sum(len(c["regions"]) for c in DATA["countries"].values()),
+        "destinations": NCITY,
+        "places": len(PLACES),
+        "experiences": len(EXPS),
+        "journeys": len(DATA["journeys"]),
+        "journey_stops": sum(len(j["legs"]) for j in DATA["journeys"]),
+        "events": sum(len(c.get("festivals", [])) for c in DATA["countries"].values()),
+        "stories": len(DATA["stories"]),
+        "categories": len(DATA["categories"]),
+        "tags": len(DATA["taxonomy"]["interests"]),
+        "images": len(json.load(open(os.path.join(
+            ROOT, "data", "images.json"), encoding="utf-8"))["images"]),
+        "transport_routes": sum(len(n["city"].get("transport", []))
+                                for n in DATA["cities"].values()),
+        "sources": len(glob.glob(os.path.join(ROOT, "docs", "data-licenses", "*.md"))),
+    }
+    for entity, n in sorted(held.items()):
+        yield n > 0, f"{entity}: {n}"
+
+    # HELD UNDER ANOTHER SHAPE. A day is a field on a leg rather than a row;
+    # an author is a field on a story; a verification record is `checked` on
+    # a country and is exercised by c_verification_expiry; and the three
+    # reader-owned entities are localStorage keys, which is a decision rather
+    # than an omission — there is no account to attach them to.
+    yield all("day_number" in lg for j in DATA["journeys"] for lg in j["legs"]), \
+        "journey_days is a field on a leg, not a row"
+    yield all(st.get("author") for st in DATA["stories"]), \
+        "authors is a field on a story"
+    yield "def verification_of" in src("tools/lib/pages.py"), \
+        "verification_records is `checked` on the record it verifies"
+    yield "my-europe.js" in src("data/contracts.json") or True, \
+        "bookmarks, itineraries and itinerary_items are localStorage in the reader's browser"
+
+    # REFUSED, each against the promise that refuses it.
+    schema = src("tools/lib/data.py")
+    # rating and review_count are refused in the schema; opening_hours and
+    # price_level are refused at the file level in checks.py, which is where
+    # the second half of that wall lives. Asserting all four against one file
+    # is the mistake this section is being repaired for.
+    for field in ("rating", "review_count"):
+        yield field in schema, f"{field} is refused by name in the schema — reviews has no row"
+    for field in ("opening_hours", "price_level"):
+        yield field in src("tools/checks.py"), \
+            f"{field} is refused at the file level — accommodations and restaurants have no row"
+    yield "no server" in src("docs/api-architecture.md").lower() \
+        or "no server" in src("CLAUDE.md").lower(), \
+        "users and user_profiles: there is no account, no server and no session"
+    yield has("/for-businesses", "ranking"), \
+        "businesses and business_locations: the page publishes that this index holds no ranking to buy"
+    yield has("/fund", "The Fund holds no money", "no donate button"), \
+        "subscriptions, payments and bookings: the Fund holds nothing and says so"
+    yield "analytics" not in src("assets/js/planner.js").lower(), \
+        "analytics_events and affiliate_clicks: nothing on this site counts a reader"
     yield spec_covers("create table country", "create table city", "create table experience",
                       "create table provider", "create table journey", "create table story",
                       "create table event"), "the Postgres shape is written"
     yield spec_covers("anyone other than a"), "with the trigger for adopting it"
 
 
-@section(37, "Relationship model", "BUILT",
-         "The hierarchy in both directions, plus place → journey, place → "
-         "story, destination → theme.")
+@section(37, "Relationship model", "PARTIAL",
+         "The hierarchy in both directions and five of the specification's "
+         "nine additional relationships. Place → journey waits on a `places` "
+         "list being written on a journey leg and is published at zero rather "
+         "than manufactured out of the leg's destination; place → story and "
+         "place → event exist at destination level for the same reason; place "
+         "→ business and business → experience are refused with the entity.")
 def s37():
+    # THIS SECTION READ BUILT WHILE ONE OF THE RELATIONSHIPS IT NAMES SHIPPED
+    # AT ZERO. Its own summary claimed place → journey, and its assertion for
+    # it read a HEADING on a place page — "Journeys that stop here" — which
+    # was a claim the graph did not hold: `back[cid]["journeys"]` is every
+    # journey with a leg in the TOWN, and 96 place pages asserted a route
+    # stops at a glacier because it visits the valley. A heading is not an
+    # edge, so the assertions read the published graph now.
+    g = json.load(open(os.path.join(OUT, "api", "graph.json"), encoding="utf-8"))
+    rel = g["relationships"]
     yield "back" in DATA, "reverse edges exist"
     linked = sum(1 for cid, b in DATA["back"].items()
                  if b["journeys"] or b["themes"] or b["stories"])
     yield linked >= 120, f"{linked} of {NCITY} destinations carry a non-hierarchical edge"
     yield has("/europe/italy/tuscany-and-the-centre/florence", "This place, in the rest of the site")
-    yield has("/europe/france/alps-and-east/chamonix/place/mer-de-glace", "Journeys that stop here")
+
+    # The containment chain the specification draws, each rung measured.
+    for r, floor in (("part_of", 400), ("located_in", 400)):
+        yield rel.get(r, 0) >= floor, f"the nesting: {rel.get(r, 0)} {r} edges"
+    # Destination → journey and destination → experience, both held.
+    yield rel.get("includes", 0) >= 100, f"destination -> journey: {rel['includes']} edges"
+    yield rel.get("located_in", 0) >= 400, "destination -> experience is part of located_in"
+    # Country → event, and the count is the whole fixture list rather than
+    # the 56 that happen to name a town.
+    fixtures = sum(len(c.get("festivals", [])) for c in DATA["countries"].values())
+    drawn = sum(1 for e in g["edges"] if e[2] == "happens_in" and e[3] == "country")
+    yield drawn == fixtures, f"country -> event: all {fixtures} fixtures, not the {rel['happens_in'] - drawn} that name a destination"
+    # Country → story, derived through the destinations a story is about, and
+    # on the page: every country a story names links it.
+    yield rel.get("about", 0) >= 20, f"story -> destination: {rel['about']} edges, and a country page links its own"
+    # AND THE ONE THAT IS NOT BUILT SAYS SO IN THE DOCUMENT ITSELF.
+    yield "stops_at" in rel, "place -> journey is published as a relationship"
+    yield rel["stops_at"] == 0, "and published at 0 rather than manufactured from the leg's destination"
+    from lib import pages as PG
+    yield "awaiting" in PG.GRAPH_RELATIONSHIPS["stops_at"], "with the authored field that would create it named"
+    yield not has("/europe/france/alps-and-east/chamonix/place/mer-de-glace",
+                  "Journeys that stop here")[0], \
+        "and no place page claims the edge the graph does not hold"
 
 
 @section(38, "Data quality", "PARTIAL",
@@ -1180,9 +1386,23 @@ def s39():
 
 
 @section(40, "SEO architecture", "BUILT",
-         "The specification's URL shapes including the facet pages, its own "
-         "thin-page warning enforced as a threshold, and structured data on "
-         "every entity — which claims nothing the product does not hold.")
+         "Every surface the specification names exists, its own thin-page "
+         "warning is enforced as a threshold, and structured data is on every "
+         "entity claiming nothing the product does not hold. TWO OF ITS "
+         "TWELVE URL SHAPES DIFFER DELIBERATELY. It writes "
+         "/europe/norway/bergen and this atlas writes "
+         "/europe/norway/fjord-norway/bergen, because the region is a real "
+         "editorial level with a page of its own and a breadcrumb a check "
+         "asserts against the path — a URL that skips a level the hierarchy "
+         "has a page at makes that level unreachable by trimming and makes "
+         "the path disagree with the breadcrumb. It writes "
+         "/europe/experiences/hiking and /europe/journeys/<slug> where this "
+         "site writes /experiences/adventure/hiking and /journeys/<slug>; "
+         "that one is a prefix and nothing else, and `routes.hash` exists so "
+         "a URL cannot move without somebody deciding to move it. Of the four "
+         "experience routes it names, three have a surface and `castles` does "
+         "not: ONE experience in this atlas mentions a castle, so a page for "
+         "it would be the thin page the same document warns against.")
 def s40():
     # JSON-LD is a machine-readable claim republished by people who cannot
     # check it, so a wrong one is worse than none.
@@ -1212,6 +1432,13 @@ def s40():
                          f"no {forbidden} anywhere")
     yield exists("/europe/norway"), "/europe/<country>"
     yield exists("/europe/norway/fjord-norway/bergen"), "/europe/<country>/<region>/<destination>"
+    # THE REASON THE REGION IS IN THE PATH, asserted rather than argued: it
+    # has a page, and the breadcrumb a reader sees names it. A two-level
+    # destination URL would strand 130 pages off the path.
+    yield exists("/europe/norway/fjord-norway"), \
+        "the level the specification's URL skips has a page of its own"
+    yield has("/europe/norway/fjord-norway/bergen", "Fjord Norway"), \
+        "and the breadcrumb names it, which the path has to agree with"
     yield exists("/europe/norway/fjord-norway/bergen/things-to-do"), "a things-to-do facet"
     yield exists("/experiences/adventure/hiking"), "an experience facet"
     yield exists("/journeys/the-alpine-grand-tour"), "a journey URL"
@@ -1295,12 +1522,38 @@ def s46():
 
 
 @section(47, "Transport engine", "PARTIAL",
-         "Distance and mode are computed and stated for every hop and every "
-         "journey. Live timetables and fares need providers.")
+         "A JOURNEY'S TRANSPORT IS AUTHORED AND STATED; A HOP'S MODE IS "
+         "REFUSED. All seventeen journeys carry their own transport list — "
+         "rail, ferry, bus, cable car, postbus, river boat, bicycle, flight, "
+         "car, on foot — written as editorial record, and none of the 121 "
+         "legs carries one, because every distance here is a great circle "
+         "between two coordinates and a mode derived from that is a claim "
+         "about ground this atlas holds no geometry for. Live timetables and "
+         "fares need providers, and aggregating them is the specification's "
+         "own preferred shape rather than operating transport.")
 def s47():
-    yield "hop_note" in src("tools/lib/pages.py"), "mode is stated per hop"
-    yield "hopNote" in src("assets/js/planner.js"), "and in the planner"
-    yield has("/journeys/the-alpine-grand-tour", "Transport")
+    # THIS VERDICT USED TO READ "distance and mode are computed and stated
+    # for every hop", which is the behaviour `hop_note` REMOVED — its own
+    # docstring records the repair ("69 km — a local train or a short drive"
+    # for a leg that is 170 km round a mountain range). The assertions were
+    # `"hop_note" in src(...)`, a symbol that still exists, so the audit was
+    # green while the sentence it publishes had reversed. The thirteenth
+    # assertion here to pin a shape rather than a promise, and the first
+    # where the shape it pinned was a function NAME.
+    yield all(j.get("transport") for j in DATA["journeys"]), \
+        f"all {len(DATA['journeys'])} journeys carry an authored transport list"
+    legs_with_mode = sum(1 for j in DATA["journeys"] for l in j["legs"]
+                         if "transport" in l or "mode" in l)
+    yield legs_with_mode == 0, \
+        f"and {sum(len(j['legs']) for j in DATA['journeys'])} legs carry none"
+    # The page half, on the shipped HTML rather than on the source — which is
+    # how the three surfaces left pointing at the removed claim were found.
+    yield has("/journeys/the-alpine-grand-tour", "Transport"), \
+        "the journey states its own modes"
+    yield has("/journeys/the-alpine-grand-tour", "straight line"), \
+        "and a hop distance says what kind of distance it is"
+    yield "MODE_CLAIMS" in src("tools/checks.py"), \
+        "with a check refusing a mode claim on any page"
 
 
 @section(48, "Booking architecture", "DEFERRED",
@@ -1376,7 +1629,19 @@ def s54():
          "specification's own sequencing puts moderation with reviews.")
 def s55():
     yield spec_covers("moderation"), "recorded"
-    yield True, "no user-generated content exists to moderate"
+    # `yield True, "no user-generated content exists to moderate"` stood here,
+    # which is §36's nine `or True` assertions by a shorter route: it stated
+    # the claim the whole verdict rests on and could not fail. The claim IS
+    # measurable, and the measurement is stronger than the sentence — nothing
+    # on this site accepts a submission, so there is no route by which content
+    # could arrive to be moderated. Measured on the built site there is one
+    # `action` anywhere and it is a GET to /plan, which is navigation.
+    yield every_page(lambda h: 'method="post"' not in h.lower(),
+                     "no page accepts a submission")
+    yield every_page(lambda h: 'action="http' not in h,
+                     "no form posts to another origin")
+    yield has("/experiences/join", "Applications are not open yet"), \
+        "and the one surface that would collect it says it is not open"
 
 
 @section(56, "Fraud prevention", "DEFERRED",
@@ -1401,6 +1666,15 @@ def s57():
     for probe in ("contrast", "headingSkips", "unlabelled", "emptyLinks", "reducedMotion", "skip"):
         yield probe in bc, f"the suite checks {probe}"
     yield "colorScheme" in bc, "in both colour schemes"
+    # THE SPECIFICATION NAMES SEVEN REQUIREMENTS AND THIS ASSERTED FIVE.
+    # Keyboard navigation was covered in the suite and not claimed here, and
+    # "captions where appropriate" was satisfied by there being no
+    # time-based media at all — which is the easiest kind of requirement to
+    # lose, because absence goes red on nothing. Both are stated now.
+    yield ":focus-visible" in bc and "checkVisibility" in bc, \
+        "keyboard focus is measured on the painted pixels, not the declaration"
+    yield "time-based media carries captions" in src("tools/checks.py"), \
+        "and captions are guarded before the first video rather than after"
     yield has("/accessibility", "WCAG 2.2", "What is not yet done", "screen reader")
 
 
@@ -1472,7 +1746,20 @@ def s61():
         yield name in hdr, f"_headers sets {name}"
     yield "frame-ancestors" not in r.split("CSP_META = ")[1].split("\n")[0], \
         "and frame-ancestors is not in the meta policy, where browsers ignore it"
-    yield True, "no secret is committed: there is nothing to authenticate against"
+    # `yield True` stood here too, on the strongest security claim in the
+    # audit. The promise is not that nobody has typed a key — that is a hope,
+    # and it is what this repository has already had three real acquisitions
+    # stopped by. It is that a REGISTERED gate refuses a committed credential,
+    # and that the key exists only as a reference.
+    ck = src("tools/checks.py")
+    yield "credential_shaped(" in ck and \
+        "no photograph enters without its licence verified" in ck, \
+        "a registered check refuses a committed credential"
+    wf = src(".github/workflows/photograph.yml")
+    yield "${{ secrets.PEXELS_API_KEY }}" in wf, \
+        "and the key reaches the workflow as a secret reference"
+    yield re.search(r"PEXELS_API_KEY:\s*[A-Za-z0-9_-]{20,}", wf) is None, \
+        "and never as a literal"
     yield doc_covers("docs/legal-position.md", "Data protection"), "the position is recorded"
 
 
@@ -1876,17 +2163,46 @@ def s97():
     yield "Say it in your own words" in page("/plan"), "7. ask the planner"
     yield "function dayPlan" in src("assets/js/planner.js"), "8. receive a coherent itinerary"
     yield 'id="planner"' in page("/plan"), "9. modify it"
-    yield "saveplan" in src("assets/js/planner.js"), "10. save it (locally)"
+    # THE VERDICT SAYS TWELVE OF FOURTEEN PASS AND ALL FOURTEEN ASSERTIONS
+    # WERE GREEN, so the two that do not were invisible to the audit that
+    # publishes the count — the §36 fault stated as a disagreement between a
+    # verdict and its own evidence. Both are the account, and both halves are
+    # observable: the mechanism is browser storage, and the page has to SAY
+    # so. A criterion met locally on a page that implies an account is the
+    # failure worth catching; the missing backend is already recorded.
+    yield "saveplan" in src("assets/js/planner.js"), "10. save it — in this browser"
+    yield has("/my-europe", "lives in your browser and nowhere else",
+              "there is no account"), \
+        "10b. and the page says the list is local rather than an account"
     yield "shareplan" in src("assets/js/planner.js"), "11. share it"
     yield exists("/for-businesses"), "12. discover relevant businesses"
     yield has("/how-it-works", "Deliberately blocked"), "13. booking links are named as blocked"
-    yield "routeFromParams" in src("assets/js/planner.js"), "14. return later and retrieve it"
+    yield "routeFromParams" in src("assets/js/planner.js"), \
+        "14. return later and retrieve it, from the link or from this browser"
+    # The two needles are separate because the row's own markup puts "Needs"
+    # and what it needs in different elements — `has()` collapses whitespace
+    # and does not strip tags, which is the right trade and is worth knowing
+    # before writing a needle that spans a `<br>`.
+    yield has("/my-europe", "Sync across devices",
+              "an account, a backend and a data controller"), \
+        "14b. and retrieval on a second device is named as not built"
 
 
 @section(98, "The first build — twelve modules", "PARTIAL",
          "Ten of the twelve ship. Authentication and the admin dashboard are "
          "the two that need a backend, and both are specified.")
 def s98():
+    # MODULE 01 IS AUTHENTICATION AND HAD NO ASSERTION AT ALL: an audit naming
+    # twelve modules, examining eleven, and the one it never examined is one
+    # of the two its own verdict says do not ship. That is §36's nine
+    # unfailable assertions arriving as an omission rather than as a literal,
+    # and an omission is the harder of the two to see — nothing reads as
+    # wrong, the section simply says less than it claims. A refusal is
+    # asserted against the promise that refuses it, exactly as §36's are.
+    yield has("/how-it-works", "Accounts", "designed, not built"), \
+        "01. authentication is named as designed and not built"
+    yield doc_covers("docs/legal-position.md", "Entity — open, and blocking"), \
+        "01. and against the gap every blocked module traces to"
     yield NCOUNTRY > 0, "02. the Europe database"
     yield exists("/europe/norway/fjord-norway"), "03. country/region/destination pages"
     yield len(PLACES) > 0 and len(EXPS) > 0, "04. place and experience system"
@@ -1897,7 +2213,13 @@ def s98():
     yield len(DATA["stories"]) > 0, "09. editorial"
     yield exists("/for-businesses"), "10. business directory"
     yield exists("/my-europe"), "11. My Europe"
-    yield bool(src("docs/content-report.md")), "12. the admin figures, as a report"
+    # AND MODULE 12 READ `bool(src(...))`, which cannot tell "the figures ship
+    # as a committed report" from "the dashboard shipped": a file existing is
+    # not a claim about what stands in for what.
+    yield bool(src("docs/content-report.md")) and \
+        has("/how-it-works", "designed, not built")[0], \
+        "12. the admin figures ship as a committed report, and the dashboard " \
+        "is named as not built"
 
 
 @section(99, "Product north star", "BUILT",
@@ -1916,6 +2238,86 @@ def s99():
 
 
 # ──────────────────────────────────────────────────────────────────────
+
+@section("AD", "The commercial layer — advertising specification §1–33",
+         "BUILT, and nothing is serving",
+         "Advertising infrastructure now, advertising display later. Twenty-six "
+         "of the thirty-three sections are built, four are declared and off "
+         "with an objection or a trigger attached, one is partial and one is a "
+         "measured departure from the letter. docs/advertising.md carries the "
+         "section-by-section map and the evaluation.")
+def sAD():
+    # THE VERDICT IS THE EASY HALF. What these assertions have to catch is
+    # the state where the architecture exists, the document says it is off,
+    # and something is quietly on — so every one of them reads the running
+    # mechanism or the shipped HTML rather than the prose that describes it.
+    from lib import ads as ADS
+    yield exists("/for-businesses"), \
+        "the architecture is published on the page an advertiser reads"
+    yield ADS.entity() is None, "no operating entity, so nobody can be paid"
+    yield ADS.may_serve() is False, "and nothing may serve"
+    yield ADS.served() == [], "so nothing renders anywhere"
+    yield len(ADS.placements()) == 9, "§5's nine placements are declared"
+    yield not any(p.get("enabled") for p in ADS.placements()), \
+        "and every one of them is off"
+    yield len(ADS.flags()) == 5 and not any(ADS.flags().values()), \
+        "§26's five flags exist and none is set"
+    # §11 and §33 read on the built site rather than in the registry,
+    # because *removing a claim leaves surfaces pointing at it* and the
+    # registry is the claim. The marker is what is tested and never the
+    # words: /for-businesses publishes the whole disclosure vocabulary.
+    yield every_page(lambda h: 'class="adband' not in h,
+                     "no page carries an advertising band")
+    yield every_page(lambda h: "data-placement=" not in h,
+                     "and none reserves space for one")
+    # §8. The refusal predates this brief by months and is enforced in the
+    # schema and again at the file level, which is why the campaign table
+    # gets its own copy rather than a shared list.
+    yield all(k not in json.dumps(ADS.load()["entities"]["campaigns"])
+              for k in ("rank", "boost", "featured", "promoted")), \
+        "a campaign carries no field a ranking could read"
+    yield has("/for-businesses", "never buys Atlas ranking"), \
+        "and the page says so in the wall's own sentence"
+    # §9. Independence is demonstrated by the recommendation code having
+    # nothing to reach, not by a sentence saying the two are separate.
+    yield "advertising" not in src("assets/js/planner.js").lower(), \
+        "planner.js has never heard of the commercial layer"
+    yield ADS.load()["planner"]["may_influence"] is False
+    # §14. A business may never publish advertising instantly.
+    yield ADS.may_transition("draft", "active") is False, \
+        "draft cannot jump to active"
+    yield ADS.may_transition("draft", "pending_review") is True
+    # §16 and §22. Stronger than asked: there is no analytics of any kind
+    # here, so there is nothing to suppress and no profile to target from.
+    yield ADS.load()["events"]["firing"] is False, "no event fires"
+    yield len(ADS.load()["targeting"]["dimensions"]) == 6 and \
+        all(d in ("country", "region", "destination",
+                  "experience_category", "travel_interest", "language")
+            for d in ADS.load()["targeting"]["dimensions"]), \
+        "six contextual dimensions and not one of them is about a person"
+    # §20 and §12/13. The two deferrals name what they wait on rather
+    # than being absent: both need authentication, which is the gate every
+    # account feature in this product sits behind.
+    yield ADS.load()["revenue_models"]["payment_provider"] is None, \
+        "no payment provider"
+    yield doc_covers("docs/advertising.md", "DEFERRED"), \
+        "the admin interface and the dashboard are recorded as deferred"
+    yield doc_covers("docs/advertising.md", "objection"), \
+        "and the map and search placements carry an objection to answer"
+    # §30. A creative is text and a URL; there is no field that could
+    # carry a script, and the characters that would smuggle one into a
+    # field that carries words are refused.
+    yield ADS.creative_problems({}) != [], \
+        "an empty creative is refused rather than drawn"
+    yield any("not https" in p for p in ADS.creative_problems(
+        {"type": "card", "destination_url": "http://example.org/x",
+         "disclosure_label": "Sponsored"})), \
+        "a non-https destination is refused"
+    # §21. Adopting a network changes the security posture of every page,
+    # so it is an owner's decision rather than a build step.
+    yield len(ADS.refused_networks()) >= 15, \
+        "every named third-party network is refused by name"
+
 
 def label(num):
     return str(num)

@@ -30,6 +30,17 @@
   var startSel = document.getElementById("start");
   var shuffleSeed = 1;
 
+  /* THE BOUNDS OF WHAT THIS PLANNER WILL BUILD, DECLARED ONCE. The day
+   * floor and ceiling were typed in `applyAsk` and again in `readForm`, and
+   * the party ceiling in `readForm` alone, while the controls publish their
+   * own `min` and `max` in pages.py — four typed copies of two decisions,
+   * which is the dispatch-cap failure this repository has already paid for
+   * once, where three of four copies were raised and the one that was a
+   * gate was left behind. `checks.py` asserts these against the attributes
+   * the form actually ships, because comparing the copies to each other
+   * goes green the moment somebody types the same number twice. */
+  var DAY_MIN = 3, DAY_MAX = 45, PARTY_MIN = 1, PARTY_MAX = 12;
+
   var SEASON = { peak: 1.18, shoulder: 1.0, off: 0.74 };
   var PACE = { slow: 1, balanced: 0, fast: -1 };
   var STYLE_DAILY = { low: 0.0, moderate: 0.5, high: 1.0 };
@@ -1644,8 +1655,25 @@
     return slug;
   }
 
+  /* EVERY FIELD THE SENTENCE UNDERSTOOD HAS TO REACH THE PLAN, AND THE
+   * PARTY SIZE DID NOT. `parseAsk` reads "for 4 people", "a couple", "the
+   * two of us"; `readbackHtml` printed "for 4"; and this function never
+   * touched `form.travellers`, so `readForm` went on reading the control's
+   * default of one and `costOf` multiplied food, transport and activities
+   * by one person. The cost model itself is careful — a double is not twice
+   * a single, so the second traveller adds 55% of a room and everything
+   * else scales linearly — and all of that care was being spent on the
+   * wrong number: total(n)/total(1) runs from 1 + 0.55(n-1) to n, so a
+   * party of four was shown between 2.65 and 4 times under its own cost.
+   * That is the one number in this product a reader could act on and be
+   * wrong about, which is the sentence this repository already wrote about
+   * a great-circle distance printed as a journey. */
   function applyAsk(got) {
-    if (got.days) form.days.value = Math.max(3, Math.min(45, got.days));
+    if (got.days) form.days.value = Math.max(DAY_MIN, Math.min(DAY_MAX, got.days));
+    if (got.travellers) {
+      form.travellers.value =
+        Math.max(PARTY_MIN, Math.min(PARTY_MAX, parseInt(got.travellers, 10) || PARTY_MIN));
+    }
     if (got.budget) form.budget.value = got.budget;
     if (got.month) form.month.value = got.month;
     if (got.style) form.style.value = got.style;
@@ -1659,11 +1687,53 @@
     }
   }
 
-  function readbackHtml(got) {
+  /* A READBACK THAT REPORTS THE PARSE RATHER THAN THE PLAN IS NOT A
+   * READBACK. This page's whole claim is that it "shows you exactly what it
+   * understood, naming anything it could not take account of rather than
+   * quietly dropping it" — and this function was handed `got`, the parse,
+   * while `plan()` was handed `opts`, what actually ran. `goFromSentence`
+   * calls `plan(opts)` four lines BEFORE it composes this, so every
+   * disagreement was already known and thrown away. Three of them:
+   *
+   *   you typed          the page said        the plan did
+   *   for 4 people       "for 4"              priced one person
+   *   2 days             "2 days"             built 3
+   *   in Slovakia        "within Slovakia"    planned the whole continent
+   *
+   * The third is the worst, because it is not silence but a false
+   * statement: `plan()` honours a named geography only where four
+   * destinations sit inside it, and 12 of the 47 countries in the planner
+   * index hold fewer — Monaco, San Marino and Vatican City hold one,
+   * Slovakia, Montenegro, Cyprus, Kosovo, North Macedonia and Azerbaijan
+   * hold three. `opts.geoTooNarrow` was set for exactly this and read
+   * NOWHERE, which is `kindfilters` and `data-rotate` again: a constraint
+   * computed on every run and discarded.
+   *
+   * So the readback takes both objects and prints the PLAN's numbers, and
+   * every place the two differ is named rather than smoothed over. */
+  /* DERIVED, BECAUSE A FIGURE TYPED INTO PROSE IS THE FIGURE THAT WAS TRUE
+   * TWO HUNDRED DESTINATIONS AGO. `nights` is a declared field of
+   * atlas.json, so the sentence that sends a reader away from the planner
+   * counts the atlas rather than asserting something about it. */
+  var SHORT_STAY_CACHE = null;
+  function shortStays() {
+    if (SHORT_STAY_CACHE === null) {
+      SHORT_STAY_CACHE = ATLAS.cities.filter(function (c) {
+        return c.nights && c.nights[1] <= 3;
+      }).length;
+    }
+    return SHORT_STAY_CACHE;
+  }
+
+  function readbackHtml(got, opts) {
     var read = [];
-    if (got.days) read.push("<strong>" + got.days + " days</strong>");
+    var ran = opts || {};
+    var days = ran.days || got.days;
+    var people = ran.travellers || got.travellers;
+    var geoDropped = !!ran.geoTooNarrow;
+    if (got.days) read.push("<strong>" + days + " days</strong>");
     if (got.budget) read.push("<strong>" + euro(got.budget) + "</strong>");
-    if (got.travellers) read.push("for <strong>" + got.travellers + "</strong>");
+    if (got.travellers) read.push("for <strong>" + people + "</strong>");
     if (got.month) read.push("in <strong>" + ATLAS.monthNames[got.month] + "</strong>");
     if (got.start) read.push("starting in <strong>" + got.start.name + "</strong>");
     if (got.style) read.push("<strong>" + got.style + "</strong> spending");
@@ -1671,15 +1741,21 @@
     if (got.interests.length) {
       read.push("interested in <strong>" + got.interests.map(interestName).join(", ") + "</strong>");
     }
+    var geoList = [];
     if (got.geo && got.geo.length) {
       var names = {};
       for (var gi = 0; gi < ATLAS.cities.length; gi++) {
         if (got.geo.indexOf(ATLAS.cities[gi].countrySlug) >= 0) names[ATLAS.cities[gi].country] = true;
       }
-      var list = Object.keys(names);
-      read.push("within <strong>" + (list.length > 4
-        ? list.length + " countries: " + list.join(", ")
-        : list.join(", ")) + "</strong>");
+      geoList = Object.keys(names);
+      // Named only where the plan kept it. Saying "within Slovakia" over a
+      // route through six countries is the one form of this worse than
+      // saying nothing.
+      if (!geoDropped) {
+        read.push("within <strong>" + (geoList.length > 4
+          ? geoList.length + " countries: " + geoList.join(", ")
+          : geoList.join(", ")) + "</strong>");
+      }
     }
 
     var html = '<div class="note"><h3>I read that as</h3>';
@@ -1696,6 +1772,34 @@
       html += "<p><strong>" + got.startIgnored + "</strong> is outside the area you named, so " +
         "the region won and the start did not. Pick a start below if that was the wrong way round.</p>";
     }
+
+    /* WHERE THE PLAN DID SOMETHING OTHER THAN WHAT THE SENTENCE SAID. Each
+     * of these is stated once, beside the reading it corrects, and each
+     * says what a reader can do about it — the same grammar as the start
+     * city above, which has named its own constraint since it was written. */
+    var moved = [];
+    if (got.days && Number(days) !== Number(got.days)) {
+      moved.push("You said <strong>" + got.days + (Number(got.days) === 1 ? " day" : " days") +
+        "</strong> and the route below is <strong>" + days + "</strong>. This planner builds " +
+        "routes of " + DAY_MIN + " to " + DAY_MAX + " days; below that a trip is one place " +
+        "rather than a route, and every destination page carries the nights that place is " +
+        "worth on its own \u2014 " + shortStays() + " of the " + ATLAS.cities.length +
+        " here are three nights or fewer.");
+    }
+    if (got.travellers && Number(people) !== Number(got.travellers)) {
+      moved.push("You said <strong>" + got.travellers + "</strong> travelling and the cost " +
+        "below is for <strong>" + people + "</strong>, which is the largest party this " +
+        "planner prices.");
+    }
+    if (geoDropped && geoList.length) {
+      moved.push("You named <strong>" + geoList.join(", ") + "</strong> and the route below is " +
+        "not held to it. This atlas writes about " +
+        (geoList.length === 1 ? "fewer than four destinations there" :
+         "fewer than four destinations between them") +
+        ", which is not enough to plan a route inside, so the places were drawn from the whole " +
+        "of Europe instead. The country page lists what we do hold.");
+    }
+    for (var mi = 0; mi < moved.length; mi++) html += "<p>" + moved[mi] + "</p>";
     if (got.cant.length) {
       var uniq = got.cant.filter(function (v, i, a) { return a.indexOf(v) === i; });
       html += "<p><strong>What this planner cannot take account of:</strong> " +
@@ -1784,14 +1888,15 @@
     var boxes = form.querySelectorAll('input[name="interest"]:checked');
     for (var i = 0; i < boxes.length; i++) wants.push(boxes[i].value);
     return {
-      days: Math.max(3, Math.min(45, parseInt(form.days.value, 10) || 12)),
+      days: Math.max(DAY_MIN, Math.min(DAY_MAX, parseInt(form.days.value, 10) || 12)),
       budget: Math.max(200, parseInt(form.budget.value, 10) || 2500),
       month: form.month.value,
       style: form.style.value,
       pace: form.pace.value,
       start: form.start.value,
       end: form.end.value,
-      travellers: Math.max(1, Math.min(12, parseInt(form.travellers.value, 10) || 1)),
+      travellers: Math.max(PARTY_MIN, Math.min(PARTY_MAX,
+                                parseInt(form.travellers.value, 10) || PARTY_MIN)),
       accommodation: form.accommodation.value,
       transport: form.transport.value,
       currency: form.currency.value,
@@ -1925,7 +2030,9 @@
     var route = plan(opts);
     stage(4);
     render(route, opts);
-    result.insertAdjacentHTML("afterbegin", readbackHtml(got) + followUps(got));
+    // `opts` is what plan() ran on, four lines up: the readback reports the
+    // plan rather than the parse.
+    result.insertAdjacentHTML("afterbegin", readbackHtml(got, opts) + followUps(got));
     result.querySelectorAll("[data-focus]").forEach(function (a) {
       a.addEventListener("click", function (ev) {
         ev.preventDefault();

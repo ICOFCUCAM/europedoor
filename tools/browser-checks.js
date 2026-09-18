@@ -185,6 +185,107 @@ async function main() {
     ok(!coast.includes(banned) && !alps.includes(banned), `planner routed into ${banned}`);
   }
 
+  // ── the sentence box must report the plan, not the parse ───────────
+  // /plan ships the claim that it "shows you exactly what it understood,
+  // naming anything it could not take account of rather than quietly
+  // dropping it". It was composing that readback from the PARSE while the
+  // route beside it came from something else, and `plan()` runs four lines
+  // before the readback is built, so every disagreement was already known
+  // and thrown away. Three shipped, and none is visible to any static
+  // check: the readback is composed at runtime, so a page that reports its
+  // plan and a page that reports its parse are the same bytes until
+  // somebody types a sentence.
+  async function askFor(sentence) {
+    await page.goto(base + "/plan", { waitUntil: "networkidle" });
+    await page.fill("#ask", sentence);
+    await page.click("#askform button[type=submit]");
+    await page.waitForSelector("#result .note h3");
+    // A REFUSAL IS A VALID ANSWER AND MUST NOT LOOK LIKE A HANG. The
+    // planner declines to build a trip it cannot fund — "EUR 4,618 against
+    // a budget of EUR 2,500. That is not a plan you can take." — and the
+    // specification's own flagship sentence (EUR 2,500, twelve days, "my
+    // wife") is exactly that case now the party size reaches the
+    // arithmetic. Reading `.result-summary` straight would wait thirty
+    // seconds and die on a locator instead of failing with a sentence,
+    // which is the crash-stops-counting fault in the instrument.
+    const priced = await page.locator("#result .result-summary dd").count();
+    const money = priced
+      ? await page.locator("#result .result-summary dd").first().textContent()
+      : "0";
+    return {
+      priced: priced > 0,
+      // .first(), because the result carries three `.note` blocks — the
+      // readback, the what-if rail and the budget line — and a strict
+      // locator resolving to several is how this suite died once before.
+      say: (await page.locator("#result .note").first().innerText()).replace(/\s+/g, " "),
+      days: await page.locator("#days").inputValue(),
+      people: await page.locator("#travellers").inputValue(),
+      cost: parseInt(money.replace(/[^0-9]/g, ""), 10),
+    };
+  }
+
+  // 1. THE PARTY SIZE, WHICH IS THE EXPENSIVE ONE. `applyAsk` never set
+  //    form.travellers, so the cost model multiplied food, transport and
+  //    activities by the control's default of one while the page said "for
+  //    4". The cost model itself is careful — a double is not twice a
+  //    single, so the second traveller adds 55% of a room and everything
+  //    else scales linearly — which makes total(n)/total(1) land between
+  //    1 + 0.55(n-1) and n. Asserted as that BAND rather than as a figure,
+  //    because a number typed here is a second copy of the cost model.
+  // The FORM path's party size is already asserted further down, with the
+  // same cost band — which is the whole shape of this defect: the tested
+  // path worked and the untested one did not. A code path nothing
+  // exercises is a code path nothing checks.
+  const askOne = await askFor("Ten days in Italy starting in Rome");
+  const four = await askFor("Ten days in Italy starting in Rome for 4 people");
+  ok(four.people === "4",
+     `the sentence named four travellers and the form carried ${four.people}: ` +
+     "a party size that does not reach readForm is a cost for somebody else");
+  ok(/for <?4|for 4/.test(four.say) || four.say.includes("for 4"),
+     "the readback did not state the party size it planned for");
+  ok(askOne.priced && four.priced,
+     "one of the two party-size sentences was refused on budget, so the cost " +
+     "band below has nothing to compare. Both must produce a priced plan for " +
+     "this assertion to mean anything.");
+  const ratio = four.cost / askOne.cost;
+  ok(ratio >= 1 + 0.55 * 3 - 0.15 && ratio <= 4 + 0.15,
+     `four travellers cost ${ratio.toFixed(2)}x one traveller (EUR ${askOne.cost} ` +
+     `to EUR ${four.cost}). The cost model scales beds by 1+0.55(n-1) and ` +
+     "everything else by n, so the ratio has to sit between 2.65 and 4. " +
+     "Outside that band the party size is reaching the page and not the money.");
+
+  // 2. THE DAY FLOOR. A trip shorter than the planner builds is clamped,
+  //    and the clamp has to be named rather than applied behind a number
+  //    the page has already printed.
+  const short = await askFor("2 days in Vienna");
+  ok(short.days === "3",
+     `"2 days" left the day field at ${short.days}, so the floor moved`);
+  ok(/You said .*2 days.* and the route below is .*3/.test(short.say),
+     "the planner clamped a two-day request to three and did not say so. " +
+     "It printed the number the reader typed beside a route of a different " +
+     "length: " + short.say.slice(0, 200));
+
+  // 3. THE NAMED GEOGRAPHY, which is the dishonest one, because it was not
+  //    silence but a false statement. plan() honours a named country only
+  //    where four destinations sit inside it, and 12 of the 47 countries in
+  //    the index hold fewer — so "A week in Slovakia" planned the whole
+  //    continent under the words "within Slovakia".
+  const askThin = await askFor("A week in Slovakia in June");
+  ok(!/within .*Slovakia/.test(askThin.say),
+     "the readback claimed the route was held within Slovakia. The planner " +
+     "drops a geography holding fewer than four destinations, so that " +
+     "sentence describes a route through six countries: " + askThin.say.slice(0, 200));
+  ok(/You named .*Slovakia.* not held to it/.test(askThin.say),
+     "the planner dropped the named geography and did not name the drop. " +
+     "opts.geoTooNarrow is computed on every run for exactly this: " +
+     askThin.say.slice(0, 200));
+  // And a country with enough to plan inside keeps its constraint, or the
+  // fix above would have been satisfied by never honouring a geography.
+  const wide = await askFor("Twelve days in Italy in June");
+  ok(/within .*Italy/.test(wide.say),
+     "Italy holds far more than four destinations and the readback stopped " +
+     "claiming the route is inside it: " + wide.say.slice(0, 200));
+
   // ── the planner inputs the specification asks for ──────────────────
   // Every one of these was added because §10 lists it as an input. An
   // input that renders but does not change the answer is decoration, so
@@ -5139,6 +5240,101 @@ async function main() {
          `${hits.length} of ${seen} families scroll sideways at ${W}px: ` +
          `${hits.slice(0, 5).join(", ")}. A reader cannot put the page back.`);
     }
+  }
+
+  /* NOTHING HERE HAD EVER MEASURED A LAYOUT SHIFT, AND ONE PAGE OF THIRTY
+   * WAS AT 0.3025.
+   *
+   * §49 of the Build Package asks for "excellent Core Web Vitals" and this
+   * repository measures BYTES — `weight.home_kb` and `weight.max_page_kb`
+   * are ceilings and they are the whole of what any gate here knew about
+   * performance. Bytes are not movement: a page can be 26 KB and still
+   * throw its own content down the screen after it has painted.
+   *
+   * Measured across every family at 1280: twenty-nine of thirty are
+   * EXACTLY 0.0000, which is what a static site with `width`/`height` on
+   * all 1,617 of its `<img>` and 64 `aspect-ratio` declarations should be
+   * — and /search was 0.3025, past the 0.25 that Google calls poor.
+   * `search.js` replaced the build's own 1,185-pixel index breakdown with
+   * `<p class="small">Loading the index…</p>` and put it back when the
+   * fetch resolved: `#results` 25px at 72ms with `readyState` already
+   * complete, 1,185px the instant /api/search.json arrived, 266 pixels of
+   * push that sent the footer off the fold. Delaying the index by 400ms
+   * moved the jump to 448ms, which is what proves the FETCH is the trigger
+   * rather than the parse.
+   *
+   * AND THE LINE THAT DID IT SAT 168 LINES BELOW A COMMENT SAYING IT HAD
+   * BEEN REMOVED. `AT_REST` captures the band and restores it — the half
+   * that got written — and the assignment that threw it away first was
+   * left standing. A loading state over a complete page is a regression
+   * dressed as feedback, and it is honest only where the reader is waiting
+   * for something they asked for, which is the `?q=` arrival.
+   *
+   * THE CEILING IS 0.02 RATHER THAN 0.1. Google's "good" is 0.1, and a
+   * threshold a site is nowhere near is a threshold that admits a real
+   * regression: every family here is at zero, so the honest ceiling is
+   * "essentially zero" and the number a reader would notice is far above
+   * it. The message names the ELEMENT that moved and its box before and
+   * after, because a CLS figure with no element in it cannot be diagnosed.
+   */
+  {
+    const FAM = require("./lib/families.js").ALL;
+    // Its own page, because `PerformanceObserver` with `buffered: true`
+    // reports the shifts of whatever this page has already loaded — the
+    // dead-rule scan's recorded failure, where a shared page carried the
+    // pointer position of an earlier check into this one.
+    const cp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await cp.addInitScript(() => {
+      window.__cls = 0;
+      window.__shifts = [];
+      new PerformanceObserver((l) => {
+        for (const e of l.getEntries()) {
+          if (e.hadRecentInput) continue;
+          window.__cls += e.value;
+          for (const s of e.sources || []) {
+            const n = s.node;
+            window.__shifts.push({
+              v: e.value,
+              el: n && n.tagName
+                ? n.tagName.toLowerCase() + (n.id ? "#" + n.id : "") +
+                  (n.className ? "." + String(n.className).split(" ").slice(0, 2).join(".") : "")
+                : "(anonymous)",
+              was: s.previousRect
+                ? `y${Math.round(s.previousRect.y)}+${Math.round(s.previousRect.height)}` : "-",
+              now: s.currentRect
+                ? `y${Math.round(s.currentRect.y)}+${Math.round(s.currentRect.height)}` : "-",
+            });
+          }
+        }
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    const shifty = [];
+    let seenCls = 0;
+    for (const [name, url] of FAM) {
+      const r = await cp.goto(base + url, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      seenCls++;
+      // Long enough for a fetch to land and re-render: the defect this was
+      // written for happened at 90ms with the index served locally and at
+      // 448ms with it delayed, and a reader on a real network is slower
+      // than either.
+      await cp.evaluate(() => new Promise((res) => setTimeout(res, 700)));
+      const v = await cp.evaluate(() => ({ cls: window.__cls, shifts: window.__shifts }));
+      if (v.cls > 0.02) {
+        const worst = v.shifts.sort((a, b) => b.v - a.v)[0];
+        shifty.push(`${name} ${v.cls.toFixed(4)}` +
+                    (worst ? ` (${worst.el} ${worst.was} -> ${worst.now})` : ""));
+      }
+    }
+    await cp.close();
+    checked += seenCls;
+    ok(seenCls >= 40,
+       `the layout-shift sweep read only ${seenCls} families — it has ` +
+       `stopped finding them, and a sweep of nothing reports no shift`);
+    ok(shifty.length === 0,
+       `${shifty.length} of ${seenCls} families shift after painting: ` +
+       `${shifty.slice(0, 6).join("; ")}. Content that moves once a reader ` +
+       `has started reading it is the one performance fault bytes cannot see.`);
   }
 
   /* A LINK AT ZERO ALPHA IS PRESENT, PLACED, SIZED, KEYBOARD-REACHABLE AND

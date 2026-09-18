@@ -168,7 +168,20 @@ def measure():
                        "something real too: every interest page draws its own "
                        "tag and says it does so \"so the seventeen can be "
                        "compared\", and there was nowhere they could be. The "
-                       "index is that comparison, ordered by reach."},
+                       "index is that comparison, ordered by reach."
+                       "  1034 -> 1032 WHEN A SUB-CATEGORY HAD TO EARN ITS "
+                       "PAGE. FACET_MIN is three and its reason is that below "
+                       "it a page is a heading over a list a reader could have "
+                       "seen in full on the page they came from - exactly true "
+                       "of a sub-category, whose parent lists every invitation "
+                       "it holds. Two of the twenty-eight shipped ONE row, and "
+                       "the smaller was worse than thin: /experiences/nature/"
+                       "fjords declares fjord, inlet, calanque, ria and sea "
+                       "loch, NO experience in this atlas mentions a fjord at "
+                       "all, and the page called Fjords held Marseille. "
+                       "Removing a URL is the deliberate act this row exists to "
+                       "make visible, and nothing is orphaned: every entry it "
+                       "selected is already on the parent page."},
             "routes.hash": {
                 "value": route_hash, "kind": "exact",
                 "why": "A visual change must not move a URL. Every inbound link, "
@@ -184,7 +197,20 @@ def measure():
                        "something real too: every interest page draws its own "
                        "tag and says it does so \"so the seventeen can be "
                        "compared\", and there was nowhere they could be. The "
-                       "index is that comparison, ordered by reach."},
+                       "index is that comparison, ordered by reach."
+                       "  1034 -> 1032 WHEN A SUB-CATEGORY HAD TO EARN ITS "
+                       "PAGE. FACET_MIN is three and its reason is that below "
+                       "it a page is a heading over a list a reader could have "
+                       "seen in full on the page they came from - exactly true "
+                       "of a sub-category, whose parent lists every invitation "
+                       "it holds. Two of the twenty-eight shipped ONE row, and "
+                       "the smaller was worse than thin: /experiences/nature/"
+                       "fjords declares fjord, inlet, calanque, ria and sea "
+                       "loch, NO experience in this atlas mentions a fjord at "
+                       "all, and the page called Fjords held Marseille. "
+                       "Removing a URL is the deliberate act this row exists to "
+                       "make visible, and nothing is orphaned: every entry it "
+                       "selected is already on the parent page."},
             "shell.count": {
                 "value": sum(open(os.path.join(ROOT, "tools", "lib", f),
                                   encoding="utf-8").read().count("<!doctype html>")
@@ -633,7 +659,28 @@ def measure():
                        "the markup of two plates with heads on them. The "
                        "drawing itself did not change by a byte: the ceiling "
                        "is here to catch a template inlining geometry across "
-                       "a family, and this is prose."},
+                       "a family, and this is prose."
+                       "  444 -> 489 WHEN THE POPUP GOT THE PHOTOGRAPH IT "
+                       "HAD FIVE OF SIX FIELDS FOR. /map's popup already "
+                       "printed the name, the country, the region, the "
+                       "summary and the link, off the baked `mapinfo` block "
+                       "— and the register holds a photograph for 105 of the "
+                       "319, which the instrument showed none of. The three "
+                       "fields are the derivative URL, the alt the "
+                       "photographer wrote and the credit fragment "
+                       "`render.credit_html` composes: 46,505 raw bytes and "
+                       "10,045 over the wire, measured by gzipping the page "
+                       "with the fields and without. The credit is carried "
+                       "rather than composed in the browser because it is a "
+                       "licence obligation and this product has exactly one "
+                       "implementation of it — the same reason the planner "
+                       "receives `cities.shotCredit` instead of building it. "
+                       "Reading it out of `/api/atlas.json` instead would "
+                       "trade 10 KB against a 350 KB fetch to show one "
+                       "picture, so the bytes are the cheap half of that "
+                       "trade. The raw figure is what this ceiling measures "
+                       "and the compressed one is what a reader pays."
+                       "  489 -> 581 WHEN THE REGISTER REACHED EVERY DESTINATION, AND NOTHING ABOUT THIS PAGE CHANGED. The popup carries the derivative URL, the photographer's alt and the credit for each destination the register holds a picture of, and that went from 105 to 319 when eight acquisition batches merged into the default branch. Measured on the shipped page, `mapinfo` is 253,111 bytes of 597,481 and what a reader pays is 125 KB compressed. The ceiling is raised rather than argued with, because the trade was decided at 105 and this is the same trade at three times the coverage — but it is recorded rather than rounded up, because the per-destination photograph fields are now the largest single thing on the largest page on the site, and the next honest move is a second index rather than a bigger document."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need

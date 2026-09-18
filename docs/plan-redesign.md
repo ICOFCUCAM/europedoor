@@ -471,3 +471,130 @@ the thing it proves. The band whose subject is a list of refusals now carries
 six, and **not one of them is written there for the first place**: each is
 already published on this site and the row says where, because a refusal
 nobody can check is a slogan.
+
+## The readback reported the parse and the plan ran on something else
+
+The specification's §10 lists eleven planner inputs, and this repository's
+own verdict on it read *"ten of the eleven inputs are taken and every one of
+them moves the answer."* That was true of the FORM and false of the sentence
+box, in three places, and the sentence box is the thing the page leads with.
+
+`goFromSentence` calls `plan(opts)` four lines before it composes
+`readbackHtml(got)`. So every disagreement between what was parsed and what
+was planned was already known, and the readback was handed the wrong object:
+
+| you typed | the page said | the plan did |
+|---|---|---|
+| `for 4 people` | "for 4" | priced one person |
+| `2 days in Vienna` | "2 days" | built three |
+| `A week in Slovakia` | "within Slovakia" | planned the whole continent |
+
+**The party size was the expensive one.** `applyAsk` set days, budget,
+month, style, pace, start and interests, and never `form.travellers` — so
+`readForm` read the control's default of one and `costOf` multiplied food,
+transport and activities by one person. The cost model is careful: a double
+is not twice a single, so the second traveller adds 55% of a room and
+everything else scales linearly, which puts `total(n)/total(1)` between
+`1 + 0.55(n-1)` and `n`. All of that care was being spent on the wrong
+number. Measured in Chromium on one sentence with and without four people:
+
+| | one traveller | four travellers |
+|---|---|---|
+| accommodation | €664 | €1,760 (×2.65, which is 1 + 3×0.55 exactly) |
+| food | €443 | €1,771 (×4) |
+| transport | €44 | €176 (×4) |
+| activities | €180 | €720 (×4) |
+| **estimated total** | **€1,491** | **€4,958** |
+
+A party of four was shown a total **70% under its own cost**, on the one
+number in this product a reader could act on and be wrong about — which is
+the sentence already written here about a great-circle distance printed as a
+journey.
+
+**The geography was the dishonest one, because it was not silence but a
+false statement.** `plan()` honours a named country only where four
+destinations sit inside it — *"three cities is not a fortnight, and silently
+returning a two-stop trip would look like a bug rather than a constraint"* —
+and **12 of the 47 countries in the planner index hold fewer**: Monaco, San
+Marino and Vatican City hold one, Andorra, Liechtenstein and Moldova two,
+and Azerbaijan, Cyprus, Kosovo, Montenegro, North Macedonia and Slovakia
+three. `opts.geoTooNarrow` was set for exactly this and **read nowhere** —
+`kindfilters` and `data-rotate` again, a constraint computed on every run
+and discarded — while the readback went on printing "within Slovakia" over a
+route through six countries.
+
+**The day floor was the smallest and is the one with somewhere to send a
+reader.** The control publishes `min="3"`, so the form path declares the
+bound; the sentence path accepted "2 days" and raised it in silence. It now
+says so, and says what the atlas holds instead: **278 of the 313
+destinations in the index are three nights or fewer**, derived from
+`nights`, which atlas.json already carries. A trip shorter than the planner
+builds is one place rather than a route, and every destination page carries
+the nights that place is worth.
+
+### One mechanism, and the tested path was the one that worked
+
+All three are the same fault: **a readback that reports the parse rather
+than the plan is not a readback.** `readbackHtml` takes both objects now,
+prints the plan's numbers, and names every place the two differ in the
+grammar the start city has used since it was written.
+
+The browser suite already asserted the party size — through the FORM, with
+the same cost band. *A code path nothing exercises is a code path nothing
+checks*, and here the exercised path was correct and the unexercised one was
+not, in the same function. The suite now types the three sentences and reads
+the money.
+
+### Four typed copies of two bounds
+
+`DAY_MIN`, `DAY_MAX`, `PARTY_MIN` and `PARTY_MAX` are declared once.
+`applyAsk` and `readForm` each clamped both with literals, and the controls
+publish their own `min` and `max` — four typed copies of two decisions,
+which is the dispatch cap exactly, where three of four copies were raised
+and the one that was a gate was left behind. `checks.py` asserts the
+declaration against **the attribute the form ships**, because comparing the
+copies to each other goes green the moment somebody types the same number
+twice, and the attribute is what a reader's own browser enforces before any
+script runs.
+
+### Two of the new checks were green on the state they exist to refuse
+
+Proved by mutation, which is the only reason either is known.
+
+**The flag scan read its own documentation.** `c_plan_reports_what_it_ran`
+asserts that every constraint the planner computes is also read back, and
+the paragraph in `planner.js` explaining that `opts.geoTooNarrow` was *read
+nowhere* contains those words — so deleting the real read left the check
+passing. That is the **seventh** time an instrument here has read the
+documentation of code as code, and the first where the check and the comment
+that defeated it were written in the same commit. `bare_js()` now does for
+the script what `bare_css()` has always done for the stylesheet, stepping
+over string literals rather than stripping them, because `https://` inside a
+string is not the start of a comment. Its output is asserted to still parse.
+
+**And the party-size check was satisfied by the text being present.**
+Replacing `applyAsk`'s condition with `if (false)` left the words
+`form.travellers` in place and the check green — pinning a shape rather than
+a promise, in a check written against that. What the party size has to do is
+move the money, and only a browser can see that, so the static check says
+what it can honestly say and its failure message names the instrument that
+owns the rest.
+
+### And a scoped instrument, because the first one was right about the wrong thing
+
+The clamp scan's first version matched any nested `Math.max`/`Math.min` and
+flagged `Math.max(1, Math.min(14, r[i].nights + by))` — the per-leg nights
+nudge, a real clamp of a different quantity. An instrument that reports a
+true thing about the wrong subject is the caption-against-credit failure
+recorded one family over. It is scoped to the two statements that clamp a
+day count or a party size.
+
+### What is recorded rather than closed
+
+**Restoring a plan from a URL or from My Europe sets the day field without
+clamping** — `form.days.value = q.get("d")` and `= j.days`. The route is
+re-rendered from the encoded stops rather than re-planned, so nothing is
+mis-costed, and `readForm` clamps on the next rebuild; what a reader could
+see is a field showing a number outside the bound until they press the
+button. Recorded because it is the same class as the three above, arriving
+on a path where it costs nothing today.
