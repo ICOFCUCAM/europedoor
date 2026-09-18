@@ -509,3 +509,40 @@ the page before the picture is described.
 page**, so nothing above 62rem changes — proved rather than argued: the
 homepage at 1280 is **byte-identical** before and after, and only 390 differs.
 
+## PLATE 02 — THE WINDOW'S CROP WAS THE ACQUISITION'S DEFAULT, AND IT WAS SKY
+
+**A fixed picture cannot be judged from an element screenshot.** `position:
+fixed` paints against the viewport, so shooting the band gives the photograph
+wherever it happens to be at scroll 0 rather than where a reader meets it —
+the same mistake `opening.js` was making two commits ago, in the instrument
+rather than in the page. Scrolled to and shot as a viewport, the window reads
+properly.
+
+Measured on the rendered `<img>`:
+
+| viewport | box | source | cover crops | keeps |
+|---|---|---|---|---|
+| 1280 | 1280×720 (1.778) | 1280×853 (1.501) | height | 84% |
+| 834 | 834×469 (1.778) | 834×556 (1.500) | height | 84% |
+| 1920 | 1920×1080 (1.778) | 1920×1280 (1.500) | height | 84% |
+| **390** | **390×488 (0.800)** | 389×259 (1.502) | **width** | 53% |
+
+So the three wide widths crop top and bottom and the phone crops left and
+right, and **a vertical focal anchor is a no-op at 390 by construction** —
+which is why the first render after the change looked identical there and
+would have been read as the change not working.
+
+All 826 rows carry the acquisition's default `focal: [50, 50]`, and at 16:9
+from a 3:2 source that centres a frame whose subject is in its lower third:
+the 1280 window was about 300 pixels of sky over a 105-pixel band of city.
+`[50, 82]` quantises to `f-cb`, keeping the bottom 84% — **the city band grows
+to about 165 pixels and the picture reads as a city seen from above rather
+than as a sky with a city under it.** The phone is untouched, as the
+arithmetic says it must be.
+
+**This is the step the pipeline names as the one it loses.** The Media Desk's
+own note says a green run merges itself and *nothing looks at the photograph
+inside the rendered page before it is live*; a focal anchor is exactly what a
+photo editor sets after looking, and the register had never had one set. It is
+the first non-default `focal` in 826 rows.
+

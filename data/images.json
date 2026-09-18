@@ -2128,7 +2128,7 @@
       "height": 4160,
       "focal": [
         50,
-        50
+        82
       ],
       "processing": {
         "tool": "Pillow 12.3.0",
