@@ -10309,7 +10309,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .dcorner h3 { font-size: var(--t-xs); font-family: var(--text);
   letter-spacing: .08em; text-transform: uppercase; color: var(--door-dark);
   margin: 0 0 var(--s2); }
-.dcorner h3 a { color: inherit; text-decoration: none; }
+/* NO `color: inherit`, which this file already says 637 lines up and this
+   rule ignored: `a { color: inherit }` is the global rule at the top, so
+   restating it is a declaration that matches its element and changes
+   nothing — and the dead-rule scan named it in the first run after this
+   band shipped. `text-decoration: none` STAYS: the scan reported `{color}`
+   alone, and deleting the whole rule is how the `.picstory` repair put an
+   underline through seven story headlines. */
+.dcorner h3 a { text-decoration: none; }
 .dcorner h3 a:hover { text-decoration: underline;
   text-underline-offset: .2em; }
 /* THE CHILD COMBINATOR IS LOAD-BEARING. `.dcorner a` also matches the

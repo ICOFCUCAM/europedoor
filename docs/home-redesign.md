@@ -576,3 +576,24 @@ words. `.dcorner > a` is the fix — **the child combinator is load-bearing**,
 because the country links are the direct children and the heading's anchor is
 not.
 
+### And the re-run found the next one, 637 lines from the note that forbids it
+
+The heading-line failure was gone and the dead-rule scan named
+**`.dcorner h3 a {color}`**: `color: inherit` restating `a { color: inherit }`,
+which is the global rule at the top of the file. The stylesheet **already
+carries that exact note**, written for a different band:
+
+> *No `color: inherit`: `a { color: inherit }` is the global rule at the top
+> of this file, and restating it here is the redundancy the dead-rule scan
+> exists to find — a declaration that matches its element and changes
+> nothing, which reads as a decision and is not one.*
+
+637 lines above the rule that ignored it. *A rule recorded is not a rule
+inherited*, in one file, in one session, by one hand.
+
+**The declaration goes and the rule stays.** The scan names declarations, not
+rules, and deleting the whole rule is exactly how the `.picstory` repair put
+an underline through seven story headlines — `text-decoration: none` is doing
+real work here. Proved: plate 05 at 1280 is **byte-identical** with the
+declaration and without it.
+
