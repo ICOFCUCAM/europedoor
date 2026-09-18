@@ -2796,7 +2796,15 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    selectors that style the original where the original sits.
    The shadow is of the group's UNION, so an internal frontier casts none —
    exactly the coast, and never a border. */
-.europemap #countries, .europemap #detail,
+/* AND /map LOST IT, BECAUSE A SHORE BAND ON NEAR-BLACK IS AN AURA. These
+   three shadows are the light map's own ocean ramp — pale, mid, deep — and
+   over pale water they read as shallows, which is what they were written
+   for. On the instrument's near-black ground they read as fifty countries
+   GLOWING: visible in one screenshot of the deployed page and in no count
+   anywhere, and it is the lit-aura failure this stylesheet already records
+   for the hero, in the family that learned it. The drawing is the light
+   atlas now and its coast is an ink stroke, which is what a printed sheet
+   uses and what `--atlas-coast` exists for. */
 .minimap.arched:not(.atlas) .countries {
   filter: drop-shadow(0 0 2px var(--ocean-coastal))
           drop-shadow(0 0 7px var(--ocean-shallow))
@@ -2838,6 +2846,97 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    is a different drawing. */
 .datacut stop { stop-color: var(--atlas-sea); }
 .europemap .context path { fill: var(--atlas-far); stroke: none; }
+/* ── /map IS DRAWN AS AN ATLAS ───────────────────────────────────── */
+/* THE FIVE CARTOGRAPHIC ROLES ARE REBOUND RATHER THAN RESTATED, which is
+   what /plan's desk drawing already does one file over: the fills below
+   name `--atlas-land`, `--atlas-frontier` and `--atlas-coast`, so a second
+   set of fill rules for this drawing would be a second implementation of
+   it. The band says which palette the role resolves to and the geometry is
+   untouched. The values are the light block's own, copied from where it
+   declares them rather than invented here.
+
+   AND IT IS A DECISION ABOUT WHAT THIS DRAWING IS. `docs/cartography.md`
+   splits every map on that question — a picture is paper, an instrument is
+   graphite — and /map was graphite because it is the tool. Measured against
+   a printed European atlas it was fifty flat shapes, no water, no rivers,
+   no coast and no type: the split had made the one drawing whose subject is
+   the whole atlas the least atlas-like thing on the site. It is a picture
+   you can operate, so it takes the picture's palette and keeps every
+   control. */
+.europemap.atlas {
+  --atlas-sea:      var(--map-water);
+  --atlas-land:     var(--map-land);
+  --atlas-far:      #C3BFB2;
+  --atlas-coast:    #3D4441;
+  --atlas-frontier: var(--map-border); }
+.europemap .lyr-ocean { fill: var(--atlas-sea); }
+/* A SEPARATE COAST PASS IS REFUSED ON ITS BYTES, and the refusal is worth
+   writing down because the benchmark has one. A coastline is where land
+   meets sea and a frontier is a line drawn on land, and every printed sheet
+   draws them at two weights — which needs a `<use>` of `#countries` stroked
+   wider underneath, and `.europemap .countries path` sets its fill BY
+   SELECTOR, so the clone comes back filled. The escape is
+   `cartography.stroke_only()`, which emits a second copy of the geometry:
+   43 KB on a page already at 598. So this drawing keeps ONE stroke and
+   spends the difference on making it quiet — a light frontier on stone,
+   which is what the reference sheet's internal borders are — and the coast
+   is read from the step between the land and the water.
+   The trigger is a lod0 land UNION in `data/geo/`: one path, one `<use>`,
+   no second copy. */
+/* AND THE GROUND BEYOND THE ATLAS IS THE SAME LAND. `context` means "a
+   country this atlas does not write about", which is a fact about the
+   dataset and not about the ground: at `--atlas-far` it drew a wedge over
+   Anatolia and the Urals whose two straight edges are the 52E and 33N data
+   cuts, and a reader can only read a tonal step as a geographic claim. The
+   plates settled this years ago — same fill, a lighter coastline, because
+   the difference that IS real is how much we know about it — and the fade
+   over the cut is what says where the data stops. */
+.europemap.atlas .context path { fill: var(--atlas-land);
+  stroke: color-mix(in srgb, var(--atlas-coast) 32%, transparent);
+  stroke-width: calc(0.8px / var(--z)); }
+.europemap.atlas .countries path {
+  stroke: color-mix(in srgb, var(--atlas-frontier) 58%, transparent);
+  stroke-width: calc(0.8px / var(--z)); }
+/* WHICH WAY IS NORTH, AND WHY IT IS NOT AN ARROW. `pages.MAPPROJ` is a
+   Lambert conformal conic with a cone constant of 0.7753, so grid north
+   turns away from true north by `n x (lon - 10)`: -27.1 degrees over
+   Iceland, zero on the central meridian, +27.1 over the Caucasus, +32.6 at
+   the data cut. One compass rose would be right on one meridian and thirty
+   degrees wrong at the edge of the same frame. The graticule is the answer
+   — north is along the meridian you are standing on, exact everywhere by
+   construction — and it is a hairline in the water's own tone, because a
+   reader should find it when they look for it and never meet it first. */
+.europemap .herograt path { fill: none;
+  stroke: color-mix(in srgb, var(--atlas-coast) 14%, transparent);
+  stroke-width: calc(0.6px / var(--z)); }
+.europemap .lyr-rivers .riv { fill: none; stroke: var(--ocean-shallow);
+  stroke-width: calc(0.7px / var(--z)); stroke-linejoin: round; }
+.europemap .lyr-rivers .riv.major { stroke-width: calc(1.1px / var(--z)); }
+.europemap .lyr-rivers .lake { fill: var(--ocean-shallow); stroke: none; }
+/* THE NAMES ARE THE PLATES' OWN TYPOGRAPHY, one level up: no font size is
+   introduced, and the ink is a shade quieter than the frontiers because a
+   name should be found when it is looked for. */
+.europemap .lyr-labels .cname {
+  font-family: var(--display); font-size: calc(15px / var(--z));
+  letter-spacing: .26em; text-transform: uppercase;
+  fill: color-mix(in srgb, var(--atlas-coast) 82%, transparent); }
+/* THE TYPE IS ON TOP OF THE DRAWING AND TAKES NO CLICKS, which is what a
+   printed sheet does and what the first version got backwards: the names
+   were emitted before the dots, so 319 destinations painted over the
+   thirteen countries the layer had just been added to name. They are the
+   last thing in the drawing now, and `pointer-events: none` keeps every dot
+   and every country reachable underneath them. */
+.europemap :is(.lyr-labels, .lyr-water-labels) { pointer-events: none; }
+.europemap .lyr-water-labels .seaname { font-size: calc(11px / var(--z));
+  fill: color-mix(in srgb, var(--ocean-deep) 58%, transparent); }
+/* AND THE DOTS TAKE THE GEOGRAPHIC ACCENT RATHER THAN THE WORLD'S. `--sea`
+   is the INTELLIGENCE world's cobalt-air, sized for a near-black ground; on
+   pale stone it is a wash. `--cobalt` is the token this palette declares as
+   the geographic accent and measures at 5.68 on bone. */
+.europemap.atlas .dot circle { fill: var(--cobalt); }
+.europemap.atlas .placedot circle { fill: var(--cobalt); opacity: .42; }
+.europemap.atlas .cshape:hover path,
+.europemap.atlas .cshape.on path { fill: var(--pine); stroke: var(--pine-deep); }
 .europemap .countries path {
   fill: var(--atlas-land); stroke: var(--atlas-frontier);
   stroke-width: calc(1px / var(--z)); stroke-linejoin: round;

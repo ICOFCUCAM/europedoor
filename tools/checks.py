@@ -4125,6 +4125,22 @@ def c_one_label_rule():
     return n
 
 
+# WHICH INSTRUMENTS ARE DRAWN AS PICTURES, and why each one is.
+#
+# `docs/cartography.md` splits every drawing on what it IS — a picture is
+# warm paper, an instrument is graphite — and this is the list of drawings
+# that are both. It is a list rather than a loosened rule because the split
+# is real and load-bearing everywhere else: /discover and /plan are still
+# graphite, and a third page joining this one has to be argued for in a diff.
+ATLAS_INSTRUMENTS = {
+    "/map/index.html":
+        "the atlas itself, and the tool for operating it. It drew no water, "
+        "no rivers, no coast and no type: fifty flat shapes and 319 "
+        "identical dots on the page titled 'Europe, and everything we hold "
+        "in it'.",
+}
+
+
 @check("every map declares whether it is an illustration or an instrument")
 def c_map_roles():
     # A MAP IS AN EDITORIAL ILLUSTRATION UNLESS IT SAYS OTHERWISE. The
@@ -4161,8 +4177,30 @@ def c_map_roles():
                     f"never land on a near-black ground")
                 illus += 1
             else:
-                assert "atlas" not in cls.split(), (
-                    f"{rel(path)}: an instrument wearing the atlas skin")
+                # AND AN INSTRUMENT MAY BE DRAWN AS AN ATLAS, ONCE, AND IT
+                # HAS TO SAY SO.
+                #
+                # The split is `docs/cartography.md`'s: a picture is warm
+                # paper and an instrument is graphite. That was written about
+                # what a drawing IS, and /map is both — the atlas itself, and
+                # the tool for operating it. Measured against a printed
+                # European sheet it had no water, no rivers, no coast and no
+                # type: fifty flat shapes and 319 identical dots, which made
+                # the one drawing whose subject is the whole atlas the least
+                # atlas-like thing on the site. So it takes the picture's
+                # palette and keeps every control.
+                #
+                # A DECLARED EXCEPTION RATHER THAN A RELAXED RULE, which is
+                # the shape `SHEET_SHARED` already uses for a composition
+                # class two families share: moving one is allowed, moving one
+                # silently is not. A second instrument wearing this skin fails
+                # here until somebody writes down why.
+                if "atlas" in cls.split():
+                    assert rel(path) in ATLAS_INSTRUMENTS, (
+                        f"{rel(path)}: an instrument wearing the atlas skin, "
+                        f"and it is not one of the {len(ATLAS_INSTRUMENTS)} "
+                        f"declared. Add it to ATLAS_INSTRUMENTS with the "
+                        f"reason, or draw it in graphite")
                 instr += 1
             n += 1
     assert illus > 700 and instr > 40, (

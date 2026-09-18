@@ -636,7 +636,7 @@ def measure():
             "weight.max_page_kb": {
                 "value": round(max(len(b) for b in bodies.values()) / 1024),
                 "kind": "ceiling",
-                "why": "The heaviest page on the site. Guards against a template "
+                "why": "AND 581 -> 598 WHEN /map BECAME AN ATLAS. It drew no water, no rivers, no coast and no type — not one `lyr-*` layer and zero `<text>` elements, on the page titled *Europe, and everything we hold in it*. Seventeen kilobytes buys the water, thirty-five rivers and the big lakes, a graticule, thirteen country names and six sea names, every one of them from a helper that already existed and had never been on this page. A separate coast pass is refused on its bytes and the refusal is written down. The heaviest page on the site. Guards against a template "
                        "quietly inlining something large across a whole family, "
                        "which is how the coastline reached 51 pages and 2.1 MB. "
                        "440 -> 441: /map gained the two fades that cover its "

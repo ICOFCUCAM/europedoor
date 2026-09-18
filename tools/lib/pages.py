@@ -698,6 +698,286 @@ def living_atlas(data, images, doc):
     return out
 
 
+def graticule_layer():
+    """The projection, drawn, and this atlas's answer to which way is north.
+
+    A PRINTED ATLAS SHOWS ITS OWN PROJECTION and a compass rose cannot, on
+    this one. `pages.MAPPROJ` is a Lambert conformal conic with a cone
+    constant of 0.7753, so grid north rotates away from true north by
+    `n * (lon - 10)` — measured: -27.1 degrees over Iceland, -15.5 over
+    Iberia, zero on the central meridian, +15.5 over Athens and Kyiv, +27.1
+    over the Caucasus and +32.6 at the data cut. A single north arrow would
+    therefore be right on ONE meridian and up to thirty-odd degrees wrong at
+    the edges of the same frame, which is a claim this projection cannot
+    make and this atlas does not make elsewhere either.
+
+    So north is drawn as a DIRECTION rather than as a corner: under a conic
+    a meridian is a straight radial line from the cone apex and a parallel is
+    a circular arc about it, so the graticule says "north is along the
+    meridian you are standing on" and is exact everywhere by construction.
+    Sampled through `MAPPROJ` rather than drawn as arcs, so it cannot
+    disagree with the geometry it is laid over: if the projection ever moves
+    again, this moves with it.
+
+    Ten degrees, which is the interval the EU's own pan-European sheets use
+    at this extent, and a hairline in the water's own tone: a reader should
+    find it when they look for it and never meet it first.
+    """
+    _grat = []
+    for _lon in range(-30, 51, 10):
+        _pts = [MAPPROJ.xy(_la / 2.0, _lon) for _la in range(60, 161, 4)]
+        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
+    for _lat in range(30, 81, 10):
+        _pts = [MAPPROJ.xy(_lat, _lo / 2.0) for _lo in range(-70, 111, 4)]
+        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
+    graticule_markup = ('<g class="herograt" aria-hidden="true">'
+                 + "".join(f'<path d="{d}"/>' for d in _grat) + '</g>')
+    return graticule_markup
+
+
+def sea_names(land, view, most=6):
+    """The seas with enough open water around them to carry a name.
+
+    Lifted out of the hero when /map needed the same layer, because the set
+    is chosen by a MEASUREMENT — the distance from the label's own point to
+    the nearest drawn coastline — and two implementations of a measurement
+    disagree within a month. The hero's own output is asserted byte-identical
+    across the move.
+    """
+    vw, vh = view[2], view[3]
+    LABEL_ROOM = 12.0
+    LABEL_REACH = 170.0
+    _coast = []
+    for _m in LAND_PATH.finditer(land):
+        _n = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", _m.group(1))]
+        _coast.extend(zip(_n[0::2], _n[1::2]))
+    _lx1 = max((cx for cx, _cy in _coast), default=view[0] + vw)
+    _ly0 = min((cy for _cx, cy in _coast), default=view[1])
+    _seas = []
+    for _x, _y, _nm in cartography.water_points(
+            lambda la, lo: MAPPROJ.xy(la, lo), view):
+        if not (view[0] < _x < view[0] + vw and view[1] < _y < view[1] + vh):
+            continue
+        _room = min((math.hypot(_x - cx, _y - cy) for cx, cy in _coast),
+                    default=0.0)
+        if _room < LABEL_ROOM:
+            continue
+        # AND NOT WHERE THE PICTURE ITSELF RUNS OUT. Two tests failed on
+        # the WHITE SEA and the CASPIAN before this one: a ceiling on the
+        # room caught the first and not the second, and counting the
+        # countries that face a sea caught neither, because Azerbaijan's
+        # coast wraps right round the Caspian's label and Finland, Sweden
+        # and Norway are all within reach of the White Sea's. What those
+        # two actually have in common is the thing a reader sees: their far
+        # shore is Russia and Kazakhstan, and the drawn land simply STOPS
+        # a few units beyond the name. `data/geo/` is cut at 52°E and at
+        # 72.5°N, and this hero drops the one country the eastern cut runs
+        # through — so a label within its own reach of the drawing's
+        # northern or eastern extreme is a label with nothing behind it.
+        # South and west the drawing ends in the Atlantic and in the
+        # Mediterranean's own southern shore, which is a decision rather
+        # than a data cut, so the test is on those two edges only.
+        if (_x > _lx1 - LABEL_REACH * 0.55) or (_y < _ly0 + LABEL_REACH * 0.4):
+            continue
+        _seas.append((_room, _x, _y, _nm))
+    _seas.sort(reverse=True)
+    seanames = ('<g class="lyr lyr-water-labels" aria-hidden="true">'
+                + "".join(
+                    f'<text class="seaname" text-anchor="middle"'
+                    f' x="{x:.1f}" y="{y:.1f}">{esc(nm)}</text>'
+                    for _r, x, y, nm in _seas[:6]) + '</g>') if _seas else ""
+    return seanames
+
+
+def name_countries(land, view, max_names=16):
+    """Set a country's name across its own drawn shape, once, for anybody.
+
+    THREE DRAWINGS ON THIS SITE NAME COUNTRIES AND ONLY ONE HAD THE RULES.
+    `NameGround` was lifted to module level the last time that was true: the
+    hero had the two ground rules and the country portrait had none, and
+    nine portraits set a name across a neighbour. The PLACEMENT stayed
+    behind, so the hero and the portrait each carried their own copy — and
+    /map carried nothing at all, which is why the one page whose subject is
+    the whole atlas shipped ZERO `<text>` elements.
+
+    This is the hero's block, MOVED rather than copied, and the hero's own
+    drawing is asserted byte-identical across the move. What it takes is the
+    land markup a drawing already emits and the frame it is drawn in; what
+    it returns is the `<text>` layer, or an empty string where nothing fits.
+    """
+    vw, vh = view[2], view[3]
+    def _dpath(d):
+        """The bounding box of the largest subpath in a `d`, and its centre."""
+        best, bb = 0.0, None
+        for sub in d.split("Z"):
+            pts = [(float(a), float(b))
+                   for a, b in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
+            if len(pts) < 3:
+                continue
+            xs = [q[0] for q in pts]
+            ys = [q[1] for q in pts]
+            area = (max(xs) - min(xs)) * (max(ys) - min(ys))
+            if area > best:
+                best, bb = area, (min(xs), min(ys), max(xs), max(ys))
+        if not bb:
+            return None
+        return ((bb[0] + bb[2]) / 2.0, (bb[1] + bb[3]) / 2.0,
+                min(bb[2] - bb[0], bb[3] - bb[1]) / 2.0, bb)
+
+    NAME_INSET = 14.0
+    taken = []
+
+    # WHOSE GROUND IS THIS? The two rules and the tolerance now live in
+    # NameGround at module level, because there are TWO drawings on this site
+    # that set a country's name across it and for the life of both only this
+    # one had them. See the class.
+    ground = NameGround([m_.group(1) for m_ in LAND_PATH.finditer(land)])
+    shapes = ground.shapes
+    CROSS_OK = NameGround.CROSS_OK
+
+    def _own(mine, x, y):
+        return ground.own(mine, x, y)
+
+    def _crossings(mine, x0, y0, w0, h0):
+        return ground.crossings(mine, x0, y0, w0, h0)
+
+    def _clear(lx, ly, lw, lh):
+        b = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
+             lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
+        return not any(not (b[2] < q[0] or b[0] > q[2]
+                            or b[3] < q[1] or b[1] > q[3]) for q in taken)
+
+    def _inframe(x, y, wide, anchor, mine=None, metric="cname", tol=0):
+        x0, y0, w0, h0 = _label_box(
+            x, y, wide, anchor, *LABEL_METRICS[metric][2:])
+        if not (x0 >= view[0] + NAME_INSET
+                and x0 + w0 <= view[0] + vw - NAME_INSET
+                and y0 >= view[1] + NAME_INSET
+                and y0 + h0 <= view[1] + vh - NAME_INSET):
+            return False
+        if mine is None:
+            return True
+        # THE MIDDLE ON ITS OWN COUNTRY, AND NOT ONE SAMPLE ON ANYBODY
+        # ELSE'S. Nine sample points along the name — seven on the baseline
+        # and three at cap height — because a name is a bar of type rather
+        # than a point, and the whole bar has to be over its own ground or
+        # over water.
+        if not _own(mine, x0 + w0 / 2.0, y0 + h0 / 2.0):
+            return False
+        return _crossings(mine, x0, y0, w0, h0) <= tol
+
+    ANCHORS = ((0, 0), (0, -0.35), (0, 0.35), (-0.4, 0), (0.4, 0),
+               (-0.3, -0.3), (0.3, -0.3), (-0.3, 0.3), (0.3, 0.3))
+    # THE BIGGEST COUNTRIES CLAIM THEIR SPACE FIRST, and there is a cap.
+    #
+    # Placed in document order — which is alphabetical by ISO code — Albania
+    # took a position before Germany was asked for one, and the map filled up
+    # from whoever happened to be first. Drawn area is the honest order here:
+    # it is a property of THIS picture rather than a judgement about the
+    # country, and it is the same quantity that decides whether a name can
+    # fit at all.
+    #
+    # And the cap is the point of the whole layer. The question is not how
+    # many countries can be labelled, it is whether the labels make Europe
+    # more recognisable — so sixteen is the ceiling and the rest of the
+    # continent is read from its shape, which is what the shape is for.
+    NAME_MAX = max_names
+    # AND THE PATTERN TOLERATES ATTRIBUTES BEFORE `d`, WHICH IT DID NOT.
+    # It was the literal `<path d="..."><title>`, and the day the land paths
+    # gained an `id` — so the Living Atlas could clip a photograph to a
+    # country with a `<use>` instead of a second copy of its ring — the
+    # regex matched nothing and all fifteen country names left the hero in
+    # silence. Nothing failed: the layer was simply empty, which is the same
+    # shape as the check that matched `pointsmap arched"><svg` and examined
+    # zero dots on a site with 130 region maps. A pattern pinned to the
+    # exact attribute order of markup somebody else emits is a pattern that
+    # breaks on an attribute nobody thought about, so this one asks for the
+    # attribute it needs and ignores the rest — and the assertion under the
+    # loop says the layer found countries at all.
+    order_ = []
+    for idx, m in enumerate(LAND_PATH.finditer(land)):
+        spot = _dpath(m.group(1))
+        if spot:
+            order_.append(((spot[3][2] - spot[3][0]) * (spot[3][3] - spot[3][1]),
+                           idx, m, spot))
+    order_.sort(key=lambda t: -t[0])
+    assert order_, (
+        "the hero's name layer read no country out of the land markup. The "
+        "pattern above has stopped matching what geo.landmass() emits, and "
+        "an empty layer looks exactly like a drawing that was always "
+        "unlabelled")
+    names = []
+    for _area, idx, m, spot in order_:
+        if len(names) >= NAME_MAX:
+            break
+        cx, cy, rad, bbox = spot
+        up = (m.group(2).replace('&amp;', '&').replace('&lt;', '<')
+              .replace('&gt;', '>').replace('&quot;', '"')).upper()
+        # A NAME MUCH WIDER THAN ITS OWN COUNTRY IS NOT A LABEL, IT IS A
+        # SENTENCE LYING ACROSS THE NEIGHBOURS. Keeping the centre on the
+        # country stopped ICELAND floating in the Denmark Strait and left a
+        # worse fault behind it: SWITZERLAND ran from Bordeaux to Munich,
+        # BOSNIA AND HERZEGOVINA from Italy to Romania, BELGIUM out over the
+        # North Sea. A printed atlas answers that with an abbreviation, a
+        # leader line or a number in a key, and this picture will not carry
+        # any of the three — so the name is dropped and the country keeps its
+        # shape, its frontier, its link and its accessible name.
+        #
+        # Measured against the country's LONGEST side rather than its width,
+        # because Portugal is 55 units across and 160 tall and its name reads
+        # perfectly down it. Twice that side is the limit: Iceland's name is
+        # 1.8 times its island and belongs on the map; Switzerland's is 3.6
+        # times its country and does not.
+        # A LOOSE CAP, AND ONLY TO BOUND THE WORK. The crossing test is what
+        # decides now; this stops a name four times its own country's length
+        # from paying for nine anchors and forty polygon tests to be told so.
+        span = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
+        pad_, ch_, _u, _d = LABEL_METRICS["cname"]
+        one = pad_ + len(up) * ch_
+        two = (pad_ + max(len(a) for a in up.rsplit(" ", 1)) * ch_
+               if " " in up else one)
+        if min(one, two) > 3.0 * span:
+            continue
+        got = None
+        for tol_ in (0, CROSS_OK):
+            for fx, fy in ANCHORS:
+                got = place_label_box(
+                    cx + fx * rad, cy + fy * rad, up, vw, vh, cls="cname",
+                    off=10.0, prefer="over", metric="cname", clears=_clear,
+                    fits=lambda *a, _i=idx, _t=tol_: _inframe(
+                        *a, mine=_i, tol=_t))
+                if got:
+                    break
+            if got:
+                break
+        if not got and " " in up:
+            a_, b_ = up.rsplit(" ", 1)
+            long_ = a_ if len(a_) >= len(b_) else b_
+
+            def _two(attr, x, y, _nm, _a=a_, _b=b_):
+                return (f'<text class="cname"{attr} x="{x:.1f}" y="{y:.1f}">'
+                        f'<tspan x="{x:.1f}" dy="{-CNAME_LEAD / 2:.1f}">'
+                        f'{esc(_a)}</tspan>'
+                        f'<tspan x="{x:.1f}" dy="{CNAME_LEAD:.1f}">'
+                        f'{esc(_b)}</tspan></text>')
+
+            for fx, fy in ANCHORS:
+                got = place_label_box(cx + fx * rad, cy + fy * rad, long_,
+                                      vw, vh, cls="cname", off=10.0,
+                                      prefer="over", metric="cname2",
+                                      clears=_clear, wrap=_two,
+                                      fits=lambda *a, _i=idx: _inframe(
+                                          *a, mine=_i, metric="cname2",
+                                          tol=CROSS_OK))
+                if got:
+                    break
+        if got:
+            names.append(got[0])
+            taken.append((got[1], got[2], got[1] + got[3], got[2] + got[4]))
+    names = "".join(names)
+    return names
+
+
 def heroeurope(data, featured=(), beyond_ground=True):
     """Europe, entire, seen through the doorway. The homepage's picture.
 
@@ -876,15 +1156,7 @@ def heroeurope(data, featured=(), beyond_ground=True):
     # Ten degrees, which is the interval the EU's own pan-European sheets
     # use at this extent, and a hairline in the water's own tone: a reader
     # should find it when they look for it and never meet it first.
-    _grat = []
-    for _lon in range(-30, 51, 10):
-        _pts = [MAPPROJ.xy(_la / 2.0, _lon) for _la in range(60, 161, 4)]
-        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
-    for _lat in range(30, 81, 10):
-        _pts = [MAPPROJ.xy(_lat, _lo / 2.0) for _lo in range(-70, 111, 4)]
-        _grat.append("M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in _pts))
-    graticule = ('<g class="herograt" aria-hidden="true">'
-                 + "".join(f'<path d="{d}"/>' for d in _grat) + '</g>')
+    graticule = graticule_layer()
 
     # ── THE SEA NAMES ────────────────────────────────────────────────
     # `data/geo/marine-lod1.json` holds twenty-one of them with a real
@@ -920,47 +1192,7 @@ def heroeurope(data, featured=(), beyond_ground=True):
     # shore. The floor is the same question from the other end — the
     # Strait of Gibraltar and the Bristol Channel are real entries at 0.8
     # units, and are exactly what a printed sheet leaves out at this scale.
-    LABEL_ROOM = 12.0
-    LABEL_REACH = 170.0
-    _coast = []
-    for _m in LAND_PATH.finditer(land):
-        _n = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", _m.group(1))]
-        _coast.extend(zip(_n[0::2], _n[1::2]))
-    _lx1 = max((cx for cx, _cy in _coast), default=view[0] + vw)
-    _ly0 = min((cy for _cx, cy in _coast), default=view[1])
-    _seas = []
-    for _x, _y, _nm in cartography.water_points(
-            lambda la, lo: MAPPROJ.xy(la, lo), view):
-        if not (view[0] < _x < view[0] + vw and view[1] < _y < view[1] + vh):
-            continue
-        _room = min((math.hypot(_x - cx, _y - cy) for cx, cy in _coast),
-                    default=0.0)
-        if _room < LABEL_ROOM:
-            continue
-        # AND NOT WHERE THE PICTURE ITSELF RUNS OUT. Two tests failed on
-        # the WHITE SEA and the CASPIAN before this one: a ceiling on the
-        # room caught the first and not the second, and counting the
-        # countries that face a sea caught neither, because Azerbaijan's
-        # coast wraps right round the Caspian's label and Finland, Sweden
-        # and Norway are all within reach of the White Sea's. What those
-        # two actually have in common is the thing a reader sees: their far
-        # shore is Russia and Kazakhstan, and the drawn land simply STOPS
-        # a few units beyond the name. `data/geo/` is cut at 52°E and at
-        # 72.5°N, and this hero drops the one country the eastern cut runs
-        # through — so a label within its own reach of the drawing's
-        # northern or eastern extreme is a label with nothing behind it.
-        # South and west the drawing ends in the Atlantic and in the
-        # Mediterranean's own southern shore, which is a decision rather
-        # than a data cut, so the test is on those two edges only.
-        if (_x > _lx1 - LABEL_REACH * 0.55) or (_y < _ly0 + LABEL_REACH * 0.4):
-            continue
-        _seas.append((_room, _x, _y, _nm))
-    _seas.sort(reverse=True)
-    seanames = ('<g class="lyr lyr-water-labels" aria-hidden="true">'
-                + "".join(
-                    f'<text class="seaname" text-anchor="middle"'
-                    f' x="{x:.1f}" y="{y:.1f}">{esc(nm)}</text>'
-                    for _r, x, y, nm in _seas[:6]) + '</g>') if _seas else ""
+    seanames = sea_names(land, view)
 
     # AND THE RELIEF, which is the whole reason this is worth doing. Every
     # destination plate on this site carries hypsometric bands and the front
@@ -1012,175 +1244,7 @@ def heroeurope(data, featured=(), beyond_ground=True):
     # Tracked uppercase at the plates' own size and colour, so this is the
     # same typography one level up rather than a new one: no font size is
     # introduced, and `checks.py` counts them.
-    def _dpath(d):
-        """The bounding box of the largest subpath in a `d`, and its centre."""
-        best, bb = 0.0, None
-        for sub in d.split("Z"):
-            pts = [(float(a), float(b))
-                   for a, b in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
-            if len(pts) < 3:
-                continue
-            xs = [q[0] for q in pts]
-            ys = [q[1] for q in pts]
-            area = (max(xs) - min(xs)) * (max(ys) - min(ys))
-            if area > best:
-                best, bb = area, (min(xs), min(ys), max(xs), max(ys))
-        if not bb:
-            return None
-        return ((bb[0] + bb[2]) / 2.0, (bb[1] + bb[3]) / 2.0,
-                min(bb[2] - bb[0], bb[3] - bb[1]) / 2.0, bb)
-
-    NAME_INSET = 14.0
-    taken = []
-
-    # WHOSE GROUND IS THIS? The two rules and the tolerance now live in
-    # NameGround at module level, because there are TWO drawings on this site
-    # that set a country's name across it and for the life of both only this
-    # one had them. See the class.
-    ground = NameGround([m_.group(1) for m_ in LAND_PATH.finditer(land)])
-    shapes = ground.shapes
-    CROSS_OK = NameGround.CROSS_OK
-
-    def _own(mine, x, y):
-        return ground.own(mine, x, y)
-
-    def _crossings(mine, x0, y0, w0, h0):
-        return ground.crossings(mine, x0, y0, w0, h0)
-
-    def _clear(lx, ly, lw, lh):
-        b = (lx - LABEL_CLEAR, ly - LABEL_CLEAR,
-             lx + lw + LABEL_CLEAR, ly + lh + LABEL_CLEAR)
-        return not any(not (b[2] < q[0] or b[0] > q[2]
-                            or b[3] < q[1] or b[1] > q[3]) for q in taken)
-
-    def _inframe(x, y, wide, anchor, mine=None, metric="cname", tol=0):
-        x0, y0, w0, h0 = _label_box(
-            x, y, wide, anchor, *LABEL_METRICS[metric][2:])
-        if not (x0 >= view[0] + NAME_INSET
-                and x0 + w0 <= view[0] + vw - NAME_INSET
-                and y0 >= view[1] + NAME_INSET
-                and y0 + h0 <= view[1] + vh - NAME_INSET):
-            return False
-        if mine is None:
-            return True
-        # THE MIDDLE ON ITS OWN COUNTRY, AND NOT ONE SAMPLE ON ANYBODY
-        # ELSE'S. Nine sample points along the name — seven on the baseline
-        # and three at cap height — because a name is a bar of type rather
-        # than a point, and the whole bar has to be over its own ground or
-        # over water.
-        if not _own(mine, x0 + w0 / 2.0, y0 + h0 / 2.0):
-            return False
-        return _crossings(mine, x0, y0, w0, h0) <= tol
-
-    ANCHORS = ((0, 0), (0, -0.35), (0, 0.35), (-0.4, 0), (0.4, 0),
-               (-0.3, -0.3), (0.3, -0.3), (-0.3, 0.3), (0.3, 0.3))
-    # THE BIGGEST COUNTRIES CLAIM THEIR SPACE FIRST, and there is a cap.
-    #
-    # Placed in document order — which is alphabetical by ISO code — Albania
-    # took a position before Germany was asked for one, and the map filled up
-    # from whoever happened to be first. Drawn area is the honest order here:
-    # it is a property of THIS picture rather than a judgement about the
-    # country, and it is the same quantity that decides whether a name can
-    # fit at all.
-    #
-    # And the cap is the point of the whole layer. The question is not how
-    # many countries can be labelled, it is whether the labels make Europe
-    # more recognisable — so sixteen is the ceiling and the rest of the
-    # continent is read from its shape, which is what the shape is for.
-    NAME_MAX = 16
-    # AND THE PATTERN TOLERATES ATTRIBUTES BEFORE `d`, WHICH IT DID NOT.
-    # It was the literal `<path d="..."><title>`, and the day the land paths
-    # gained an `id` — so the Living Atlas could clip a photograph to a
-    # country with a `<use>` instead of a second copy of its ring — the
-    # regex matched nothing and all fifteen country names left the hero in
-    # silence. Nothing failed: the layer was simply empty, which is the same
-    # shape as the check that matched `pointsmap arched"><svg` and examined
-    # zero dots on a site with 130 region maps. A pattern pinned to the
-    # exact attribute order of markup somebody else emits is a pattern that
-    # breaks on an attribute nobody thought about, so this one asks for the
-    # attribute it needs and ignores the rest — and the assertion under the
-    # loop says the layer found countries at all.
-    order_ = []
-    for idx, m in enumerate(LAND_PATH.finditer(land)):
-        spot = _dpath(m.group(1))
-        if spot:
-            order_.append(((spot[3][2] - spot[3][0]) * (spot[3][3] - spot[3][1]),
-                           idx, m, spot))
-    order_.sort(key=lambda t: -t[0])
-    assert order_, (
-        "the hero's name layer read no country out of the land markup. The "
-        "pattern above has stopped matching what geo.landmass() emits, and "
-        "an empty layer looks exactly like a drawing that was always "
-        "unlabelled")
-    names = []
-    for _area, idx, m, spot in order_:
-        if len(names) >= NAME_MAX:
-            break
-        cx, cy, rad, bbox = spot
-        up = (m.group(2).replace('&amp;', '&').replace('&lt;', '<')
-              .replace('&gt;', '>').replace('&quot;', '"')).upper()
-        # A NAME MUCH WIDER THAN ITS OWN COUNTRY IS NOT A LABEL, IT IS A
-        # SENTENCE LYING ACROSS THE NEIGHBOURS. Keeping the centre on the
-        # country stopped ICELAND floating in the Denmark Strait and left a
-        # worse fault behind it: SWITZERLAND ran from Bordeaux to Munich,
-        # BOSNIA AND HERZEGOVINA from Italy to Romania, BELGIUM out over the
-        # North Sea. A printed atlas answers that with an abbreviation, a
-        # leader line or a number in a key, and this picture will not carry
-        # any of the three — so the name is dropped and the country keeps its
-        # shape, its frontier, its link and its accessible name.
-        #
-        # Measured against the country's LONGEST side rather than its width,
-        # because Portugal is 55 units across and 160 tall and its name reads
-        # perfectly down it. Twice that side is the limit: Iceland's name is
-        # 1.8 times its island and belongs on the map; Switzerland's is 3.6
-        # times its country and does not.
-        # A LOOSE CAP, AND ONLY TO BOUND THE WORK. The crossing test is what
-        # decides now; this stops a name four times its own country's length
-        # from paying for nine anchors and forty polygon tests to be told so.
-        span = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
-        pad_, ch_, _u, _d = LABEL_METRICS["cname"]
-        one = pad_ + len(up) * ch_
-        two = (pad_ + max(len(a) for a in up.rsplit(" ", 1)) * ch_
-               if " " in up else one)
-        if min(one, two) > 3.0 * span:
-            continue
-        got = None
-        for tol_ in (0, CROSS_OK):
-            for fx, fy in ANCHORS:
-                got = place_label_box(
-                    cx + fx * rad, cy + fy * rad, up, vw, vh, cls="cname",
-                    off=10.0, prefer="over", metric="cname", clears=_clear,
-                    fits=lambda *a, _i=idx, _t=tol_: _inframe(
-                        *a, mine=_i, tol=_t))
-                if got:
-                    break
-            if got:
-                break
-        if not got and " " in up:
-            a_, b_ = up.rsplit(" ", 1)
-            long_ = a_ if len(a_) >= len(b_) else b_
-
-            def _two(attr, x, y, _nm, _a=a_, _b=b_):
-                return (f'<text class="cname"{attr} x="{x:.1f}" y="{y:.1f}">'
-                        f'<tspan x="{x:.1f}" dy="{-CNAME_LEAD / 2:.1f}">'
-                        f'{esc(_a)}</tspan>'
-                        f'<tspan x="{x:.1f}" dy="{CNAME_LEAD:.1f}">'
-                        f'{esc(_b)}</tspan></text>')
-
-            for fx, fy in ANCHORS:
-                got = place_label_box(cx + fx * rad, cy + fy * rad, long_,
-                                      vw, vh, cls="cname", off=10.0,
-                                      prefer="over", metric="cname2",
-                                      clears=_clear, wrap=_two,
-                                      fits=lambda *a, _i=idx: _inframe(
-                                          *a, mine=_i, metric="cname2",
-                                          tol=CROSS_OK))
-                if got:
-                    break
-        if got:
-            names.append(got[0])
-            taken.append((got[1], got[2], got[1] + got[3], got[2] + got[4]))
-    names = "".join(names)
+    names = name_countries(land, view)
 
     # A LITTLE WATER, AND THE RANK IS WHERE THE RESTRAINT LIVES. The plates
     # draw rank 6 and every lake, which over the whole continent is 153 rivers
@@ -12489,7 +12553,7 @@ def map_page(data):
     # of detail is for — shipping the finest one at every zoom is the same
     # mistake as having only one.
     doc = geo.load("europe-lod0.json")
-    context, shapes, nogeo = [], [], []
+    context, shapes, nogeo, named = [], [], [], []
     if doc:
         for ident, ent in sorted(doc["countries"].items(),
                                  key=lambda kv: kv[1]["name"]):
@@ -12509,6 +12573,17 @@ def map_page(data):
                     f'<path d="{d}"></path>'
                     f'<title>{esc(ent["name"])}</title></a>'
                 )
+                # THE SAME GEOMETRY, IN THE SHAPE THE NAMING RULE READS.
+                # `name_countries()` takes the land markup a drawing emits
+                # and `LAND_PATH` asks for a `<title>` INSIDE the path,
+                # because that is what `geo.landmass()` writes; here the
+                # title is a sibling of the path inside the country's own
+                # `<a>`, so the drill-down is a link before any script runs.
+                # Two true shapes of one geometry, so the naming layer gets
+                # its own view of it rather than a regex that has to know
+                # about both.
+                named.append(f'<path d="{d}"><title>{esc(ent["name"])}</title>'
+                             f'</path>')
             else:
                 context.append(f'<path d="{d}"></path>')
         # Monaco is 2 km² and Vatican City is 0.44 km²; a 1:50m cartographic
@@ -12590,6 +12665,60 @@ def map_page(data):
     # the stage still gains `.withpanel` only while the panel or popup is
     # open, so the drawing is full width the rest of the time, which is the
     # behaviour that rule was written for.
+    # ── THE DRAWING BECOMES AN ATLAS ─────────────────────────────────
+    #
+    # THIS PAGE DREW NO WATER, NO RIVERS, NO COAST AND NO TYPE. Measured on
+    # the built site before this change: `#europemap` emitted NOT ONE
+    # `lyr-*` layer and ZERO `<text>` elements, on the page titled *Europe,
+    # and everything we hold in it*. Fifty flat shapes separated by a
+    # hairline, 319 identical dots, and a teal halo round every coast —
+    # `filter: drop-shadow` three deep in the light map's pale SHORE ramp,
+    # painted on a near-black ground, which is the lit-aura failure this
+    # stylesheet already records for the hero, in the family that learned
+    # it. And the pale wedge over Anatolia and the Urals is the context
+    # layer at `--atlas-far`, clipped to a BOX whose straight edges at 52°E
+    # and 33°N run through the frame: the same slab /plan already records,
+    # where the note says near-black absorbs its straight edges. On this
+    # frame it plainly does not.
+    #
+    # Every layer added here already existed somewhere in this repository
+    # and had never been on this page. Nothing is invented and nothing is
+    # acquired: the rivers are `cartography.rivers`, the names are
+    # `name_countries`, the seas are `sea_names`, and the graticule is this
+    # atlas's answer to which way is north.
+    _mview = (0.0, 0.0, float(MAP_W), float(MAP_H))
+    _mland = "".join(named)
+    # AND THE CALLER STATES THE LAYER, TWICE IN ONE COMMIT. `name_countries`
+    # and `rivers` both return CONTENT — the text, the paths — and the group
+    # that names the layer is the caller's, because the hero puts the names
+    # above the relief and a plate puts them above the route. The first
+    # version of this band forgot both wrappers, and neither failed: the
+    # rivers were 9,479 bytes no rule reached, and the country names computed
+    # `fill: rgb(0,0,0)` at the SVG default in a palette that contains no
+    # black. A layer with no group is a layer no rule reaches, which is the
+    # `<stop>` that no rule reaches in another costume.
+    mapnames = name_countries(_mland, _mview, max_names=24)
+    mapnames = (f'<g class="lyr lyr-labels" aria-hidden="true">{mapnames}</g>'
+                if mapnames else "")
+    mapseas = sea_names(_mland, _mview)
+    mapgrat = graticule_layer()
+    # RANK 3 AND THE BIG LAKES, WHICH IS THE HERO'S ANSWER RATHER THAN THE
+    # PLATES'. A plate is a picture of somewhere and wants the watercourses
+    # that carry that somewhere's shape — rank 6 and every lake, which over
+    # the whole continent is 153 rivers, 65 lakes and 49 KB, a hydrology map
+    # with Europe underneath it. This frame IS the whole continent, so it
+    # takes the three dozen a reader would name unprompted.
+    # AND THE LAYER IS WRAPPED HERE, BECAUSE `rivers()` RETURNS PATHS. It
+    # emits the geometry and the caller states which layer it is, which is
+    # the same contract the hero honours one screen up — and the first
+    # version of this call dropped the wrapper, so `lyr-rivers` was absent
+    # from the built page while the function had returned 9,479 bytes of
+    # river. Nothing failed: a layer with no group is a layer no rule
+    # reaches, which is the `<stop>` that no rule reaches in another costume.
+    _mw = cartography.rivers(MAPPROJ, _mview, river_rank=3, lake_rank=0,
+                             thin_units=1.6, min_lake_units=25.0)
+    mapwater = (f'<g class="lyr lyr-rivers" aria-hidden="true">{_mw}</g>'
+                if _mw else "")
     mapopen = f"""
   <div class="pagehead instrument">
     <p class="kicker">The map</p>
@@ -12610,17 +12739,19 @@ def map_page(data):
     <span class="small" id="zoomwhere" aria-live="polite"></span>
   </div>
   <div class="mapwrap">
-  <svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
-  <rect width="{MAP_W}" height="{MAP_H}" fill="none"/>
+  <svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap atlas" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
+  <rect class="lyr lyr-ocean" width="{MAP_W}" height="{MAP_H}"/>
   <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
   <g id="countries" class="countries">{''.join(shapes)}</g>
   <g id="detail" class="countries"></g>
+  {mapwater}{mapgrat}
   {cut_fade('map', MAP_W, MAP_H, dusk_reach())}
   <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
   <g id="route"></g>
   <g id="regions" hidden display="none"></g>
   <g id="places" hidden display="none">{''.join(placedots)}</g>
   <g id="dots">{''.join(dots)}</g>
+  {mapseas}{mapnames}
   </svg>
   </div>
   <p class="small" id="routenote"></p>
