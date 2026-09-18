@@ -729,3 +729,88 @@ on the wall's own paper, which is right on every other plate and wrong on the
 only one whose first screen is the opening rather than the wall: it sat at the
 top of the band, at z-index 2, over graphite. Nothing counts a mark that is
 the colour of what is behind it.
+
+## Home 16/30 — the masthead is furniture, and the footer is the bound edge
+
+Two components, both on all 1,032 pages, both asked for by name: *give the
+menu bar a premium colour and design. Also do same for the footer. Make the
+footer iconic.*
+
+### The masthead was a rule with words above it
+
+`background: color-mix(in srgb, var(--paper) 92%, transparent)` over a page of
+`--paper`. So the only thing separating the first component every reader meets
+from the document under it was a one-pixel hairline. That was a **correction
+rather than a design**: the band used to be solid pine, which was measured as
+the largest single reason twelve families read as one page — the first 63
+pixels identical and the most saturated thing in frame whatever changed
+underneath — and the fix was to stop spending a *saturated* colour there, not
+to stop having a surface. `--paper-2` is the next rung of the same ladder, a
+step of 1.09, bound per world, neutral, and it costs the family accents
+nothing.
+
+Four more moves, and every one is rules and space rather than a box:
+
+| | |
+|---|---|
+| the edge | a **reveal**, not a border: the wall's face and a fine line just inside it, which is what every aperture on this site draws at its cut. One hairline says *a border*; two say *an edge* |
+| the air | 58 → **82** at desk width. 58 pixels is a toolbar; this is the masthead of a publication, and the h1 under it is 76 |
+| the mark | 1.05em → **1.24em**. At the same optical size as the word beside it, the door read as a decoration in front of a name rather than as a mark and its name |
+| the tools | a hairline before Search and My Europe. Seven rooms and two tools are not the same kind of thing, and the bar set all nine in one weight at one size with one gap |
+
+**Two things were built, measured and taken out again.** Centring the sections
+on the page: `space-between` puts the nav wherever its neighbours leave it — at
+1280 it ran 309 to 921, so its middle sat at 615 against a page middle of 640 —
+and three tracks fix that exactly. They also give the middle track only what
+the two `1fr` cheeks leave, so at 960 the row wrapped and the bar went 82 →
+114, and at 1024 → 95. **A two-row masthead across every laptop and every split
+window is a real cost; twenty-five pixels of optical centring is not.**
+
+And the air was first written as `@media (min-width: 60rem)`, which is wrong by
+one pixel: **`max-width: 60rem` and `min-width: 60rem` both match at exactly
+960**, so the padding landed on top of the two-row grid on the one width where
+the two-row grid is what is wanted — 90 became 114. The narrow block already
+exists and already wins at equal specificity by coming later, so the air goes
+in the base rule and that block takes it back.
+
+**The row had under nine pixels of slack at 1024 and nothing knew it.**
+Measured before: 58 pixels, one row. After a mark went up a tenth of an em and
+a hairline appeared: 122, two rows. A layout whose one-row-ness depends on
+nobody ever adding a glyph is not a layout, so the gap between the three groups
+paid for it — `--s6` to `--s5` is sixteen pixels back across two gaps, and the
+groups are still further apart than the items inside them, which is the only
+thing that gap has to say. Measured at ten widths from 320 to 1800: no
+horizontal overflow anywhere, and every width below 1024 is byte-for-byte the
+height it was.
+
+### The footer is a colophon now
+
+A sentence, twenty links and a legal paragraph is the footer of any travel
+product, and that is exactly what the last band of every page was: competent,
+anonymous, and the one place on the site where nothing said what this is.
+
+A publication closes on its own name. The band is the document's **bound edge**
+— the mark at scale, the name in the display serif, the one fact a colophon
+carries, and the lists quiet beside it — and it is **graphite**, because this
+atlas's whole reading of a surface is *light wall, dark opening* and the end of
+a document is the other edge of the same idea. The top edge takes the
+masthead's reveal upside down.
+
+**The tokens are bound rather than named**, which is `.sheet-paper`'s own rule:
+a `var()` resolves where the declaration lives, so a footer that set `color:
+var(--ink)` would paint bone on bone in one preference and near-black on
+graphite in the other. On the five INTELLIGENCE pages this changes nothing,
+which is correct — a colophon is a colophon on every page of the edition.
+
+**The one fact is DERIVED.** *50 countries · 130 regions · 319 destinations ·
+255 places · 197 experiences · 17 journeys*, counted on every build from the
+same documents the pages are built from, because a figure typed there is the
+figure that was true two hundred destinations ago — a mistake this repository
+has already made on a live page. The import is lazy and the answer is cached:
+`data.py` does not import `render` and `render` does not import it at the top,
+so nothing here can become a cycle, and `page()` is called 1,032 times a build.
+
+**And the extent broke at 536 pixels inside a 1,232-pixel band**, because `p`
+carries the prose measure and this is a list of figures. `max-width: none` is a
+declaration rather than the absence of one — the same fault this stylesheet
+already records about a credit line and about a middot list of place names.

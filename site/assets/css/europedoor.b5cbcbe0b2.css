@@ -1173,12 +1173,72 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
              * already gets is the commonest thing that scan finds. */
             backdrop-filter: saturate(1.4) blur(10px);
             border-bottom: 1px solid var(--rule); }
-.masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s3) var(--s5); display: flex; align-items: center; gap: var(--s6); justify-content: space-between; }
+/* AND A MASTHEAD THE COLOUR OF THE PAGE IS A RULE WITH WORDS ABOVE IT.
+   The band was `--paper` at 92% over a page of `--paper`, so the only thing
+   separating the one component every reader meets first from the document
+   under it was a one-pixel hairline. That was a correction rather than a
+   design: it used to be a solid pine band, which was measured as the largest
+   single reason twelve families read as one page — the first 63 pixels
+   identical and the most saturated thing in frame whatever changed
+   underneath — and the fix was to stop spending a SATURATED colour there,
+   not to stop having a surface.
+   `--paper-2` is the next rung of the same ladder, a step of 1.09, which is
+   the difference between furniture and the page. It is a neutral, so it
+   costs the family accents nothing, and it is bound per world, so the
+   INTELLIGENCE pages get their own rung rather than the light world's. */
+.masthead { background: color-mix(in srgb, var(--paper-2) 94%, transparent);
+            position: sticky; }
+/* THE EDGE IS A REVEAL RATHER THAN A BORDER, which is this atlas's own way
+   of saying that two surfaces are at different depths. Every plate cuts its
+   aperture and then draws two things at the cut: the wall's face over the
+   drawing's edge, and a fine line just inside it. One hairline says "a
+   border"; two say "an edge", and the bar stops floating on the page. */
+.masthead::after { content: ""; position: absolute; inset: auto 0 -2px 0;
+                   height: 1px; pointer-events: none;
+                   background: color-mix(in srgb, var(--paper) 72%, transparent); }
+.masthead-in { max-width: var(--page); margin: 0 auto; padding: var(--s5); display: flex; align-items: center; gap: var(--s5); justify-content: space-between; }
+/* THE BAR TOOK THE AIR A 76px HEADLINE UNDER IT IMPLIES. 58 pixels is a
+   toolbar; this is the masthead of a publication. --s3 to --s5 is 58 -> 82
+   at desk width, and nothing below 60rem changes, because that is where the
+   two-row grid already answers the same question differently.
+
+   AND CENTRING THE SECTIONS ON THE PAGE WAS BUILT, MEASURED AND REMOVED.
+   `space-between` puts the nav wherever the wordmark and the utilities leave
+   it — at 1280 it ran 309 to 921, so its middle sat at 615 against a page
+   middle of 640 — and three tracks put it on the page's own centre line.
+   They also give the middle track only what the two `1fr` cheeks leave: the
+   seven sections need 612 and the cheeks take 160 each, so at 960, where
+   this block starts, the row wrapped and the masthead went 82 -> 114, and at
+   1024 -> 95. A two-row masthead across every laptop and every split window
+   is a real cost; twenty-five pixels of optical centring is not. */
+/* AND THE ROW HAD LESS THAN NINE PIXELS OF SLACK AT 1024, which nothing
+   here knew until a mark went up a tenth of an em and a hairline appeared
+   between the rooms and the tools. Measured before: 58 pixels at 1024, one
+   row. After: 122, two rows — from about nine pixels of new content. A
+   layout whose one-row-ness depends on nobody ever adding a glyph is not a
+   layout, so the gap between the three groups pays for it: --s6 to --s5 is
+   sixteen pixels back across two gaps, and the groups are still further
+   apart than the items inside them, which is the only thing that gap has to
+   say. */
+/* AND IT IS STATED IN THE BASE RULE AND TAKEN BACK BELOW 60rem, RATHER
+   THAN STATED IN A `min-width: 60rem` BLOCK. `max-width: 60rem` and
+   `min-width: 60rem` BOTH match at exactly 960 — the pixel is in both
+   ranges — so a min-width block adds its padding to the two-row grid on the
+   one width where the two-row grid is what is wanted: 90 pixels became 114.
+   The narrow block already exists and already wins at equal specificity by
+   coming later, so the air goes in the base and that block takes it out. */
+@media (max-width: 60rem) {
+  .masthead-in { padding-block: var(--s3); }
+}
 .wordmark { display: inline-flex; align-items: center; gap: .42em; text-decoration: none; font-family: var(--display); font-size: var(--t-lg); letter-spacing: -0.02em; }
 /* The mark. Two tones rather than one shape with opacity, so it holds on
    any ground including a photograph. It takes its colour from the palette,
    which is why it is inline SVG and not a file in an <img>. */
-.mark { width: 1.05em; height: 1.05em; flex: none; }
+/* AND THE MARK CARRIES THE BAR. At 1.05em it was the same optical size as
+   the word beside it, so the two read as one lockup with a decoration in
+   front of it rather than as a mark and its name. The door is the one shape
+   in this product that could not have been drawn for anything else. */
+.mark { width: 1.24em; height: 1.24em; flex: none; }
 .mark-frame { fill: var(--ink); }
 .mark-leaf  { fill: var(--signature); }
 /* A LABEL SCALE AND A READING SCALE ARE DIFFERENT THINGS, and `--t-sm` was
@@ -1948,8 +2008,72 @@ a .kicker { color: var(--ink-3); }
    content wants air under it and a band wants separation from what it
    follows. But that is ONE relationship and it belongs to one of them. It
    is main's, because main is what the reader has been reading. */
-.footer { border-top: 1px solid var(--rule); background: var(--paper-2); }
-.footer-in { max-width: var(--page); margin: 0 auto; padding: var(--s7) var(--s5); }
+/* THE COLOPHON. A sentence, twenty links and a legal paragraph is the
+   footer of any travel product, and for the life of this site that is what
+   the last band of all 1,032 pages was: competent, anonymous, and the one
+   place where nothing said what this is.
+
+   A publication closes on its own name. So the band is the document's bound
+   edge — the mark at scale, the name in the display serif, the one fact a
+   colophon carries, and the lists quiet beside it — and it is GRAPHITE,
+   because this atlas's whole reading of a surface is light wall, dark
+   opening, and the end of a document is the other edge of the same idea.
+   The tokens are BOUND here rather than named, which is `.sheet-paper`'s own
+   rule: a `var()` resolves where the DECLARATION lives, so a footer that set
+   `color: var(--ink)` would take the page's ink and paint bone on bone in
+   one preference and near-black on graphite in the other. On the five
+   INTELLIGENCE pages this changes nothing, which is correct — a colophon is
+   a colophon on every page of the edition. */
+.footer { background: var(--paper); color: var(--ink);
+          border-top: 0;
+          --paper:      var(--graphite);
+          --paper-2:    var(--graphite-2);
+          --paper-3:    var(--graphite-3);
+          --ink:        var(--bone);
+          --ink-2:      #c5cac5;
+          --ink-3:      #97a097;
+          --rule:       #2d352d;
+          --sea:        var(--cobalt-lift);
+          --sea-dark:   var(--cobalt-air);
+          --signature:  var(--cobalt-air);
+          --door:       var(--cobalt-lift);
+          --door-dark:  var(--cobalt-lift);
+          --pine-ink:   var(--bone); }
+/* AND THE TOP EDGE IS THE MASTHEAD'S EDGE UPSIDE DOWN. One hairline says
+   "a border"; the wall's face and a fine line just inside it say "two
+   surfaces at different depths", which is what the aperture draws at every
+   cut on this site and what a bound edge is. */
+.footer { position: relative; }
+.footer::before { content: ""; position: absolute; inset: -1px 0 auto 0;
+                  height: 1px; pointer-events: none;
+                  background: color-mix(in srgb, var(--bone) 26%, transparent); }
+.footer-in { max-width: var(--page); margin: 0 auto; padding: var(--s8) var(--s5) var(--s7); }
+/* THE MARK AND THE NAME AT THE SIZE A COLOPHON SETS THEM. `--ed-display-3`
+   rather than a new value: the scale already has four display steps and a
+   fifth for one band is a second type scale wearing the first one's
+   clothes. */
+.colophon { display: grid; gap: var(--s5) var(--s8); align-items: start;
+            margin: 0 0 var(--s6); }
+@media (min-width: 60rem) {
+  .colophon { grid-template-columns: minmax(0, auto) minmax(0, 1fr); }
+}
+.footmark { display: inline-flex; align-items: center; gap: .34em;
+            text-decoration: none; color: var(--ink);
+            font-family: var(--display); font-size: var(--ed-display-3);
+            letter-spacing: -0.02em; line-height: 1; }
+.footmark .mark { width: 1.1em; height: 1.1em; }
+.footmark .mark-frame { fill: var(--ink); }
+.footmark .mark-leaf { fill: var(--signature); }
+/* THE ONE FACT A COLOPHON CARRIES, and it is counted rather than typed.
+   `max-width: none` is a declaration rather than the absence of one: `p`
+   carries the prose measure, and this is a list of figures — it broke at
+   536 pixels inside a 1,232-pixel band, which is the same fault this
+   stylesheet already records about a credit line and a middot list of place
+   names. A measure exists so the eye can find the next line of a sentence,
+   and nobody reads an extent as a sentence. */
+.footer-extent { font-size: var(--t-xs); letter-spacing: .1em;
+                 text-transform: uppercase; color: var(--ink-3);
+                 max-width: none; margin: 0 0 var(--s7); }
 .footer-lede { font-family: var(--display); font-size: var(--t-lg); max-width: 34rem; }
 /* TWENTY LINKS IN ONE FLAT ROW, ON ALL 1,033 PAGES. Every one the same
    weight and the same size, wrapping into two lines of near-identical text,
@@ -2478,6 +2602,15 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 
 /* ── masthead utilities: search and My Europe sit apart from the nav ── */
 .navutil { display: flex; gap: var(--s4); align-items: center; font-size: var(--t-xs); letter-spacing: .04em; text-transform: uppercase; }
+/* SEVEN ROOMS AND TWO TOOLS ARE NOT THE SAME KIND OF THING, and the bar set
+   all nine in one weight at one size with one gap. Search and My Europe are
+   the READER's — one finds anything in the atlas, the other is what they
+   have kept — where the seven are the atlas's own rooms. A hairline is the
+   whole distinction, drawn in the vocabulary this site uses everywhere else
+   for "these are two sets": a rule, and space. */
+.navutil::before { content: ""; align-self: stretch; width: 1px;
+                   background: var(--rule); margin-right: var(--s1); }
+@media (max-width: 60rem) { .navutil::before { display: none; } }
 .navutil a { text-decoration: none; color: var(--ink-2); border-bottom: 1.5px solid transparent; padding-bottom: 2px; }
 .navutil a:hover { color: var(--door); border-bottom-color: var(--door); }
 .navsearch { color: var(--door); }

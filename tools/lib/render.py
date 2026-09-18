@@ -1019,6 +1019,43 @@ FOOTER_GROUPS = [
 FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
 
 
+# ── the colophon's one fact ──────────────────────────────────────────
+#
+# A FOOTER ON 1,032 PAGES THAT SAID NOTHING ABOUT WHAT THIS IS. Twenty
+# links, a sentence and a legal paragraph is the footer of any travel
+# product; what no other travel product's footer can say is how much of
+# Europe this one has actually written. The extent is the one fact that
+# belongs in a colophon, and it is DERIVED on every build from the same
+# documents the pages are built from — a figure typed here is the figure
+# that was true two hundred destinations ago, which is a mistake this
+# repository has already made on a live page.
+#
+# THE IMPORT IS LAZY AND THE ANSWER IS CACHED, for two reasons. `data.py`
+# does not import this module and this module does not import it at the
+# top, so nothing here can become a cycle; and `page()` is called 1,032
+# times a build, where reading and counting the whole atlas once is free
+# and doing it a thousand times is not.
+_EXTENT = None
+
+
+def extent_line():
+    """Countries, regions, destinations, places — counted, never typed."""
+    global _EXTENT
+    if _EXTENT is None:
+        from . import data as D
+        d = D.load()
+        n = [
+            (len(d["countries"]), "countries"),
+            (sum(len(c["regions"]) for c in d["countries"].values()), "regions"),
+            (len(d["cities"]), "destinations"),
+            (len(D.all_places(d["countries"])), "places"),
+            (len(D.all_experiences(d["countries"])), "experiences"),
+            (len(d["journeys"]), "journeys"),
+        ]
+        _EXTENT = " · ".join(f"{c:,} {label}" for c, label in n)
+    return _EXTENT
+
+
 # THE BROWSER PAINTS A BAR ABOVE THIS PAGE AND NOTHING TOLD IT WHAT COLOUR.
 #
 # On a phone the address bar and the task-switcher card take `theme-color`,
@@ -1610,7 +1647,13 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
 {bottom_nav(path)}
 <footer class="footer">
   <div class="footer-in">
-    <p class="footer-lede">{esc(T("footer.lede"))}</p>
+    <div class="colophon">
+      <a class="footmark" href="/" aria-label="{esc(SITE_NAME)}, home">
+        {MARK}<span class="footmark-text">europedoor</span>
+      </a>
+      <p class="footer-lede">{esc(T("footer.lede"))}</p>
+    </div>
+    <p class="footer-extent">{extent_line()}</p>
     <nav class="footer-nav" aria-label="{esc(T("nav.aria.footer"))}">{footer_nav}</nav>
     <p class="footer-legal">{esc(T("footer.legal", operator=OPERATOR))}</p>
   </div>
