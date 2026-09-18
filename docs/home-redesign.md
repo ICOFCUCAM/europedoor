@@ -597,3 +597,66 @@ an underline through seven story headlines — `text-decoration: none` is doing
 real work here. Proved: plate 05 at 1280 is **byte-identical** with the
 declaration and without it.
 
+## TWO UNPROVENANCED ORIGINALS, AND THE AUDIT THE OWNER ASKED FOR
+
+Two Pexels photographs were uploaded straight into `photographs/` —
+`pexels-itsehsanh-18442653.jpg` (2,655,622 bytes, 5726×3817) and
+`pexels-mikebird-6100149.jpg` (5,165,366 bytes, 6000×4000). `checks.py`
+refused both in the first run:
+
+> *an original with no row has no photographer, no source, no licence, no
+> date and no hash — delete it, or acquire it properly so the register
+> carries the evidence*
+
+**The gate did exactly its job and it was not weakened.** They are removed
+from the candidate set at the owner's direction; the supported route is
+`photograph.yml` fetching each BY ID (18442653, 6100149) where the key is, so
+the register carries the photographer, the source page, the licence, the date
+and the SHA-256 of the bytes **as served**. A hash of an uploaded copy is not
+that, and nothing here can verify any of it: the sandbox proxy answers 403 for
+pexels.com.
+
+### The visible-metadata audit
+
+Measured on the built homepage: **four visible provenance lines and 14
+outbound links to pexels.com.**
+
+| plate | line |
+|---|---|
+| 02 the window | `Photograph Ana Kenk · Pexels` |
+| 03 the places | `Photographs by Charlie Jordan, Argo Allvee, …` |
+| 04 the crossing | `Photographs by Efrem Efre, Jérémy Glineur, JENNY DILPHY on Pexels.` |
+| 06 the reading | `Photograph by Jean-Paul Wettstein on Pexels.` |
+
+**None of them was introduced by this arc.** Home 04 replaced six
+implementations of that line with one (`render.photo_credits`) and added no
+surface; plate 03's line grew longer because Home 05 took the band from five
+photographs to nine, which is more names on an existing line rather than a new
+one. The hero itself carries no credit — that was removed at an earlier
+direction and is recorded.
+
+### And they are NOT removed, because the owner's own exception covers them
+
+The instruction says remove visible provenance *"unless an explicit
+legal/editorial requirement for that particular asset requires visible
+attribution."* There is one, recorded in this repository's own licence gate
+with the verbatim quote behind it — `docs/data-licenses/photo-providers.json`,
+`pexels.attribution`:
+
+> **A prominent link to Pexels on any page showing a Pexels photo**, and the
+> photographer credited as "Photo by \<name\> on Pexels" linking to that
+> photo's page on Pexels.
+
+and the quote it was read from:
+
+> *"Whenever you are doing an API request make sure to show a prominent link
+> to Pexels … Always credit our photographers when possible (e.g. 'Photo by
+> John Doe on Pexels' with a link to the photo page on Pexels)."*
+
+Every photograph on this page is a Pexels photograph, so the exception applies
+to all of them. Removing the four lines would put the product in breach of the
+terms its own gate records — which is the opposite of *do not weaken the
+licence gate*. **Recorded and referred rather than acted on**: the design
+question (a supplier's name on the composition) is real and the answer is not
+mine to pick, because it has a licence consequence.
+
