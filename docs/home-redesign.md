@@ -814,3 +814,84 @@ so nothing here can become a cycle, and `page()` is called 1,032 times a build.
 carries the prose measure and this is a list of figures. `max-width: none` is a
 declaration rather than the absence of one — the same fault this stylesheet
 already records about a credit line and about a middot list of place names.
+
+## Home 17/30 — the places leave the column, and the crossing draws the crossing
+
+Two bands, both transformed against a composition the owner supplied.
+
+### 03 · the places
+
+The feature scale is 1.35 against .65 *so the photograph is the subject*, and
+the photograph was still a picture inside a 76rem measure with its caption set
+underneath — **which is a large card**, and a card is the shape this band
+already stopped being once. A band whose subject *is* a photograph lets the
+photograph leave the column.
+
+- The grid bleeds to the viewport and the lead runs to the left edge.
+- The label sits **on** the picture, taking plate 02's declaration arithmetic
+  rather than a second decision about one thing: a flat 72% wash the size of
+  the words with a five-stop ramp above it, which composites over the worst
+  case a photograph can present — a white frame — to `rgb(76,83,82)`, where
+  bone measures **6.90:1** whatever the picture is.
+- `Explore <place>` is a **span**, not an anchor. The tile is already a link
+  and an `<a>` inside an `<a>` is not nested — the parser closes the first one
+  — which is how /stories lost the two links Pexels' terms require.
+- The list beside it gains a third line, and it is the **country, not the
+  summary**. This atlas writes a destination's summary as a sentence rather
+  than as a tagline (Copenhagen's is 97 characters), so eight of them in a
+  300-pixel column is four lines apiece and the list stops being a list.
+  Clipping is not the alternative: `c_cut_word` refuses any element holding
+  more text than it shows. The country is short by construction, always
+  present, and the one thing the row does not already say — the kicker is the
+  macro region, so *THE MEDITERRANEAN / Andorra la Vella / Andorra* carries
+  three facts.
+- The head over the list states its own extent, derived, and the band closes
+  on the one link shape this page has.
+
+**The bleed is a length and never a percentage.** The classic `calc(50% -
+50vw)` cannot be handed to a child: a percentage inside a custom property is
+substituted textually and resolved against whatever element eventually *uses*
+it. So `.galwrap` carries `--edge: max(--s5, (100vw - 76rem) / 2)` — checked
+against the built page at 32 (1280), 192 (1600), 392 (2000) and the gutter
+below that — `margin-inline: calc(-1 * var(--edge))` bleeds, and the same
+value as padding on the other column puts it back on the measure.
+
+**Two things from the supplied composition are refused.** The prev/next arrows
+and the `01 — 08` counter are a carousel, and this page's only `<script>` is
+the inert JSON-LD block: a control that does nothing is `data-rotate` again,
+and this repository has already shipped 232 bytes of copy waiting for a
+rotator nobody wrote. And the faint continent behind the headline is the
+signature as wallpaper — plate 05 draws the atlas on this same page, and
+*eleven doors on one page* is the rule that stopped.
+
+### 04 · the crossing
+
+This band's subject is **movement and it drew none**: a headline, two figures
+and three rows, with the one thing that makes a journey a journey — the ordered
+line across the continent — nowhere on it. That is the finding that rebuilt
+/journeys, still standing on the homepage.
+
+It is two columns now. The right one is the **lead route drawn over a
+photograph of one of its own stops**: the picture bleeds to the right edge and
+runs the full height of the band, and the line over it is `constellation()`'s
+own geometry framed on that journey's extent. A decorative squiggle would be
+authoring a measurement, which is the one thing this repository never does.
+
+- **The photograph is a stop no row is already drawing.** *One record, one
+  picture* is a rule about a record; one picture twice on one screen is a
+  different fault with the same shape, and the band has three thumbnails and
+  one column to fill.
+- **The route has no land under it.** A translucent silhouette over a
+  photograph of one of the route's own stops is two pictures; the line carries
+  a graphite casing and a bone core, which is the rule `route_line` was written
+  for — no single colour reads on a ground you cannot predict.
+- The rows gain an index and the journey's own sentence. A journey's summary is
+  authored to be read, unlike a destination's, which is why it is refused one
+  band up.
+- The caption states the route, its straight-line distance and its stop count,
+  all derived.
+
+**The bordered button is refused.** Border, fill, radius and shadow each say
+*separate object, placed here by a system*, and this page has no boxes at all —
+which is why the one link shape here is a drawn mark, a rule and a tracked
+label. The close takes that shape.

@@ -1983,6 +1983,22 @@ def home(data):
     if picks:
         _lead, _rest = picks[0], picks[1:]
         _lc, _le = _lead
+        # AND THE THIRD LINE IS THE COUNTRY, NOT THE SUMMARY.
+        #
+        # A row carrying the macro region and the name says WHERE in the
+        # continent and WHAT it is called, and the obvious third line is the
+        # destination's own sentence. Measured, it is the wrong content for
+        # this component: this atlas writes summaries as sentences rather
+        # than as taglines — Copenhagen's is 97 characters — so eight of them
+        # in a 300-pixel column is four lines apiece and the list stops being
+        # a list. Clipping is not the alternative: `c_cut_word` refuses any
+        # element holding more text than it shows, and it is right to.
+        #
+        # The country is short by construction, always present, and it is the
+        # one thing the row does not already say: the kicker is the macro
+        # region, so "THE MEDITERRANEAN / Andorra la Vella / Andorra" carries
+        # three different facts and "THE NORDICS / Copenhagen / Denmark"
+        # carries three.
         placerows = "".join(
             f'<a class="pl" href="{urls.city(e["country"], e["region"], e["city"])}">'
             f'<span class="plshot">'
@@ -1990,9 +2006,30 @@ def home(data):
             f'</span>'
             f'<span class="pltext">'
             f'<span class="plwhere">{esc(macro_name.get(macro_of.get(cid.split("/")[0]), e["country"]["name"]))}</span>'
-            f'<span class="plname">{esc(e["city"]["name"])}</span></span>'
+            f'<span class="plname">{esc(e["city"]["name"])}</span>'
+            f'<span class="plline">{esc(e["country"]["name"])}</span></span>'
             f'<span class="plgo" aria-hidden="true">→</span></a>'
             for cid, e in _rest)
+        # THE LEAD LEAVES THE COLUMN, AND THE LABEL GOES ONTO IT.
+        #
+        # The feature scale is 1.35 against .65 so the picture is the
+        # subject, and it was still a picture INSIDE a 76rem measure with its
+        # caption under it — which is a large card. A band whose subject is
+        # a photograph lets the photograph reach the edge of the paper: the
+        # grid sits outside `.galwrap`, the left column runs to the viewport
+        # and the right column is inset to the measure the head is set on.
+        #
+        # The label takes plate 02's declaration arithmetic rather than a
+        # second decision about one thing: a flat 72% wash the size of the
+        # words with a five-stop ramp above it, which composites over the
+        # worst case a photograph can present — a white frame — to
+        # rgb(76,83,82), where bone measures 6.90:1 whatever the picture is.
+        #
+        # AND `Explore Copenhagen` IS NOT A SECOND ANCHOR. The tile is
+        # already a link, and an `<a>` inside an `<a>` is not nested — the
+        # parser closes the first one, which is how /stories lost the two
+        # links Pexels' terms require. It is a span wearing the go mark.
+        _lname = esc(_le["city"]["name"])
         places = f"""
       <div class="galwrap">
       <div class="sheettext">
@@ -2003,14 +2040,22 @@ def home(data):
       </div>
       <div class="feat">
         <a class="featlead" href="{urls.city(_le["country"], _le["region"], _le["city"])}">
-          {picture(images, "city:" + _lc, w=1200, h=1500, credit=False,
+          {picture(images, "city:" + _lc, w=1600, h=1200, credit=False,
                    alt=images["city:" + _lc]["alt"],
-                   sizes="(min-width: 62rem) 46vw, 92vw")}
-          <span class="featwhere">{esc(macro_name.get(macro_of.get(_lc.split("/")[0]), _le["country"]["name"]))}</span>
-          <span class="featname">{esc(_le["city"]["name"])}</span>
-          <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
+                   sizes="(min-width: 62rem) 62vw, 100vw")}
+          <span class="featsay">
+            <span class="featwhere">{esc(macro_name.get(macro_of.get(_lc.split("/")[0]), _le["country"]["name"]))}</span>
+            <span class="featname">{_lname}</span>
+            <span class="featline">{esc(_le["city"].get("summary", ""))}</span>
+            <span class="featgo"><span class="gomark" aria-hidden="true"></span><span
+              class="golabel">Explore {_lname}</span></span>
+          </span>
         </a>
-        <div class="featlist">{placerows}</div>
+        <div class="featside">
+          <p class="featsidehead">{len(_rest)} more corners</p>
+          <div class="featlist">{placerows}</div>
+          {golink('/countries', 'Explore all destinations', cls=' featall')}
+        </div>
       </div>
       {_phot(["city:" + c for c, _e in picks])}
       </div>"""
@@ -2027,7 +2072,7 @@ def home(data):
     # AND IT SAYS WHAT IT MEASURED. Every distance here is a haversine
     # between two coordinates; for a year the journey pages printed that
     # as the journey. "Straight line" is the correction, and §7 asserts it.
-    jrows, jkeys = [], []
+    jrows, jkeys, jlead = [], [], None
     for j in data["journeys"]:
         if len(jrows) == 3:
             break
@@ -2037,14 +2082,24 @@ def home(data):
         if not shot or len(stops) < 2:
             continue
         jkeys.append(shot)
+        if jlead is None:
+            jlead = (j, stops)
         names = " · ".join(esc(e["city"]["name"]) for e in stops[:4])
         if len(stops) > 4:
             names += f" · +{len(stops) - 4} more"
+        # AND THE ROW SAYS WHAT THE JOURNEY IS, NOT ONLY WHERE IT GOES.
+        # A name, a picture and a middot list of stops is a route's
+        # ITINERARY; the sentence beside it is the only thing on the row
+        # that says why anybody would take it, and a journey's summary is
+        # authored to be read — unlike a destination's, which is a sentence
+        # and is refused a row one band up for exactly that reason.
         jrows.append(
             f'<a class="jr" href="{urls.journey(j)}">'
+            f'<span class="jrno" aria-hidden="true">{len(jrows) + 1:02d}</span>'
             f'{picture(images, shot, w=900, h=560, credit=False, alt=images[shot]["alt"], sizes="13rem")}'
-            f'<span><span class="jrname">{esc(j["name"])}</span>'
-            f'<span class="jrstops">{names}</span></span>'
+            f'<span class="jrtext"><span class="jrname">{esc(j["name"])}</span>'
+            f'<span class="jrstops">{names}</span>'
+            f'<span class="jrline">{esc(first_sentence(j.get("summary", "")))}</span></span>'
             f'<span class="jrgo">View →</span></a>')
     crossing = ""
     if jrows:
@@ -2070,8 +2125,49 @@ def home(data):
                                  for i in range(len(_pts) - 1))))
         jfacts = [(f"{jkm:,} km", "Across every route"),
                   (str(len(data["journeys"])), "Routes")]
+        # THE ROUTE IS DRAWN OVER A PHOTOGRAPH, AND BOTH ARE REAL.
+        #
+        # This band's subject is movement and it drew none: a headline, two
+        # figures and three rows, with the one thing that makes a journey a
+        # journey — the ordered line across the continent — nowhere on it.
+        # That is the finding that rebuilt /journeys, still standing on the
+        # homepage.
+        #
+        # The line is the LEAD journey's own projected stops, framed on its
+        # own extent, in the same `constellation()` every other family draws
+        # a route with. Nothing is invented: a decorative squiggle would be
+        # authoring a measurement, which is the one thing this repository
+        # never does.
+        #
+        # AND THE PHOTOGRAPH UNDER IT IS A STOP ON THAT ROUTE THAT NO ROW IS
+        # ALREADY DRAWING. One record, one picture is a rule about a record;
+        # one picture twice on one screen is a different fault with the same
+        # shape, and the band has three thumbnails and one column to fill.
+        _jj, _jstops = jlead
+        _jkm = int(round(sum(
+            haversine(_jstops[i]["city"], _jstops[i + 1]["city"])
+            for i in range(len(_jstops) - 1))))
+        _artkey = next(("city:" + l["city"] for l in _jj["legs"]
+                        if ("city:" + l["city"]) in images
+                        and ("city:" + l["city"]) not in jkeys), None)
+        art = ""
+        if _artkey:
+            jkeys.append(_artkey)
+            art = f"""
+    <figure class="crossart">
+      {picture(images, _artkey, w=1400, h=1800, credit=False,
+               alt=images[_artkey]["alt"], sizes="(min-width: 62rem) 40vw, 100vw")}
+      <span class="crossroute">{constellation(
+          [project(e["city"]["lat"], e["city"]["lon"]) for e in _jstops],
+          route=True, frame=True, aspect=0.62, mark=9, term=14,
+          min_span=150, extra=" constel-overphoto")}</span>
+      <figcaption class="crosscap">{esc(_jj["name"])}
+        <span>{_jkm:,} km in a straight line · {len(_jstops)} stops</span></figcaption>
+    </figure>"""
         crossing = f"""
   <div class="galwrap">
+  <div class="cross">
+  <div class="crosstext">
   <div class="sheettext">
     <h2 class="mega">Europe reveals itself <br>when you move through it.</h2>
     <dl class="figures">{"".join(
@@ -2081,7 +2177,11 @@ def home(data):
     ground route is longer.</p>
   </div>
   <div class="jrows">{"".join(jrows)}</div>
-  {_phot(jkeys[:3])}
+  <div class="crossfoot">{golink('/journeys', 'Explore all routes')}
+    <p class="crossnote">Journeys connect Europe</p></div>
+  {_phot(jkeys[:4])}
+  </div>{art}
+  </div>
   </div>"""
 
     # ── 05 · THE ATLAS ───────────────────────────────────────────────
@@ -10844,6 +10944,24 @@ def datacut_line():
             f"atlas's map data ends, not at a coast.")
 
 
+def first_sentence(text):
+    """The opening sentence of an authored summary.
+
+    A JOURNEY'S SUMMARY IS A PARAGRAPH AND A ROW WANTS A LINE. Measured on
+    the homepage's crossing band, the three summaries set six to eight lines
+    apiece and the band ran 1,915 pixels for three rows. This is a
+    DERIVATION rather than a truncation: there is no ellipsis and nothing is
+    hidden, so `c_cut_word` has nothing to refuse, and the whole paragraph
+    is on the journey's own page one click away. `ed_slot()` already takes
+    the first sentence of a brief for the same reason.
+    """
+    t = (text or "").strip()
+    for i, ch in enumerate(t):
+        if ch in ".!?" and i + 1 < len(t) and t[i + 1] == " ":
+            return t[:i + 1]
+    return t
+
+
 def route_line(pts):
     """A route drawn the way a printed map draws one: a casing, then a core.
 
@@ -11068,7 +11186,7 @@ def offframe_line(pts, data, listed=True):
 
 def constellation(pts, extra="", route=False, frame=False, cut=False,
                   ocean=True, aspect=None, mark=None, term=None,
-                  labels=None, overlay=""):
+                  labels=None, overlay="", min_span=None):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -11109,8 +11227,16 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     # how far each one reaches, three countries against seven, and that
     # comparison only exists while all thirteen are drawn at one extent.
     # Framing them would delete the argument the family is making.
-    view = (glyph_view(pts, aspect=aspect) if (frame and pts)
-            else f"0 0 {MAP_W} {MAP_H}")
+    # `min_span` IS THE FLOOR THAT KEEPS A SILHOUETTE RECOGNISABLE, and a
+    # drawing with no silhouette under it has nothing to be recognisable.
+    # The homepage's crossing band draws a route over a PHOTOGRAPH — no
+    # land, no coast, no frontiers — so the 340-unit floor that stops a
+    # two-city story zooming past Europe was spending two thirds of the
+    # frame on empty projection: measured, the Arctic-to-the-Baltic line
+    # came out 130 pixels wide inside a 443-pixel column.
+    view = (glyph_view(pts, aspect=aspect,
+                       **({} if min_span is None else {"min_span": min_span}))
+            if (frame and pts) else f"0 0 {MAP_W} {MAP_H}")
     # THE DATA CUT SHOWED RAW ON EVERY INDEX OPENING. All 21 `.iheroart`
     # drawings are at the full extent, which means the straight diagonal at
     # 52°E runs right through the arch — and there it is the worst case on

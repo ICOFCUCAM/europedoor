@@ -1104,11 +1104,23 @@ _HEX = {k: v["hex"] for k, v in _PALETTE["tokens"].items()}
 # page. The browser suite named both values in one run, which is the same
 # assertion catching the same class of drift for the second time.
 #
-# The masthead paints `--paper` at 92% over the page, and the page is
-# `--paper`: so the composite IS paper, in whichever preference. No blend is
-# needed and stating one would be a third implementation of a colour.
-THEME_COLOR_LIGHT = _HEX["bone-light"]
-THEME_COLOR_DARK = _HEX["graphite"]
+# AND IT MOVED AGAIN THE MOMENT THE BAR GOT A SURFACE OF ITS OWN. A
+# masthead the colour of the page is a rule with words above it, so the
+# band is `--paper-2` at 94% over the page — one rung of the paper ladder
+# — and these two went on naming the PAGE. Same assertion, same class of
+# drift, third time: a derived meta value follows the thing it describes
+# or it is a second implementation of it. The composite is done here
+# rather than typed, from the same two hexes the stylesheet resolves.
+def _over(top, under, alpha):
+    """`top` at `alpha` over `under` — what the bar actually paints."""
+    t = [int(top[i:i + 2], 16) for i in (1, 3, 5)]
+    u = [int(under[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(a * alpha + b * (1 - alpha)):02x}"
+                         for a, b in zip(t, u))
+
+
+THEME_COLOR_LIGHT = _over(_HEX["bone-2"], _HEX["bone-light"], 0.94)
+THEME_COLOR_DARK = _over(_HEX["graphite-2"], _HEX["graphite"], 0.94)
 
 
 def theme_color_meta(world):

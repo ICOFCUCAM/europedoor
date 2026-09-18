@@ -2061,9 +2061,11 @@ a .kicker { color: var(--ink-3); }
             text-decoration: none; color: var(--ink);
             font-family: var(--display); font-size: var(--ed-display-3);
             letter-spacing: -0.02em; line-height: 1; }
+/* NO `fill` RESTATED HERE. `.mark-frame` is already `var(--ink)` and
+   `.mark-leaf` already `var(--signature)`, and this band BINDS both tokens —
+   so naming them again changes nothing, which is what the dead-rule scan
+   said in the first run that drew this mark. */
 .footmark .mark { width: 1.1em; height: 1.1em; }
-.footmark .mark-frame { fill: var(--ink); }
-.footmark .mark-leaf { fill: var(--signature); }
 /* THE ONE FACT A COLOPHON CARRIES, and it is counted rather than typed.
    `max-width: none` is a declaration rather than the absence of one: `p`
    carries the prose measure, and this is a list of figures — it broke at
@@ -9262,6 +9264,26 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    and an act mark already give, once the room hands down its own tokens
    rather than the world's. They were invisible while `.sheet-gal` named
    `--ink`, because then they were the only thing saying the right value. */
+/* AND THE DISTANCE FROM THE VIEWPORT TO THIS BOX IS `--page-gutter`, WHICH
+   ALREADY EXISTED. A band inside the measure that wants to reach the edge
+   of the paper needs to know how far that is, and the first version worked
+   it out again — `max(--s5, (100vw - 76rem) / 2)` — which is a second
+   implementation of a token this stylesheet has had all along and was
+   wrong twice over: the measure caps at 72rem rather than 76, and the
+   gutter is --s4 on a phone rather than --s5. Measured against the built
+   page it gave 8 where the real offset was 16, so a bled picture hung
+   eight pixels off both edges of a 390-pixel screen.
+
+   `--page-gutter` is `max(--s5, 50vw - 36rem)`, narrowing to --s4 below the
+   phone breakpoint, which is exactly the offset: 16 at 390, 24 at 834, 64
+   at 1280, 224 at 1600, 424 at 2000, all four checked in Chromium. So a
+   band bleeds with `margin-inline: calc(-1 * var(--page-gutter))` and the
+   column beside it takes the same value back as padding.
+
+   IT IS A LENGTH AND NEVER A PERCENTAGE, which is why the classic
+   `calc(50% - 50vw)` is not used here: a percentage inside a custom
+   property is substituted textually and resolved against whatever element
+   eventually USES it, so it cannot be handed to a child at all. */
 .galwrap { max-width: 76rem; margin: 0 auto; }
 
 /* ── 01 the door: type left, the atlas right ─────────────────────── */
@@ -9474,26 +9496,88 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    the credit line under it. The picture is what should give: 34rem is a
    crop of the same photograph, the two columns come out within 30 pixels
    of each other, and nothing is spaced to match anything. */
+/* THE PICTURE REACHES THE EDGE OF THE PAPER AND THE LABEL SITS ON IT.
+   The feature scale is 1.35 against .65 so the photograph is the subject,
+   and it was still a picture inside a 76rem measure with its caption set
+   under it — which is a large card, and a card is the shape this band
+   already stopped being once. A band whose subject IS a photograph lets
+   the photograph leave the column: the grid bleeds to the viewport, the
+   picture runs to the left edge, and the list beside it is padded back
+   onto the measure the head is set on.
+
+   The label takes plate 02's declaration arithmetic rather than a second
+   decision about one thing — a flat 72% wash the size of the words with a
+   five-stop ramp above it, which composites over the worst case a
+   photograph can present (a white frame) to rgb(76,83,82), where bone
+   measures 6.90:1 whatever the picture is. */
 .feat { display: grid;
-        grid-template-columns: minmax(0, 1.35fr) minmax(0, .65fr);
-        gap: var(--s8); margin-top: var(--s7); align-items: start; }
-.featlead :is(picture, img) { display: block; width: 100%;
-                              aspect-ratio: 4 / 5; max-height: 34rem;
+        grid-template-columns: minmax(0, 1.32fr) minmax(0, .68fr);
+        gap: var(--s8); margin-top: var(--s7); align-items: stretch;
+        margin-inline: calc(-1 * var(--page-gutter)); }
+/* THE PICTURE TAKES THE ROW RATHER THAN FLOATING IN THE MIDDLE OF IT.
+   `align-items: center` put a 598-pixel photograph in the middle of a
+   1,090-pixel row: 246 pixels of empty paper above the subject of the
+   band, with the head ending 295 pixels before the picture began. A
+   feature's picture is the tallest thing in its band or it is a thumbnail
+   with ambitions. */
+.featlead { position: relative; display: grid; color: var(--bone); }
+.featlead :is(picture, img) { grid-area: 1 / 1; display: block; width: 100%;
+                              height: 100%; min-height: 30rem;
                               object-fit: cover; }
+.featsay { position: absolute; inset: auto 0 0 0; z-index: 2;
+  display: grid; justify-items: start; gap: var(--s2);
+  padding: var(--s6) var(--s6) var(--s6) var(--page-gutter);
+  background: color-mix(in srgb, var(--graphite) 72%, transparent); }
+.featsay::before { content: ""; position: absolute; inset: auto 0 100% 0;
+  height: 11svh; pointer-events: none;
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--graphite) 72%, transparent) 0%,
+    color-mix(in srgb, var(--graphite) 65%, transparent) 18%,
+    color-mix(in srgb, var(--graphite) 46%, transparent) 40%,
+    color-mix(in srgb, var(--graphite) 24%, transparent) 62%,
+    color-mix(in srgb, var(--graphite) 8%, transparent) 82%,
+    transparent 100%); }
 .featwhere { display: block; font-family: var(--text); font-size: var(--t-xs);
-  letter-spacing: .13em; text-transform: uppercase; color: var(--door);
-  margin-top: var(--s4); }
+  letter-spacing: .13em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--bone) 82%, transparent); }
 .featname { display: block; font-family: var(--display);
-  font-size: var(--t-3xl); line-height: 1.12; margin-top: var(--s2); }
-.featlead:hover .featname { color: var(--door); }
+  font-size: var(--t-3xl); line-height: 1.12; color: var(--bone); }
 .featline { display: block; font-family: var(--display);
-  font-size: var(--t-base); line-height: 1.5; color: var(--ink-2);
-  margin-top: var(--s3); max-width: 44ch; }
+  font-size: var(--t-base); line-height: 1.5;
+  color: color-mix(in srgb, var(--bone) 88%, transparent);
+  max-width: 44ch; }
+/* `Explore Copenhagen` IS A SPAN, and that is not a style decision. The
+   tile is already a link and an `<a>` inside an `<a>` is not nested — the
+   parser closes the first one — which is how /stories lost the two links
+   Pexels' terms require. It wears the go mark and nothing else. */
+.featgo { display: inline-flex; align-items: center; gap: var(--s3);
+          margin-top: var(--s3); color: var(--bone); }
+.featlead:hover .featgo .gomark, .featlead:focus-visible .featgo .gomark {
+  opacity: 1; }
+.featgo .gomark::before { background: none; }
+@media (max-width: 62rem) {
+  /* ONE COLUMN, AND THE PICTURE KEEPS THE BLEED. A photograph inset by a
+     gutter on a phone is a card again; the label is already on it, so the
+     band loses nothing by running the picture edge to edge. The one-column
+     track is NOT restated here — `.feat, .lead` already take it at this
+     breakpoint, and a second rule with the same body is the duplicate this
+     stylesheet removed 85 of. */
+  .feat { align-items: start; }
+  .featlead :is(picture, img) { aspect-ratio: 4 / 5; height: auto;
+                               min-height: 0; }
+  .featside { padding-inline: var(--page-gutter); }
+}
 
 /* THE FOUR BESIDE IT ARE ROWS AND NOT SMALL CARDS. A row is the primitive
    this site already uses on 86% of its pages; four small cards beside one
    large picture is the same grid it just stopped being. Rules and space:
    no border box, no radius, no shadow, no fill. */
+.featside { display: grid; align-content: start; gap: var(--s5);
+            padding-right: var(--page-gutter); }
+.featsidehead { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0; }
+.featall { margin-top: var(--s2); }
 .featlist { display: grid; align-content: start; }
 .pl { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto;
       gap: var(--s4); align-items: center; text-decoration: none;
@@ -9507,6 +9591,13 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
   letter-spacing: .13em; text-transform: uppercase; color: var(--ink-3); }
 .plname { display: block; font-family: var(--display); font-size: var(--t-xl);
   line-height: 1.12; margin-top: var(--s1); }
+/* THE COUNTRY, NOT THE SUMMARY — see the builder. This atlas writes a
+   destination's summary as a sentence rather than as a tagline, so eight
+   of them in a 300-pixel column is four lines apiece, and clipping is not
+   the alternative because `c_cut_word` refuses any element holding more
+   text than it shows. */
+.plline { display: block; font-family: var(--text); font-size: var(--t-xs);
+  color: var(--ink-3); margin-top: var(--s1); }
 .plgo { font-family: var(--text); color: var(--ink-3); }
 .pl:hover .plname { color: var(--door); }
 .pl:hover .plgo { color: var(--door); }
@@ -10280,16 +10371,18 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                --door-dark: var(--pine-deep);
                --pine-ink:  var(--pine);
                background: var(--white); color: var(--ink); }
-/* AND THE PLATE MARK WAS NEAR-BLACK ON THE OPENING. `.actmark` is
-   `--ink-3` on the wall's own paper, which is right on every other plate
-   and wrong on the only one whose first screen is the opening rather than
-   the wall: measured on the built page it sat at the top of the band, at
-   z-index 2, over graphite. The mark belongs to the WALL and the opening
-   starts at the top of the band, so the mark sits on the opening and takes
-   the opening's ink. */
-.sheet-bleed > .actmark { padding-inline: var(--page-gutter);
-  position: absolute; inset: var(--s5) 0 auto 0; z-index: 3;
-  color: color-mix(in srgb, var(--bone) 72%, transparent); }
+/* AND THE PLATE MARK STAYS ON THE WALL, WHICH IS WHERE IT WAS RIGHT ALL
+   ALONG. It was briefly lifted onto the opening in bone, because the
+   opening used to be an absolutely positioned box in the TOP of the wall
+   and the mark sat over graphite. That was true of the pixels and invisible
+   to every instrument: the contrast sweep reads an element's ancestors for
+   its ground, `.actmark` is a sibling of the opening rather than a
+   descendant, so it measured bone on the wall's white at 1.14:1 — present,
+   placed, legible on screen and unmeasurable.
+   The opening is an in-flow box now, so it simply starts BELOW the mark:
+   the wall carries its own label and the aperture is cut under it, which is
+   what a label on a wall and a window in it actually are. */
+.sheet-bleed > .actmark { padding-inline: var(--page-gutter); }
 /* AND THE OPENING PAINTS ITS OWN GROUND, BECAUSE THE PICTURE IS BOUNDED
    AND THE WINDOW IS NOT. The photograph is capped at 16/9 of the viewport
    width — deliberately, because a viewport-filling slot guaranteed only 9%
@@ -10450,11 +10543,94 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   line-height: 1.12; margin-top: var(--s1); }
 .gi:hover .giname { color: var(--door); }
 
-/* ── journeys as rows ────────────────────────────────────────────── */
+/* ── the crossing: the band draws the thing it is about ──────────── */
+/* THIS BAND'S SUBJECT IS MOVEMENT AND IT DREW NONE. A headline, two
+   figures and three rows, with the one thing that makes a journey a
+   journey — the ordered line across the continent — nowhere on it. That is
+   the finding that rebuilt /journeys, still standing on the homepage.
+
+   So the band is two columns and the right one is the lead route drawn
+   over a photograph of one of its own stops: the picture bleeds to the
+   right edge and runs the full height of the band, and the line over it is
+   `constellation()`'s own geometry, framed on that journey's extent. A
+   decorative squiggle would be authoring a measurement, which is the one
+   thing this repository never does. */
+.cross { display: grid; align-items: stretch; gap: var(--s8);
+         grid-template-columns: minmax(0, 1fr) minmax(0, .58fr);
+         margin-inline: calc(-1 * var(--page-gutter)); }
+.crosstext { padding-left: var(--page-gutter); min-width: 0; }
+.crossart { position: relative; display: grid; margin: 0; }
+.crossart > :is(picture, img) { grid-area: 1 / 1; display: block;
+  width: 100%; height: 100%; object-fit: cover; }
+.crossart picture > img { width: 100%; height: 100%; object-fit: cover; }
+/* AND IT NEEDS A STACKING ORDER, NOT ONLY A CELL. Two grid items sharing
+   `grid-area: 1 / 1` paint in DOM order, which puts this span over the
+   photograph — and it did not: rendered, the line was laid out at the right
+   size in the right place and nothing of it reached a pixel. A replaced
+   element's painting is not the same question as a box's position, and the
+   only instrument that could see the difference was a crop of the column.
+   `z-index` states the order rather than inferring it. */
+.crossroute { grid-area: 1 / 1; display: grid; align-items: center;
+              justify-items: center; pointer-events: none;
+              position: relative; z-index: 1; }
+/* `height: 100%` WOULD LETTERBOX IT. An inline SVG scales its viewBox to
+   fit (`meet`), so a 0.62 drawing inside a 443x1643 column is fitted by
+   width and centred — which is what is wanted — and asking for the full
+   height only makes the box taller without making the drawing bigger. */
+.crossroute .constel { width: 100%; height: auto; max-height: 100%;
+                       display: block; }
+/* A ROUTE OVER A PHOTOGRAPH HAS NO GROUND IT CAN PREDICT, so the casing is
+   the ground's own dark and the core is bone — the same rule every printed
+   map answers this with, and the same one `route_line` was written for.
+   No land: the continent under this line is a photograph of one of its own
+   stops, and a translucent silhouette over it would be two pictures. */
+.constel-overphoto :is(.glyph-sea, .glyph-beyond, .glyph-land, .glyph-bounds,
+                       .glyph-coast) { fill: none; stroke: none; }
+.constel-overphoto .constel-route.case {
+  stroke: color-mix(in srgb, var(--graphite) 62%, transparent); }
+.constel-overphoto .constel-route:not(.case) { stroke: var(--bone); }
+.constel-overphoto circle { fill: var(--bone);
+  stroke: color-mix(in srgb, var(--graphite) 62%, transparent);
+  stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.constel-overphoto .datacut stop { stop-color: transparent; }
+.crossart .crosscap { position: absolute; z-index: 2; inset: auto var(--s5) var(--s5) var(--s5);
+  font-family: var(--display); font-size: var(--t-base); line-height: 1.5;
+  color: var(--bone); padding: var(--s3) var(--s4);
+  background: color-mix(in srgb, var(--graphite) 72%, transparent); }
+.crossart .crosscap span { display: block; font-family: var(--text);
+  font-size: var(--t-xs); letter-spacing: .12em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--bone) 80%, transparent); margin-top: var(--s1); }
+/* THE CLOSE IS THE GO MARK AND NOT A BUTTON. Border, fill, radius and
+   shadow each say "separate object, placed here by a system", and this
+   page has no boxes at all — which is why the one link shape here is a
+   drawn mark, a rule and a tracked label. */
+.crossfoot { display: flex; flex-wrap: wrap; align-items: baseline;
+             justify-content: space-between; gap: var(--s5);
+             margin-top: var(--s7); }
+.crossnote { font-family: var(--text); font-size: var(--t-xs);
+  letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0; max-width: none; }
+@media (max-width: 62rem) {
+  .cross { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+  .crosstext { padding-inline: var(--page-gutter); }
+  /* `aspect-ratio` ON A STRETCHED ITEM DERIVES THE WIDTH FROM THE HEIGHT,
+     which is the opposite of what a picture in a one-column band wants.
+     `.cross` is `align-items: stretch`, so a 4:3 box whose height came from
+     the row measured 679 wide inside a 390-pixel screen and the document
+     scrolled sideways by 289. The item has to stop stretching before the
+     ratio can mean what it says. */
+  .crossart { order: -1; aspect-ratio: 4 / 3; align-self: start;
+              height: auto; }
+}
 .jrows { margin-top: var(--s7); border-top: 1px solid var(--rule); }
-.jr { display: grid; grid-template-columns: 13rem minmax(0, 1fr) auto;
-      gap: var(--s6); align-items: center; padding: var(--s5) 0;
+.jr { display: grid; grid-template-columns: 2.5rem 11rem minmax(0, 1fr) auto;
+      gap: var(--s5); align-items: center; padding: var(--s5) 0;
       border-bottom: 1px solid var(--rule); text-decoration: none; color: inherit; }
+.jrno { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .1em;
+        color: var(--ink-3); align-self: start; padding-top: .2em; }
+.jrtext { min-width: 0; }
+.jrline { display: block; font-size: var(--t-sm); line-height: 1.5;
+          color: var(--ink-2); margin-top: var(--s2); max-width: 52ch; }
 .jr :is(picture, img) { display: block; width: 100%; aspect-ratio: 16 / 10;
                         object-fit: cover; }
 /* AND A JOURNEY'S NAME BREAKS RATHER THAN PUSHING THE PAGE SIDEWAYS.
@@ -10613,7 +10789,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .sheet-door .doorside { order: -1; }
   .feat, .lead { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
   .rdlist { grid-template-columns: minmax(0, 1fr); }
-  .jr { grid-template-columns: 8rem minmax(0, 1fr); }
+  .jr { grid-template-columns: 2rem 8rem minmax(0, 1fr); }
   .jr .jrgo { display: none; }
 }
 @media (max-width: 44rem) {

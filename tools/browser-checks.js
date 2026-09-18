@@ -2881,7 +2881,29 @@ async function main() {
           }
         }
       }
+      /* WHAT IS PROMISED IS THAT THE PICTURE STANDS STILL, NOT THAT IT IS
+       * `position: fixed`. The first version asserted the mechanism, and
+       * the mechanism changed for a reason that is about correctness: a
+       * fixed box inside a `clip-path` is two undefined-in-practice
+       * behaviours stacked on one composition — the six containing-block
+       * properties this same check walks for, and the CSS Masking rule
+       * that a `clip-path` other than `none` creates a containing block
+       * for fixed descendants, which Chromium does not implement and
+       * other engines do. The picture stands by STICKING now. So the
+       * question is whether anything between it and the band detaches it
+       * from the wall's flow, and the measurement below is what actually
+       * proves the promise. */
       const pos = getComputedStyle(pic).position;
+      let stands = "";
+      for (let e = pic; e && e !== document.body; e = e.parentElement) {
+        const q = getComputedStyle(e).position;
+        if (q === "fixed" || q === "sticky") {
+          const cls = String(e.className || "").trim();
+          stands = e.tagName.toLowerCase()
+            + (cls ? "." + cls.split(/\s+/).join(".") : "") + ` is ${q}`;
+          break;
+        }
+      }
       /* THE APERTURE IS `.shotclip` AND NOT THE BAND, and the band is what
        * this read when it was repointed off the class that no longer
        * exists. The stylesheet says why: a clip on the band clipped the
@@ -2896,13 +2918,20 @@ async function main() {
       const ap = cliphost.getBoundingClientRect();
       // The reveal itself: put the band in view, note where the picture is,
       // scroll a third of a screen, and ask again.
-      band.scrollIntoView({ block: "center" });
+      /* FROM THE START OF THE BAND, NOT ITS MIDDLE. A picture that stands
+       * by sticking stands for a bounded distance — its container's height
+       * less one viewport — so a measurement that begins halfway through
+       * the band can begin after the standing has ended and report the
+       * picture travelling when it has simply finished. `start` is where
+       * the standing starts, which is the only place this promise can
+       * honestly be measured from. */
+      band.scrollIntoView({ block: "start" });
       const img = pic.querySelector("img") || pic;
       const before = img.getBoundingClientRect();
       const y0 = scrollY;
       scrollBy(0, 300);
       const after = img.getBoundingClientRect();
-      return { position: pos, clip, blockers,
+      return { position: pos, stands, clip, blockers,
                scrolled: scrollY - y0,
                moved: Math.round(Math.abs(after.top - before.top)),
                /* AND IT FILLS THE APERTURE RATHER THAN THE VIEWPORT.
@@ -2942,9 +2971,10 @@ async function main() {
        `${w}: the homepage has no plate-03 photograph to measure — ` +
        `${r.missing ? "no .sheet-bleed" : "no .shotfull inside it"}`);
     if (r.missing || r.nopic) continue;
-    ok(r.position === "fixed",
-       `${w}: the plate-03 picture computes position: ${r.position}, not ` +
-       "fixed — it is a panel that scrolls, not a window");
+    ok(Boolean(r.stands),
+       `${w}: the plate-03 picture computes position: ${r.position} and ` +
+       "nothing between it and <body> is fixed or sticky — it is a panel " +
+       "that scrolls with the wall, not a window the wall moves past");
     ok(r.clip && r.clip !== "none",
        `${w}: the plate-03 aperture has clip-path: ${r.clip} — `+
        "`overflow: hidden` does NOT clip a fixed descendant, because a fixed " +
