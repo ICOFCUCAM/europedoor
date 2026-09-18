@@ -515,10 +515,23 @@ def s7():
     # False and the guard fired never — the same fault as the dead-rule
     # scanner recursing into an EMPTY `cssRules` list because an empty list is
     # truthy. A container standing in for the boolean inside it.
+    # AND THE NEEDLES WERE THREE LABELS RATHER THAN THE CLAIM. It required
+    # "Straight-line distance", "Countries" and "Stops" — the figure captions
+    # the band happened to carry — so it went red the day those figures
+    # stopped describing ONE journey and started describing all seventeen,
+    # which is MORE of what this assertion protects. That is the fourteenth
+    # assertion in this repository to pin a shape rather than a promise, and
+    # the first where the shape was a figure's caption.
+    #
+    # The promise is that the band prints a DISTANCE and says what kind of
+    # distance it is: every distance in this product is a haversine between
+    # two coordinates, `checks.py` refuses a mode claim anywhere, and the one
+    # thing a reader could act on and be wrong about is a kilometre figure
+    # with no qualifier. So: a km figure on the band, and the words that
+    # qualify it, in either order and whatever the captions are called.
     _jp = has("/", 'class="jrows"')[0]
-    yield (not _jp) or has("/", "Straight-line distance", "Countries",
-                           "Stops"), \
-        "the homepage journey plate states what it measured"
+    yield (not _jp) or has("/", " km", "straight"), \
+        "the homepage journey plate prints a distance and says it is a straight line"
     yield (not _jp) or has("/", 'href="/journeys/'), \
         "and opens the journey it names"
 

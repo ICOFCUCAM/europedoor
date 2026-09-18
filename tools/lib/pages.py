@@ -2028,18 +2028,37 @@ def home(data):
             f'<span class="jrgo">View →</span></a>')
     crossing = ""
     if jrows:
-        jf = data["journeys"][0]
-        jl = [idx[l["city"]]["city"] for l in jf["legs"] if l["city"] in idx]
-        jkm = int(round(sum(haversine(jl[i], jl[i + 1]) for i in range(len(jl) - 1))))
-        jfacts = [(f"{jkm:,} km", "Straight-line distance"), (str(len(jl)), "Stops")]
+        # THE TWO FIGURES DESCRIBED ONE JOURNEY AND STOOD ABOVE THREE, AND
+        # THE ONE THEY DESCRIBED WAS NOT NECESSARILY ON THE BAND.
+        #
+        # They were `data["journeys"][0]` — the first journey in the FILE —
+        # while the rows are the first three that carry a photograph of a
+        # stop and hold two stops. Those coincide today and are independent,
+        # so the head could have read "Measured on X" about a journey a
+        # reader cannot see. And a number that is not the set's own extent
+        # reads as one, which is /europe-in's recorded failure: "2,173 km"
+        # and "7 stops" over a band of three read as the band's own.
+        #
+        # Both figures are the whole set now — seventeen routes and every
+        # kilometre in them — and the selection is stated rather than
+        # implied, because all seventeen qualify for the row and three is a
+        # cap rather than a filter.
+        jkm = 0
+        for _j in data["journeys"]:
+            _pts = [idx[l["city"]]["city"] for l in _j["legs"] if l["city"] in idx]
+            jkm += int(round(sum(haversine(_pts[i], _pts[i + 1])
+                                 for i in range(len(_pts) - 1))))
+        jfacts = [(f"{jkm:,} km", "Across every route"),
+                  (str(len(data["journeys"])), "Routes")]
         crossing = f"""
   <div class="galwrap">
   <div class="sheettext">
     <h2 class="mega">Europe reveals itself <br>when you move through it.</h2>
     <dl class="figures">{"".join(
         f'<div><dd>{esc(v)}</dd><dt>{esc(k)}</dt></div>' for v, k in jfacts)}</dl>
-    <p class="lede">Measured on {esc(jf["name"])}. Every distance here is a straight
-    line between two coordinates — the ground route is longer.</p>
+    <p class="lede">Three of them below, in the order this atlas holds them.
+    Every distance here is a straight line between two coordinates — the
+    ground route is longer.</p>
   </div>
   <div class="jrows">{"".join(jrows)}</div>
   {_phot(jkeys[:3])}

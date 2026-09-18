@@ -348,3 +348,49 @@ widening it on the homepage is the one axis `c_photo_safe_area` exists to
 guard. **Trigger: declare `.featlead` as a second container for `city:` and
 measure it, in the same commit as any change to its crop.**
 
+## PLATE 04 — TWO FIGURES ABOUT ONE JOURNEY, STANDING ABOVE THREE
+
+The head printed **`2,173 km` / `7 STOPS`** with the note *"Measured on Arctic
+to the Baltic"* over a band of three journeys, on a site that holds
+**seventeen**. A number that is not the set's own extent reads as one — the
+/europe-in failure, where the index stated the 319 its queries run against and
+never the 12 queries in front of the reader.
+
+**And the journey those figures described was not necessarily on the band.**
+They came from `data["journeys"][0]`, the first journey in the FILE, while the
+rows are the first three that carry a photograph of a stop and hold at least
+two stops. Those coincide today and are computed independently, so the head
+could have read *"Measured on X"* about a journey a reader cannot see.
+
+Both figures are the whole set now — **31,213 km across every route** and
+**17 routes** — and the straight-line disclosure is kept, because it is the
+rule `checks.py` asserts on every page that prints a hop and the figure is
+what it is about.
+
+**And the selection is stated rather than implied.** Measured: **all seventeen
+journeys qualify** for the row — every one holds two stops and a photographed
+one — so three is a cap and not a filter, and the lede says *three of them
+below, in the order this atlas holds them.*
+
+**The first draft then put the count in the figure and again in the lede** —
+`17 Routes` over *"Seventeen routes"* — which is plate 05's own defect, made
+again in the commit that cites it. The figure carries the extent; the sentence
+carries the selection.
+
+### And the assertion that broke pinned three captions
+
+`ux-audit.py` §7 required the literal **`Straight-line distance`**,
+**`Countries`** and **`Stops`** — the figure captions the band happened to
+carry — so it went red the day those figures stopped describing one journey
+and started describing all seventeen, which is *more* of what it protects.
+**The fourteenth assertion here to pin a shape rather than a promise, and the
+first where the shape was a figure's caption.**
+
+The promise is that the band prints a distance and says what kind of distance
+it is: every distance in this product is a haversine between two coordinates,
+`checks.py` refuses a mode claim anywhere, and a kilometre figure with no
+qualifier is the one number a reader could act on and be wrong about. It reads
+`" km"` and `"straight"` now, in either order and whatever the captions are
+called — **proved red by deleting the qualifier**, which named the page and
+the missing needle.
+
