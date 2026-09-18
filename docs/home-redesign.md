@@ -452,3 +452,36 @@ is a caption rather than a folio, and then it is **one** declaration of "this
 plate is centred" read by both rules — not the six composition classes that
 each centre in their own way today.
 
+## THE INSTRUMENT THAT CLOSED FINDING 1 WAS COUNTING A PICTURE NOBODY CAN SEE
+
+`tools/opening.js` measures how much of the first screen is a picture, and it
+is what `docs/first-class-audit.md` closes its Finding 1 on. It counted every
+`figure, svg, img, picture…` whose rect intersects the viewport.
+
+**The window plate's photograph is `position: fixed`** — that is the whole
+mechanism of the plate, and it carries a paragraph about six CSS properties
+that silently kill it — **and a fixed box's client rect is the viewport
+whatever the scroll.** So at scroll 0 the probe read a 1280×720 photograph at
+y=90 on the homepage, while the band holding it begins 1,818 pixels below the
+fold and clips it with `clip-path: inset(0)`.
+
+| the homepage's opening | before | after |
+|---|---|---|
+| at 1280 | 85.5% | **50.5%** |
+| at 390 | 72% | **4.4%** |
+
+**One family of thirty moved**, which is what says the repair is surgical
+rather than a new reading of the site: the probe now intersects each element
+with every ancestor that clips — a `clip-path`, or an overflow that is not
+visible — which is the honest reading of *what a reader gets*, and a fixed box
+inside a clipping ancestor is bounded by it exactly as a static one is.
+
+**And the correction hands back a real finding about this page.** At 390 the
+homepage's first screen is the masthead, the plate mark, a 60px headline, a
+three-line lede, a link, a rule and four counts — **not one pixel of
+picture**, on the most-seen page of a product whose own mandate says a page
+that is type to the fold is the thing to fix. The hero's drawing begins at
+y=812 of an 844-tall screen. That is the next commit, not this one: this one
+is the instrument, and mixing the two would mean measuring a change with the
+device that was wrong about it.
+

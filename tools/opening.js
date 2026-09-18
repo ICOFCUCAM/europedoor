@@ -63,15 +63,53 @@ const PROBE = () => {
     if (pos === 'fixed' || pos === 'sticky') bars += e.getBoundingClientRect().height;
   }
   const screen = H - bars;
+  /* AND A FIXED ELEMENT'S CLIENT RECT IS THE VIEWPORT, WHICH MADE THIS
+   * INSTRUMENT COUNT A PICTURE NOBODY CAN SEE — on the homepage, which is
+   * the page it exists for.
+   *
+   * The window plate holds its photograph `position: fixed` so the picture
+   * stands still while the wall scrolls past it, and the band clips it with
+   * `clip-path: inset(0)` — that is the whole mechanism, and it is why the
+   * plate carries a paragraph about six properties that silently kill it.
+   * `getBoundingClientRect()` on a fixed box reports it against the
+   * viewport whatever the scroll, so at scroll 0 this read a 390x488
+   * photograph at top=178 while the band containing it starts 1,818 pixels
+   * below the fold and clips it to nothing.
+   *
+   * Measured: the homepage read 72% at 390 and 85.5% at 1280, and a reader
+   * at scroll 0 sees no photograph at all — 4.4% and 50.5%, which is the
+   * drawn continent alone. `docs/first-class-audit.md` closes its Finding 1
+   * on this instrument, so the one page the finding is most about was the
+   * one it was most wrong about.
+   *
+   * THE FIX IS TO INTERSECT WITH EVERY ANCESTOR THAT CLIPS, which is the
+   * honest reading of "what a reader gets": a clip-path, or an overflow
+   * that is not visible. A fixed box inside a clipping ancestor is bounded
+   * by that ancestor's own rect exactly as a static one is. */
+  const clipped = e => {
+    let t = -Infinity, b = Infinity;
+    for (let a = e.parentElement; a; a = a.parentElement) {
+      const st = getComputedStyle(a);
+      if (st.clipPath !== 'none' ||
+          (st.overflow !== 'visible' && st.overflowY !== 'visible')) {
+        const r = a.getBoundingClientRect();
+        t = Math.max(t, r.top); b = Math.min(b, r.bottom);
+      }
+    }
+    return [t, b];
+  };
   const spans = [];
   let first = null;
   for (const e of document.querySelectorAll('figure, svg, img, picture, .card-art, .constel, .plate, .yearband')) {
     if (e.tagName.toLowerCase() !== 'svg' && e.closest('svg')) continue;
     const r = e.getBoundingClientRect();
     if (r.width < 40 || r.height < 30) continue;            // a mark is not a picture
-    const top = r.top + scrollY;
+    const [ct, cb] = clipped(e);
+    const rt = Math.max(r.top, ct), rb = Math.min(r.bottom, cb);
+    if (rb <= rt) continue;                     // clipped away: not on the screen
+    const top = rt + scrollY;
     if (first === null || top < first) first = top;
-    const t = Math.max(r.top, 0), b = Math.min(r.bottom, H);
+    const t = Math.max(rt, 0), b = Math.min(rb, H);
     if (b > t) spans.push([t, b]);
   }
   spans.sort((a, b) => a[0] - b[0]);

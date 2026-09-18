@@ -464,10 +464,36 @@ Written as the work landed, so the audit and the record do not drift.
 | 49 | thirty-three pages never reached the head-role check | 1,001 heads of 1,034 → 1,033 |
 | 50 | a headline ran off the right edge of a phone, at the design width | /place +7px at 390, +77 at 320 → 0 at every width, on every family |
 
-**Finding 1, re-measured three times**: seven surfaces with no picture on
-the phone's first screen became six, then three of twenty-seven, and now
-**three of thirty, with none under a fifth** — all three of them an
-instrument or a recorded refusal. The median share is 24% → 35.6%. The table
+**Finding 1, re-measured FOUR times, and the fourth correction is the
+instrument rather than the pages.** Seven surfaces with no picture on the
+phone's first screen became six, then three of twenty-seven, then three of
+thirty with none under a fifth and a median of 35.6% — **and that reading
+counted, on the homepage, a photograph no reader can see.**
+
+`tools/opening.js` measured every `figure, svg, img, picture…` intersecting
+the first screen. The homepage's window plate holds its photograph
+`position: fixed`, so it stands still while the wall scrolls past it, and the
+band clips it with `clip-path: inset(0)`. **A fixed box's client rect is the
+viewport whatever the scroll**, so at scroll 0 the probe read a 1280×720
+photograph at y=90 while the band containing it begins 1,818 pixels below the
+fold and clips it to nothing. The probe intersects with every clipping
+ancestor now, and re-running it moved **one family of thirty** — which is what
+says the repair is surgical rather than a new reading of the site:
+
+| | before | after |
+|---|---|---|
+| homepage at 1280 | 85.5% | **50.5%** |
+| homepage at 390 | 72% | **4.4%** |
+
+At 1280 the corrected figures are **three of thirty with no picture** —
+`/discover`, `/search` and `/my-europe`, every one an instrument — **one more
+under a fifth** (`/stories/<story>` at 16.6%) and a median of **49.7%**.
+
+At 390 they are five with none and twelve more under a fifth, median 16.8% —
+and those were true before this repair as well as after it, because only the
+homepage moved. **The phone column was never the column this finding was
+closed on**, and saying so is the correction: Finding 1 is closed at 1280 and
+is open at 390. The table
 grew by three because `tools/lib/families.js` had never carried a month
 page, a sub-category page or a fund project page, and the last of those was
 the find: no figure anywhere on it, at any width, on the register whose
