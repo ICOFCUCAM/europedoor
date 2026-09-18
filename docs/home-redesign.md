@@ -1005,3 +1005,113 @@ came off `.featlead` because the anchor paints no text of its own and read
 before as a restatement of the anchor's. Between them the place name inherited
 the page's near-black onto a dark scrim over a bright building and was not
 there. The element that paints the scrim owns the ink on it.
+
+## Home 20 — the footer is the other side of the door
+
+The brief is that the masthead and the footer are two ends of one
+architectural object: the header is the entrance and the footer is the far
+side of the same door, sharing a ground so the site has a recognisable
+frame — *same colour, not same weight*. The header is quiet, precise and
+navigational; the footer is large, editorial and conclusive. **This commit
+is the footer half.** The header's ground is the next one, because renaming
+the masthead's sections without the fields behind them would be worse than
+what exists.
+
+**FIVE COLUMNS, AND TWO OF THEM ARE NOT LISTS OF LINKS.** That is the whole
+composition rather than a wider grid: four identical lists side by side is
+the 280px card grid this site already threw away, one component down — the
+shape of the data as the layout. THE ATLAS is the geographic field, THE
+JOURNEY is what a reader does with it, GO FURTHER is a register of external
+services with a line under each, EUROPEDOOR is the house, and STAY WITH
+EUROPE is a statement with three ways back in. The tracks are unequal for
+the same reason a feature is 1.35 against .65.
+
+**GO FURTHER IS A REGISTER AND NOT A LIST OF LINKS, BECAUSE EVERY ROW IS A
+HOST.** `data/go-further.json` declares seven services — flying, buying a
+home, moving, a car, digital privacy, Africa, selling a company — and
+`checks.py` pins the set of external hosts this site may navigate to against
+that file and `data/stay.json`. A new outbound destination cannot appear
+anywhere without a row, and every one of these links carries
+`rel="nofollow noopener"` and opens in a new tab. **They are deliberately
+not in the primary navigation**: EuropeDoor's subject is the continent, and
+seven commercial verbs in a masthead turn a European atlas into a
+marketplace navigation bar.
+
+**A SERVICE WITH NO DESTINATION DRAWS NOTHING.** `fly` is declared with
+`state: "unbuilt"` and no partner, so the column renders no row for it — a
+row that looks like navigation and leads nowhere is the chip that filters
+nothing and the `data-rotate` attribute nobody reads. The declaration stays
+in the file so the absence is written down, and `c_go_further` asserts both
+halves: every live service reaches all 1,032 pages, and the unbuilt one
+reaches none. Proved red by drawing it.
+
+**AND THE TRACKING PARAMETERS WERE STRIPPED BEFORE THE FIRST BUILD.** The
+URLs arrived carrying `utm_source=chatgpt.com`, which is a claim about where
+a reader came from that is false for every reader of this site and a
+parameter this product would not ship even if it were true. `data.py`
+refuses a query string on any of them, proved red.
+
+**THE VALIDATOR WAS ONLY REACHED WHEN A PAGE WAS BUILT, WHICH IS A
+VALIDATOR NOTHING RUNS.** Three deliberately broken registers — a tracking
+parameter, a live row with no host, an unbuilt row carrying an href — each
+printed *data ok* and then stopped the build a minute later. `build.py
+check` is the command that validates the data, so `load_go_further()` is
+called from `load()`. All four refusals are red now.
+
+**A CHECK CONFLATED AN OUTBOUND LINK WITH AN AFFILIATE REFERRAL, AND DID
+NOT FAIL — IT CRASHED.** `c_csp` pins the outbound host set and then asks
+whether `rel="sponsored"` tracks a credential, by looking the host up in
+`data/stay.json` with `next(...)`. A GO FURTHER host is in the allowed set
+and not in that registry, so the first build raised `StopIteration` and the
+whole check reported as broken rather than naming a host. `sponsored` is
+the machine-readable half of a *disclosure* and tracks a credential; a
+declared service has no credential mechanism at all, so the rule inverts:
+an ecosystem host must never carry `sponsored`, because claiming one would
+spend the disclosure vocabulary on a relationship that does not exist. That
+is the recorded *outbound LINK is not a subresource LOAD* finding one shape
+over, with a referral instead of a request. Both directions proved red.
+
+**THE CLOSE, AND THE APERTURE HAD TO LOSE ITS THRESHOLD.**
+`EUROPE IS NOT A CHECKLIST. / OPEN ANOTHER DOOR.` at `--ed-display-2`, then
+the signature, then a thin line carrying the strap, the four legal pages and
+the notice. The arch is struck by `arch_path()` — the one implementation the
+plates, the social cards and the CSS all agree with — and **it returns a
+CLOSED figure**, because everywhere else on this site it is a clip and a
+clip has to close. Stroked, that closing segment draws a line across the
+bottom and the mark reads as a panel with a curved top rather than as an
+opening. The path is struck at 96×54 and the frame stops at 52, so the
+jambs run off the bottom edge exactly as a real opening does. Only
+rendering it found that.
+
+**AND THE NOTICE CARRIES NEITHER AN ENTITY NOR A YEAR.** `OPERATOR` is a
+placeholder and `docs/legal-position.md` records the entity gap, which the
+legal paragraph one line above names in as many words — writing the
+placeholder into a © line would be the one place on this site where the gap
+read as a company. And no year, which is a build decision rather than a
+legal one: `site/` is committed and CI rebuilds it to check for staleness,
+so `date.today().year` would turn every page in the repository red on the
+first of January for nobody's change. The same reasoning made *Explore this
+month* into *Explore the year*, pointing at the index rather than at a month
+page that would move twelve times as often.
+
+**THE LEGAL PAGES LOST A COLUMN AND KEPT EVERYTHING ELSE.** Privacy, terms,
+cookies and the accessibility statement are the register a reader needs when
+something is wrong, and a fifth of a footer's visual weight spent on them
+says they are a fifth of what this is. They are in the document, in the tab
+order, inside `.footer-nav`'s accessible name and one click from all 1,032
+pages; they are not a column.
+
+**THE COST IS RECORDED AND IT IS THE ONE MOVE ON THAT CEILING THAT IS NOT
+ABOUT /map.** The footer went 2,122 → 4,261 raw bytes: 2.1 KB on every one
+of 1,032 documents, about 1.6 KB compressed for the whole band, and
+`weight.max_page_kb` 598 → 601. It lands on EVERY page rather than on the
+heaviest one, which is exactly the case that row exists to catch — so it is
+paid deliberately, because a site-wide frame is the one thing that has to be
+on every document, and the alternative is a footer that says less on 1,031
+pages so the heaviest one can stay under a number.
+
+**Two more the invariant register refused, each in the commit that made
+them.** A `@media (max-width: 34rem)` block would have been a seventh
+breakpoint, and the two-column rule already covers 320; `line-height: 1.06`
+and `1.16` would have been a ninth and a tenth where the register holds
+eight, and `1.12` was already in the set for both.

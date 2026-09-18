@@ -1,0 +1,80 @@
+{
+  "$comment": [
+    "GO FURTHER — WHAT HAPPENS AFTER DISCOVERY, AND WHY IT IS NOT IN THE",
+    "PRIMARY NAVIGATION.",
+    "",
+    "EuropeDoor's subject is the continent: where places are, what they are",
+    "for, and how to move between them. Flying, driving, moving, buying a",
+    "home, protecting a digital life and selling a company are all real and",
+    "none of them is that — putting seven of them in the masthead would turn",
+    "a European atlas into a marketplace navigation bar, which is the one",
+    "thing the brand lock and the commercial wall both exist to prevent.",
+    "",
+    "So they are a DECLARED SET with a home of their own: a footer column",
+    "and, when the mega-navigation lands, a field inside it. They are never",
+    "an editorial recommendation, never ranked, never scored, and never",
+    "mixed into a page's own links.",
+    "",
+    "EVERY ROW IS A HOST, AND THAT IS WHAT MAKES THIS A REGISTER RATHER THAN",
+    "A LIST OF LINKS. `checks.py` pins the set of external hosts this site",
+    "may navigate to: a new outbound host cannot appear anywhere without a",
+    "row here or in data/stay.json, and every such link carries",
+    "rel=\"nofollow noopener\" and opens in a new tab.",
+    "",
+    "AND THE TRACKING PARAMETERS ARE STRIPPED. The URLs arrived carrying",
+    "`utm_source=chatgpt.com`, which is a claim about where a reader came",
+    "from that is false for every reader of this site, and a parameter this",
+    "product would not ship even if it were true.",
+    "",
+    "A SERVICE WITH NO DESTINATION IS NOT DRAWN. `fly` is declared and has",
+    "no partner, so it renders nothing at all — a row that looks like",
+    "navigation and leads nowhere is the failure this repository already",
+    "records about a chip that filters nothing and an attribute nobody",
+    "reads. It is here so the absence is written down rather than forgotten."
+  ],
+  "disclosure": "Separate services, run by the people behind EuropeDoor and by partners. They are not editorial recommendations and nothing here is ranked or paid for a place in the Atlas.",
+  "services": [
+    {
+      "slug": "fly", "label": "Fly",
+      "line": "Flights through EuropeDoor's flight partners",
+      "state": "unbuilt",
+      "why": "no flight partner is declared. The trigger is a partner with terms somebody has read."
+    },
+    {
+      "slug": "buy-a-home", "label": "Buy a home",
+      "line": "European property",
+      "host": "re.flyttgo.com", "href": "https://re.flyttgo.com/",
+      "state": "live"
+    },
+    {
+      "slug": "move", "label": "Move",
+      "line": "Relocation and logistics",
+      "host": "www.flyttgo.com", "href": "https://www.flyttgo.com/",
+      "state": "live"
+    },
+    {
+      "slug": "drive", "label": "Book a car",
+      "line": "A car for the journey",
+      "host": "www.flyttgo.com", "href": "https://www.flyttgo.com/",
+      "state": "live"
+    },
+    {
+      "slug": "protect", "label": "Online security",
+      "line": "Digital privacy and risk",
+      "host": "www.myprivacyos.com", "href": "https://www.myprivacyos.com/",
+      "state": "live"
+    },
+    {
+      "slug": "africa", "label": "Visit Africa",
+      "line": "Beyond the continent",
+      "host": "afrinkong.com", "href": "https://afrinkong.com/",
+      "state": "live"
+    },
+    {
+      "slug": "sell-a-company", "label": "Sell a company",
+      "line": "Exit and acquisition",
+      "host": "exit.sovereigndo.com", "href": "https://exit.sovereigndo.com/",
+      "state": "live"
+    }
+  ]
+}

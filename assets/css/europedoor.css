@@ -2088,17 +2088,90 @@ a .kicker { color: var(--ink-3); }
 .footer-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
               gap: var(--s6) var(--s5); margin: var(--s6) 0 var(--s7);
               font-size: var(--t-sm); align-items: start; }
+/* FIVE COLUMNS, AND TWO OF THEM ARE NOT LISTS OF LINKS — which is the whole
+   composition rather than a wider grid. Four identical lists side by side is
+   the 280px card grid this site already threw away, one component down: the
+   shape of the data as the layout. GO FURTHER is a register of external
+   services, each with a line saying what it is, and STAY WITH EUROPE is a
+   statement with three ways back in. The columns are unequal for the same
+   reason a feature is 1.35 against .65 — two equal columns read as a layout
+   and an unequal pair reads as something with an argument. */
+@media (min-width: 62rem) {
+  .footer-nav { grid-template-columns:
+                  minmax(0, .82fr) minmax(0, .82fr) minmax(0, 1.05fr)
+                  minmax(0, .82fr) minmax(0, 1.15fr);
+                gap: var(--s6) var(--s6); }
+}
 .fgroup { display: grid; gap: var(--s2); align-content: start; }
 .fghead { font-size: var(--t-xs); letter-spacing: .1em; text-transform: uppercase;
           color: var(--ink-3); margin: 0 0 var(--s1); }
 .footer-nav a { text-decoration: none; color: var(--ink-2); }
 .footer-nav a:hover, .footer-nav a:focus-visible { color: var(--door); }
-@media (max-width: 52rem) {
-  /* Two columns rather than one: four stacked lists is a very long footer on
-     a phone, and the groups are short enough to sit side by side. */
+/* THE EXTERNAL REGISTER. Every row leaves this origin, so every row says
+   what it is under its own name — a bare list of seven verbs in a footer
+   column reads as more of the Atlas, which is exactly the confusion the
+   commercial wall exists to prevent. The line is the disambiguation, not
+   decoration. */
+.fgroup-go .gorow { display: grid; gap: 1px; padding: 2px 0; }
+.goline { font-size: var(--t-xs); color: var(--ink-3); }
+.fgroup-go .gorow:hover .goline,
+.fgroup-go .gorow:focus-visible .goline { color: var(--ink-2); }
+/* ONE DISCLOSURE FOR THE COLUMN, NOT ONE PER ROW. Six copies of the same
+   sentence is `never explain the constraint back` — a reason shared by
+   every row is hoisted once above the set. */
+.godis { font-size: var(--t-xs); color: var(--ink-3); margin: var(--s3) 0 0;
+         max-width: 24rem; }
+/* THE LAST COLUMN IS A SENTENCE. It carries the one thing a footer can say
+   that a list cannot: that the thing above it keeps changing. */
+.staysay { font-family: var(--display); font-size: var(--ed-display-3);
+           line-height: 1.12; color: var(--ink); max-width: 16em;
+           margin: 0 0 var(--s4); text-wrap: balance; }
+.stayrow { display: block; padding: 2px 0; }
+@media (max-width: 62rem) {
+  /* Two columns rather than one: five stacked lists is a very long footer on
+     a phone, and the groups are short enough to sit side by side. The
+     statement takes the full width there, because a display line in half a
+     phone is four words a line. */
   .footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fgroup-stay { grid-column: 1 / -1; }
 }
+/* ── the close ────────────────────────────────────────────────────────
+   THE OTHER SIDE OF THE DOOR. The masthead is the entrance and is quiet,
+   precise and navigational; this is the far side of the same object and is
+   large, editorial and conclusive — same ground, opposite weight, which is
+   the difference between a frame and a repeat. The arch is the signature
+   struck by `arch_path()` rather than a second drawing of it, sitting on
+   the type as an opening rather than beside it as a logo. */
+.footclose { display: grid; justify-items: center; gap: var(--s5);
+             padding: var(--s8) 0 var(--s7); margin: 0 0 var(--s6);
+             border-top: 1px solid var(--rule); text-align: center; }
+.footsay { font-family: var(--display); color: var(--ink);
+           font-size: var(--ed-display-2); line-height: 1.12;
+           letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.footarch { width: 96px; height: 52px; }
+/* STROKED AND UNFILLED, because at the end of a document the door is an
+   opening rather than an object. `non-scaling-stroke` for the reason this
+   stylesheet records about every framed drawing: a stroke in user units is
+   a different width at every rendered size. */
+.footarch path { fill: none; stroke: var(--ink-3); stroke-width: 1.4;
+                 vector-effect: non-scaling-stroke; }
 .footer-legal { font-size: var(--t-xs); color: var(--ink-3); max-width: 46rem; }
+/* THE THIN FINAL LINE, and the register is in it rather than in a column of
+   its own. Privacy, terms, cookies and the accessibility statement are what
+   a reader needs when something is wrong: in the document, in the tab order
+   and one click from all 1,032 pages, and not a fifth of the footer's
+   weight, which would say they are a fifth of what this is. */
+.footline { display: flex; flex-wrap: wrap; align-items: baseline;
+            gap: var(--s2) var(--s5); margin: var(--s6) 0 0;
+            padding: var(--s5) 0 0; border-top: 1px solid var(--rule);
+            font-size: var(--t-xs); color: var(--ink-3); }
+.footstrap { text-transform: uppercase; letter-spacing: .12em;
+             color: var(--ink-2); margin: 0; }
+.footlegal-nav { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4);
+                 margin-right: auto; }
+.footlegal-nav a { text-decoration: none; color: var(--ink-3); }
+.footlegal-nav a:hover, .footlegal-nav a:focus-visible { color: var(--door); }
+.footcopy { margin: 0; }
 
 @media (max-width: 60rem) {
   .split { grid-template-columns: 1fr; }

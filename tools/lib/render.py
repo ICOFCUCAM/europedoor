@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import html
+import datetime as _dt
 import json
 import os
 import re
@@ -51,6 +52,47 @@ MARK = (
     '<path class="mark-leaf" d="M10.9 29V16.6a5.1 5.1 0 0 1 5.1-5.1V29z"/>'
     "</svg>"
 )
+
+
+# ── the copyright notice, and the two things it does not carry ───────
+#
+# NO ENTITY. `OPERATOR` is a placeholder and `docs/legal-position.md`
+# records the entity gap; the legal paragraph one line above this notice
+# names it in as many words. So the notice carries the trading name a
+# reader recognises — writing the placeholder into a © line would be the
+# one place on this site where the gap read as a company.
+#
+# AND NO YEAR, WHICH IS A BUILD DECISION RATHER THAN A LEGAL ONE. `site/`
+# is committed and CI rebuilds it to check for staleness, so anything a
+# page derives from the clock makes the build stale with no commit behind
+# it: `date.today().year` would turn every page in the repository red on
+# the first of January for nobody's change. A notice is optional in every
+# Berne country and a year that is wrong is worse than no year — so the
+# same reasoning also made "Explore this month" into "Explore the year",
+# pointing at the index rather than at a month page that would move twelve
+# times as often.
+#
+# ── the aperture as a mark ───────────────────────────────────────────
+#
+# The closing symbol is the SIGNATURE rather than the logo: an elliptical
+# arch struck by `arch_path()`, which is the one implementation the plates,
+# the social cards and the CSS all agree with. Stroked and unfilled,
+# because at the end of a document the door is an opening rather than an
+# object — and drawn at 96x54, which is the same 34% rise every aperture on
+# this site is cut at, by construction rather than by a second number.
+def _foot_arch():
+    # AND THE VIEWBOX IS SHORTER THAN THE PATH, WHICH IS THE WHOLE POINT.
+    # `arch_path()` returns a CLOSED figure, because everywhere else on this
+    # site it is a clip and a clip has to close. Stroked, that closing
+    # segment draws a line across the bottom and the mark reads as a panel
+    # with a curved top rather than as an opening — a doorway has two jambs
+    # and a head, and no threshold drawn in the same ink. The path is struck
+    # at 96x54 and the frame stops at 52, so the jambs run off the bottom
+    # edge exactly as a real opening does and the closing line is outside
+    # the viewport. `overflow` is left at its default for that reason: this
+    # is the one drawing here whose frame is doing the work.
+    return ('<svg class="footarch" viewBox="0 0 96 52" aria-hidden="true" '
+            'focusable="false"><path d="' + arch_path(96, 54) + '"/></svg>')
 
 
 def arch_path(w, h, rise=None):
@@ -1029,43 +1071,87 @@ NAV = [
 # not headings, because the homepage asserts its own <h2> count and a footer
 # is not a band of the page.
 FOOTER_GROUPS = [
-    ("Explore", [
-        ("/map", T("footer.map")),
-        ("/themes", T("footer.themes")),
-        ("/europe-in", T("footer.motion")),
-        ("/beyond-the-obvious", T("footer.beyond")),
-        # SEVENTEEN PAGES SHIPPED AND THEIR INDEX WAS A SERVER AUTOINDEX.
-        # Nothing linked to /interests, which is exactly why no check caught
-        # it: the link checker validates links that exist, and a missing
-        # index is an absence.
+    # ── column 1: the geographic field ───────────────────────────────
+    ("footer.col.atlas", [
+        ("/countries", T("footer.countries")),
+        ("/discover", T("footer.destinations")),
         ("/interests", T("footer.interests")),
-        ("/my-europe", T("footer.myeurope")),
+        ("/themes", T("footer.themes")),
+        ("/beyond-the-obvious", T("footer.beyond")),
+        ("/map", T("footer.map")),
     ]),
-    ("The project", [
+    # ── column 2: what a reader does with it ─────────────────────────
+    ("footer.col.journey", [
+        ("/journeys", T("footer.journeys")),
+        ("/experiences", T("footer.experiences")),
+        ("/europe-in", T("footer.motion")),
+        ("/events", T("footer.events")),
+        ("/stories", T("footer.stories")),
+        ("/plan", T("footer.plan")),
+    ]),
+    # ── column 3 is GO FURTHER and is NOT here ───────────────────────
+    #
+    # It is rendered from `data/go-further.json` by `go_further_column()`,
+    # because every one of its rows is an external HOST and `checks.py` pins
+    # the set of hosts this site may navigate to against that file. A copy
+    # of those URLs typed here would be a second declaration of the one
+    # thing the outbound-link guard reads, which is the failure this
+    # repository has now recorded seven times.
+    # ── column 4: the house itself ───────────────────────────────────
+    ("footer.col.house", [
         ("/manifesto", T("footer.manifesto")),
         ("/about", T("footer.about")),
         ("/how-it-works", T("footer.how-it-works")),
         ("/method", T("footer.method")),
         ("/sources", T("footer.sources")),
         ("/api-docs", T("footer.api")),
-    ]),
-    ("Work with us", [
         ("/for-businesses", T("footer.for-businesses")),
         ("/for-tourism-boards", T("footer.for-tourism-boards")),
         ("/fund", T("footer.fund")),
-    ]),
-    ("Help & legal", [
         ("/contact", T("footer.contact")),
         ("/help", T("footer.help")),
-        ("/accessibility", T("footer.accessibility")),
-        ("/privacy", T("footer.privacy")),
-        ("/terms", T("footer.terms")),
-        ("/cookies", T("footer.cookies")),
     ]),
 ]
 
+# The thin final line. THESE ARE NOT A COLUMN, and that is the whole
+# reason they moved: privacy, terms, cookies and the accessibility
+# statement are the register a reader needs when something is wrong, and a
+# fifth of a footer's visual weight spent on them says they are a fifth of
+# what this is. They keep every property that matters — in the document, in
+# the tab order, inside `.footer-nav`'s accessible name, one click from all
+# 1,032 pages — and lose only the column.
+FOOTER_LEGAL_NAV = [
+    ("/privacy", T("footer.privacy")),
+    ("/terms", T("footer.terms")),
+    ("/cookies", T("footer.cookies")),
+    ("/accessibility", T("footer.accessibility")),
+]
+
+
+def go_further() -> list:
+    """The declared external services, live ones only.
+
+    A SERVICE WITH NO DESTINATION IS NOT DRAWN. `fly` is declared with
+    `state: "unbuilt"` and no href, so it renders nothing at all — a row
+    that looks like navigation and leads nowhere is the chip that filters
+    nothing and the `data-rotate` attribute nobody reads, one surface over.
+    The declaration stays in the file so the absence is written down.
+
+    Lazy, for the same reason `extent_line()` is: `data.py` does not import
+    this module and this module does not import it at the top.
+    """
+    global _GO_FURTHER
+    if _GO_FURTHER is None:
+        from . import data as _d
+        _GO_FURTHER = _d.load_go_further()
+    return _GO_FURTHER
+
+
+_GO_FURTHER = None
+
+
 # Kept flat as well, because it is the set and several checks read it as one.
-FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows]
+FOOTER_NAV = [row for _, rows in FOOTER_GROUPS for row in rows] + FOOTER_LEGAL_NAV
 
 
 # ── the colophon's one fact ──────────────────────────────────────────
@@ -1655,11 +1741,44 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     scripts_html = "".join(
         f'<script src="{esc(asset(s[len("/assets/"):]) if s.startswith("/assets/") else s)}" defer></script>'
         for s in scripts)
-    footer_nav = "".join(
-        f'<div class="fgroup"><p class="fghead">{esc(head)}</p>'
-        + "".join(f'<a href="{href}">{esc(label)}</a>' for href, label in rows)
-        + "</div>"
-        for head, rows in FOOTER_GROUPS)
+    # ── the five columns ─────────────────────────────────────────────
+    #
+    # Four of them are lists of links and the fifth is not, which is the
+    # point: a footer that is five identical lists is the 280px card grid
+    # this site already threw away, one component down. GO FURTHER is the
+    # declared external register and STAY WITH EUROPE is a statement with
+    # three ways back in.
+    _cols = []
+    for head, rows in FOOTER_GROUPS:
+        _cols.append(
+            f'<div class="fgroup"><p class="fghead">{esc(T(head))}</p>'
+            + "".join(f'<a href="{href}">{esc(label)}</a>' for href, label in rows)
+            + "</div>")
+        if head == "footer.col.journey":
+            _gf = go_further()
+            _cols.append(
+                '<div class="fgroup fgroup-go">'
+                f'<p class="fghead">{esc(T("footer.col.go"))}</p>'
+                + "".join(
+                    # nofollow noopener and a new tab, because this is the
+                    # only kind of link on this site that leaves the origin
+                    # and `checks.py` asserts both on every one of them.
+                    f'<a class="gorow" href="{esc(svc["href"])}" '
+                    'rel="nofollow noopener" target="_blank">'
+                    f'{esc(svc["label"])}<span class="goline">{esc(svc["line"])}</span></a>'
+                    for svc in _gf["services"])
+                + f'<p class="godis">{esc(_gf["disclosure"])}</p></div>')
+    _cols.append(
+        '<div class="fgroup fgroup-stay">'
+        f'<p class="fghead">{esc(T("footer.col.stay"))}</p>'
+        f'<p class="staysay">{esc(T("footer.stay.say"))}</p>'
+        f'<a class="stayrow" href="/my-europe">{esc(T("footer.stay.mine"))} &rarr;</a>'
+        f'<a class="stayrow" href="/events">{esc(T("footer.stay.month"))} &rarr;</a>'
+        f'<a class="stayrow" href="/map">{esc(T("footer.stay.map"))} &rarr;</a>'
+        "</div>")
+    footer_nav = "".join(_cols)
+    legal_nav = " ".join(
+        f'<a href="{href}">{esc(label)}</a>' for href, label in FOOTER_LEGAL_NAV)
     full_title = title if title == SITE_NAME else f"{title} · {SITE_NAME}"
     return curl(f"""<!doctype html>
 <html lang="en">
@@ -1716,7 +1835,16 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     </div>
     <p class="footer-extent">{extent_line()}</p>
     <nav class="footer-nav" aria-label="{esc(T("nav.aria.footer"))}">{footer_nav}</nav>
+    <div class="footclose">
+      <p class="footsay">{esc(T("footer.close.a"))}<br>{esc(T("footer.close.b"))}</p>
+      {_foot_arch()}
+    </div>
     <p class="footer-legal">{esc(T("footer.legal", operator=OPERATOR))}</p>
+    <div class="footline">
+      <p class="footstrap">{esc(T("footer.strap"))}</p>
+      <nav class="footlegal-nav" aria-label="{esc(T("nav.aria.legal"))}">{legal_nav}</nav>
+      <p class="footcopy">&copy; {esc(SITE_NAME)}</p>
+    </div>
   </div>
 </footer>
 {scripts_html}</body>

@@ -216,6 +216,55 @@ def _read(path):
         return _curl(json.load(fh))
 
 
+# ── the declared external services ───────────────────────────────────
+#
+# EVERY ROW IS A HOST, and that is what makes `data/go-further.json` a
+# register rather than a list of links. `checks.py` pins the set of
+# external hosts this site may navigate to against this file and
+# `data/stay.json`, so a new outbound destination cannot appear anywhere
+# without a row here — and every such link carries `rel="nofollow noopener"`
+# and opens in a new tab.
+#
+# THE VALIDATION IS HERE AND NOT IN THE RENDERER, because a renderer that
+# checks its own input is a renderer that silently draws something else
+# when the input is wrong. A live row with no host, a host that does not
+# appear inside its own href, or a tracking parameter smuggled back into a
+# URL each stop the build.
+def load_go_further():
+    path = os.path.join(DATA, "go-further.json")
+    doc = _read(path)
+    out = []
+    for svc in doc.get("services", []):
+        for key in ("slug", "label", "line", "state"):
+            if not svc.get(key):
+                raise SystemExit(f"go-further.json: {svc.get('slug')!r} has no {key}")
+        if svc["state"] == "unbuilt":
+            if svc.get("href"):
+                raise SystemExit(
+                    f"go-further.json: {svc['slug']} is unbuilt and carries an href")
+            if not svc.get("why"):
+                raise SystemExit(
+                    f"go-further.json: {svc['slug']} is unbuilt and does not say why")
+            continue
+        host, href = svc.get("host"), svc.get("href")
+        if not host or not href:
+            raise SystemExit(f"go-further.json: {svc['slug']} is live with no host/href")
+        if not href.startswith("https://" + host):
+            raise SystemExit(
+                f"go-further.json: {svc['slug']} declares host {host} and links {href}")
+        # A TRACKING PARAMETER IS A CLAIM ABOUT WHERE A READER CAME FROM.
+        # These URLs arrived carrying `utm_source=chatgpt.com`, which is
+        # false for every reader of this site and is a parameter this
+        # product would not ship even if it were true.
+        if "?" in href or "utm_" in href:
+            raise SystemExit(
+                f"go-further.json: {svc['slug']} carries a query string: {href}")
+        out.append(svc)
+    if not doc.get("disclosure"):
+        raise SystemExit("go-further.json: no disclosure sentence")
+    return {"disclosure": doc["disclosure"], "services": out}
+
+
 def load():
     """Return the whole dataset, cross-linked and validated."""
     tax = _read(os.path.join(DATA, "taxonomy.json"))
@@ -1085,9 +1134,18 @@ def load():
         for r in c["regions"]:
             r["cities"] = [t for t in r["cities"] if t["status"] != "draft"]
 
+    # VALIDATED HERE RATHER THAN WHERE IT IS DRAWN, because `build.py check`
+    # is the command that validates the data and the first version of this
+    # was only reached when a page was built — so three deliberately broken
+    # registers each printed "data ok" and then stopped the build a minute
+    # later. A validator a validation pass does not run is a validator
+    # nothing runs.
+    go = load_go_further()
+
     return {
         "motions": motions,
         "home": home,
+        "go_further": go,
         "images": images,
         "design": design,
         "taxonomy": tax,

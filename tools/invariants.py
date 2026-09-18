@@ -680,7 +680,27 @@ def measure():
                        "picture, so the bytes are the cheap half of that "
                        "trade. The raw figure is what this ceiling measures "
                        "and the compressed one is what a reader pays."
-                       "  489 -> 581 WHEN THE REGISTER REACHED EVERY DESTINATION, AND NOTHING ABOUT THIS PAGE CHANGED. The popup carries the derivative URL, the photographer's alt and the credit for each destination the register holds a picture of, and that went from 105 to 319 when eight acquisition batches merged into the default branch. Measured on the shipped page, `mapinfo` is 253,111 bytes of 597,481 and what a reader pays is 125 KB compressed. The ceiling is raised rather than argued with, because the trade was decided at 105 and this is the same trade at three times the coverage — but it is recorded rather than rounded up, because the per-destination photograph fields are now the largest single thing on the largest page on the site, and the next honest move is a second index rather than a bigger document."},
+                       "  489 -> 581 WHEN THE REGISTER REACHED EVERY DESTINATION, AND NOTHING ABOUT THIS PAGE CHANGED. The popup carries the derivative URL, the photographer's alt and the credit for each destination the register holds a picture of, and that went from 105 to 319 when eight acquisition batches merged into the default branch. Measured on the shipped page, `mapinfo` is 253,111 bytes of 597,481 and what a reader pays is 125 KB compressed. The ceiling is raised rather than argued with, because the trade was decided at 105 and this is the same trade at three times the coverage — but it is recorded rather than rounded up, because the per-destination photograph fields are now the largest single thing on the largest page on the site, and the next honest move is a second index rather than a bigger document."
+                       "  598 -> 601 WHEN THE FOOTER BECAME THE OTHER END "
+                       "OF THE DOOR, AND THIS IS THE ONE MOVE ON THIS ROW "
+                       "THAT IS NOT ABOUT /map. The masthead is the "
+                       "entrance and the footer is the far side of the "
+                       "same object, so it gained a fifth column, the "
+                       "declared external register with a line under each "
+                       "service, one hoisted disclosure, a closing "
+                       "statement, the aperture struck by `arch_path()` "
+                       "and a thin line carrying the four legal pages. "
+                       "Measured on the shipped homepage the footer went "
+                       "2,122 -> 4,261 raw bytes: 2.1 KB on every one of "
+                       "1,032 documents, about 1.6 KB compressed for the "
+                       "whole band. It lands on EVERY page rather than on "
+                       "the heaviest one, which is exactly the case this "
+                       "row exists to catch — a template growing across a "
+                       "whole family — so it is paid deliberately: a "
+                       "site-wide frame is the one thing that has to be on "
+                       "every document, and the alternative is a footer "
+                       "that says less on 1,031 pages so the heaviest one "
+                       "can stay under a number."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need

@@ -1351,6 +1351,30 @@ def c_csp():
         os.path.join(ROOT, "data", "stay.json")) else {"providers": []}
     allowed_hosts = {p["host"] for p in stayreg.get("providers", [])
                      if p.get("enabled")}
+    # AND THE THIRD KIND OF OUTBOUND LINK: THE ECOSYSTEM. `data/go-further.json`
+    # declares what happens AFTER discovery — flying, moving, buying a home,
+    # protecting a digital life — as a register rather than a list of links,
+    # for exactly the reason the Stay layer is one: a new external host
+    # cannot appear on this site without a row stating what it is. The same
+    # rule applies to every one of them (`nofollow noopener`, a new tab), and
+    # the set is pinned here.
+    #
+    # AND IT IS KEPT AS ITS OWN SET, because the `sponsored` question is not
+    # the same question. `sponsored` is the machine-readable half of a
+    # DISCLOSURE and tracks a credential in `data/stay.json`; a GO FURTHER
+    # service has no credential mechanism at all, so asserting the pair on
+    # one would look up a provider that does not exist — which is what the
+    # first version of this did, raising StopIteration and reporting the
+    # whole check as broken rather than naming a host. A check that
+    # conflated an outbound LINK with a subresource LOAD is already recorded
+    # one screen up; this is the same shape with an affiliate REFERRAL.
+    ecosystem_hosts = set()
+    gfpath = os.path.join(ROOT, "data", "go-further.json")
+    if os.path.exists(gfpath):
+        for _svc in json.load(open(gfpath, encoding="utf-8")).get("services", []):
+            if _svc.get("href") and _svc.get("host"):
+                ecosystem_hosts.add(_svc["host"])
+    allowed_hosts |= ecosystem_hosts
     # A CREDIT IS A SECOND KIND OF OUTBOUND LINK AND IT IS NOT COMMERCIAL.
     # Pexels' API guidelines require "a prominent link to Pexels" and the
     # photographer credited "with a link to the photo page on Pexels" — an
@@ -1431,6 +1455,18 @@ def c_csp():
                 fail(f"{os.path.relpath(f, OUT)}: outbound link to {host} does "
                      f"not open in a new tab; leaving the atlas must be the "
                      f"reader's choice and not a side effect")
+            # A DECLARED SERVICE IS NOT A PAID PLACEMENT, and saying it is
+            # would be the disclosure vocabulary spent on a relationship
+            # that does not exist — the inverse of the defect the Stay
+            # layer's own `sponsored` rule exists for.
+            if host in ecosystem_hosts:
+                if "sponsored" in relv:
+                    fail(f"{os.path.relpath(f, OUT)}: {host} is declared in "
+                         f"data/go-further.json, which carries no credential "
+                         f"mechanism, so rel=sponsored claims a paid "
+                         f"relationship that does not exist")
+                n += 1
+                continue
             # `sponsored` is the machine-readable half of the disclosure and
             # must track the credential, in both directions.
             prov = next(p for p in stayreg["providers"] if p.get("host") == host)
@@ -8673,6 +8709,61 @@ def c_ads_separation():
             fail(f"planner.js refers to {token!r}. §9 asks that the Guide "
                  f"and the commercial layer be independent, and a "
                  f"recommendation engine that can see a campaign is not")
+    return n
+
+
+@check("the declared ecosystem is on every page, and the undeclared one is nowhere")
+def c_go_further():
+    """GO FURTHER is a register, and a register has two failure modes.
+
+    A row that leads nowhere is the first — `fly` is declared with
+    `state: "unbuilt"` and no partner, and it must draw NOTHING, because a
+    row that looks like navigation and leads nowhere is the chip that
+    filters nothing and the `data-rotate` attribute nobody reads, one
+    surface over. The declaration stays in the file so the absence is
+    written down rather than forgotten.
+
+    A LABEL REACHING A READER WITHOUT ITS HOST is the second. These are the
+    only links on this site that leave the origin, and the whole reason
+    they are a register is that `c_csp` pins the host set against it — so a
+    label rendered from anywhere other than this file would be an outbound
+    link with no row behind it, which is the state the register exists to
+    make impossible.
+
+    The footer is emitted by `render.page()`, so one page proving it proves
+    1,032 — but the count is over every page anyway, because a template
+    that stops reaching one family is exactly what a site-wide claim
+    cannot see from one document.
+    """
+    doc = json.load(open(os.path.join(ROOT, "data", "go-further.json"),
+                         encoding="utf-8"))
+    live = [s for s in doc["services"] if s.get("href")]
+    dead = [s for s in doc["services"] if not s.get("href")]
+    if not live:
+        fail("data/go-further.json declares no live service — the column "
+             "would render as a heading over nothing")
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        where = os.path.relpath(f, OUT)
+        for svc in live:
+            if svc["href"] not in h:
+                fail(f"{where}: does not carry the declared service "
+                     f"{svc['slug']} ({svc['href']})")
+            n += 1
+        for svc in dead:
+            # THE LABEL, not the slug: `fly` is three letters and appears
+            # inside ordinary prose, so a slug test would fail on a page
+            # that says "a short flying visit". The claim is that the
+            # column does not render a row for it.
+            if f'>{svc["label"]}<span class="goline"' in h:
+                fail(f"{where}: draws {svc['slug']}, which is declared "
+                     f"unbuilt and has no destination — {svc.get('why', '')}")
+            n += 1
+        if doc["disclosure"] not in h:
+            fail(f"{where}: carries the ecosystem column without its one "
+                 f"hoisted disclosure")
+        n += 1
     return n
 
 
