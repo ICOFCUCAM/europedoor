@@ -24,7 +24,8 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, ca
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
-                     ed_slot, photo_href, credit_html, ad_slot)
+                     ed_slot, photo_href, credit_html, ad_slot,
+                     photo_credits)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -1893,27 +1894,9 @@ def home(data):
     picks = picks[:5]
 
     def _phot(keys):
-        """One credit line for a row, paid once. The licence asks for the
-        photographer and the provider, not a caption per frame."""
-        # A KEY THE REGISTER DOES NOT HOLD IS SKIPPED, NOT A KeyError. Every
-        # caller passes the keys of a band it has already filtered, so this
-        # is unreachable on the real register — and `contact_sheet.py` builds
-        # this page with a register holding ONE row, which is the state the
-        # whole credit line exists to describe honestly. A credit names the
-        # photographs that are ON the page; a key with no row is a photograph
-        # that is not.
-        out, seen = [], set()
-        for k in keys:
-            if k not in images:
-                continue
-            nm = images[k]["photographer"]
-            if nm in seen:
-                continue
-            seen.add(nm)
-            out.append(f'<a href="{esc(images[k]["source"])}" rel="noopener" '
-                       f'target="_blank">{esc(nm)}</a>')
-        return ('<p class="sheetcred rowcred">Photographs by '
-                + ", ".join(out) + " on Pexels.</p>") if out else ""
+        """This band's credit line — `render.photo_credits`, which is one
+        implementation because the line is a licence obligation."""
+        return photo_credits(images, keys)
 
     # ── 02 · THE WINDOW ──────────────────────────────────────────────
     # THE ONE FULL-BLEED PICTURE ON THE PAGE, and it is the window: fixed
@@ -2183,13 +2166,32 @@ def home(data):
     # one of the thinnest months for what is ON and the deepest for
     # countries in their quieter shoulder — and a row of four seasonal
     # cards would have drawn the opposite.
+    # AND THE LEDE SAID THE CHART'S KEY, WHICH THE CHART ALREADY SAYS, AND
+    # CLAIMED A MEASUREMENT THIS PRODUCT REFUSES.
+    #
+    # It read "What is on, and where the crowds are not. The bar above the
+    # line is the fixtures this atlas holds that month; the bar below is how
+    # many countries are in their quieter shoulder" — and `year_band()`'s own
+    # caption, 250 pixels below it, reads "ABOVE THE LINE is what is on.
+    # Below it is how many countries are in their quieter shoulder that
+    # month." The key twice on one band is this family's own rule broken:
+    # never explain the constraint back, and the proof goes under the thing
+    # it proves.
+    #
+    # WORSE, "where the crowds are not" IS A CROWD CLAIM. /method publishes
+    # "It is not a crowd measurement. We hold no visitor numbers, no search
+    # volumes" — and a country's shoulder is an AUTHORED seasonal
+    # classification, which is the editorial work and is legitimate, where a
+    # statement about where crowds are is a measurement nothing here holds.
+    # The lede states the two series' extents instead, both derived.
+    _nfix, _nsh = year_totals(data)
     year = f"""
   <div class="galwrap">
   <div class="sheettext">
     <h2 class="mega">Every month opens <br>a different Europe.</h2>
-    <p class="lede">What is on, and where the crowds are not. The bar above the line
-    is the fixtures this atlas holds that month; the bar below is how many countries
-    are in their quieter shoulder.</p>
+    <p class="lede">{numword(_nfix, cap=True)} recurring fixtures this atlas
+    holds a month for, and the quieter shoulder {numword(_nsh)} countries record
+    for themselves.</p>
     {golink('/events', 'Open the calendar')}
   </div>
   <div class="yearwrap">{year_band(data)}</div>
@@ -2837,42 +2839,6 @@ def moved_drawing(data, key, drawing, caption):
         return ""
     return section("Where it is", f'<div class="movedraw">{drawing}</div>',
                    lede=caption)
-
-
-def photostrip(data, items, limit=6):
-    """A rail of photographs of the things below — and only the ones that
-    exist.
-
-    THE BENCHMARK CARRIES FOUR TO SIX PHOTOGRAPHS ACROSS THE FOOT OF NEARLY
-    EVERY PAGE, and this atlas draws maps there instead. Both are right: a
-    map answers WHERE and a photograph answers WHAT IT LOOKS LIKE, and the
-    second is the question a reader browsing a country is actually asking.
-
-    It composes as the library fills, which is the property the homepage's
-    theme row already has: `items` is [(register key, name, url)] and a key
-    the register does not hold is simply not in the rail. With none of them
-    held the rail is not drawn at all — a slot waiting for a picture is
-    honest, and a row of six empty frames is a page saying the library is
-    thin.
-    """
-    reg = data.get("images") or {}
-    have = [(k, n, u) for k, n, u in items if k in reg][:limit]
-    if not have:
-        return ""
-    cells = "".join(
-        f'<a class="pstile" href="{esc(u)}">'
-        + picture(reg, k, w=560, h=700, alt=reg[k].get("alt") or n,
-                  sizes="(min-width: 60rem) 16vw, 40vw", credit=False)
-        + f'<span class="psname">{esc(n)}</span></a>'
-        for k, n, u in have)
-    # THE RAIL PAYS ITS ATTRIBUTION ONCE, under the row, exactly as the
-    # homepage's row of eight does: six figcaptions under six thumbnails is
-    # noise, and the licence asks for the photographer and the provider.
-    who = ", ".join(dict.fromkeys(
-        f'<a href="{esc(reg[k]["source"])}" rel="noopener" target="_blank">'
-        f'{esc(reg[k]["photographer"])}</a>' for k, _n, _u in have))
-    return (f'<div class="pstrip">{cells}</div>'
-            f'<p class="sheetcred rowcred">Photographs by {who} on Pexels.</p>')
 
 
 def macro_page(data, m):
@@ -5468,16 +5434,7 @@ def journeys_index(data):
         """One credit per band, paid once — the homepage's own rule, and
         never on the opening: that surface is the composition and the
         register is where the record lives."""
-        out, seen = [], set()
-        for k in keys:
-            row = images.get(k)
-            if not row or row["photographer"] in seen:
-                continue
-            seen.add(row["photographer"])
-            out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
-                       f'target="_blank">{esc(row["photographer"])}</a>')
-        return ('<p class="sheetcred rowcred">Photographs by '
-                + ", ".join(out) + " on Pexels.</p>") if out else ""
+        return photo_credits(images, keys)
 
     # ── 01 · THE ROAD ────────────────────────────────────────────────
     # ALL SEVENTEEN AT ONCE, AND THE CASINGS BEFORE THE CORES. Seventeen
@@ -9599,16 +9556,7 @@ def experiences_index(data):
         opening: that surface is the composition and the register is where
         the record lives.
         """
-        out, seen = [], set()
-        for k in keys:
-            row = images.get(k)
-            if not row or row["photographer"] in seen:
-                continue
-            seen.add(row["photographer"])
-            out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
-                       f'target="_blank">{esc(row["photographer"])}</a>')
-        return ('<p class="sheetcred rowcred">Photographs by '
-                + ", ".join(out) + " on Pexels.</p>") if out else ""
+        return photo_credits(images, keys)
 
     # ── 01 · THE INVITATION ──────────────────────────────────────────
     # THE PHOTOGRAPH BREAKS THE COLUMN, which is the one move that makes
@@ -11433,14 +11381,11 @@ def themes_index(data):
     _shot = [t for t in data["themes"] if ("theme:" + t["slug"]) in _imgs]
     themecred = ""
     if _shot:
-        _who = ", ".join(dict.fromkeys(
-            f'<a href="{esc(_imgs["theme:" + t["slug"]]["source"])}" rel="noopener" '
-            f'target="_blank">{esc(_imgs["theme:" + t["slug"]]["photographer"])}</a>'
-            for t in _shot))
         _n = len(data["themes"]) - len(_shot)
-        themecred = (f'<p class="sheetcred rowcred">Photographs by {_who} on Pexels.'
-                     + (f' The {numword(_n)} without one carry their own places '
-                        f'instead.' if _n else "") + '</p>')
+        themecred = photo_credits(
+            _imgs, ["theme:" + t["slug"] for t in _shot],
+            more=(f"The {numword(_n)} without one carry their own places "
+                  f"instead." if _n else ""))
     nwide = sum(1 for t in data["themes"]
                 if facts[t["slug"]]["ncorner"] >= majority)
     ntight = sum(1 for t in data["themes"]
@@ -11908,10 +11853,7 @@ def stories_index(data):
     # that distinguishes them and puts somebody else's brand seven times
     # into a page that is EuropeDoor's. Once, under the row, with each
     # photographer linked to the photograph's own page.
-    picwho = ", ".join(dict.fromkeys(
-        f'<a href="{esc(images["story:" + st["slug"]]["source"])}" rel="noopener"'
-        f' target="_blank">{esc(images["story:" + st["slug"]]["photographer"])}</a>'
-        for st in shots))
+    picwho = photo_credits(images, ["story:" + st["slug"] for st in shots])
     picband = f"""
   <div class="sheettext">
     <h2 class="mega">Photographed.</h2>
@@ -11924,7 +11866,7 @@ def stories_index(data):
     to carry &mdash; the page does not change, only the register does.</p>
   </div>
   <div class="storypics">{pics}</div>
-  <p class="sheetcred rowcred">Photographs by {picwho} on Pexels.</p>"""
+  {picwho}"""
 
     # ── 05 · WHERE THEY HAPPEN ───────────────────────────────────────
     # THE DRAWING IS HERE RATHER THAN AT THE TOP, AND THAT IS THE PAGE'S
@@ -12670,6 +12612,27 @@ def map_page(data):
 
 
 # ── events ────────────────────────────────────────────────────────────
+
+def year_totals(data):
+    """The two series' extents, from the two fields `year_band` reads.
+
+    A SECOND LOOP OVER ONE FACT IS A SECOND CHANCE TO DISAGREE WITH IT, so
+    this walks `festivals` and `season.shoulder` exactly as the band does,
+    including the band's own asymmetry: a fixture counts wherever it is held
+    and an advisory country's shoulder does not count at all, because the
+    three advisory countries are the ones this atlas will not route a reader
+    into. 150 and 47 today, and the day somebody writes a fifty-first
+    festival both the chart and the sentence above it move together.
+    """
+    nfix = nsh = 0
+    for c in data["countries"].values():
+        nfix += len(c["festivals"])
+        if c.get("advisory"):
+            continue
+        if c["season"].get("shoulder"):
+            nsh += 1
+    return nfix, nsh
+
 
 def year_band(data, here=None):
     """The European year as its own shape, and the events family's signature.

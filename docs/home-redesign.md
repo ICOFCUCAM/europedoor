@@ -230,3 +230,64 @@ bone-on-bone index at 1.14:1, and *a declared colour is overridden, never
 inherited away*, which is exactly the mistake `.dcorner a` can make the next
 time this plate's paper moves.
 
+## PLATE 07 — THE CHART'S KEY, PRINTED TWICE, AND A CROWD CLAIM
+
+The lede read *"What is on, and where the crowds are not. The bar above the
+line is the fixtures this atlas holds that month; the bar below is how many
+countries are in their quieter shoulder."* `year_band()`'s own caption, **250
+pixels below it**, reads *"ABOVE THE LINE is what is on. Below it is how many
+countries are in their quieter shoulder that month."* The key twice on one
+band is this family's own rule broken — *never explain the constraint back*,
+and *the proof goes under the thing it proves*.
+
+**And "where the crowds are not" is a crowd claim.** `/method` publishes *"It
+is not a crowd measurement. We hold no visitor numbers, no search volumes"*.
+A country's shoulder is an **authored seasonal classification**, which is the
+editorial work and is legitimate; a statement about where crowds are is a
+measurement nothing in this repository holds. The lede states the two series'
+extents instead — **150 recurring fixtures and 47 countries recording a
+shoulder** — both derived by `year_totals()`, which walks the two fields
+`year_band()` walks, including its asymmetry: a fixture counts wherever it is
+held and an advisory country's shoulder does not count at all.
+
+`numword` spells under a hundred and uses digits above, so "150 … forty-seven"
+is the ordinary editorial rule rather than plate 05's defect, which was **one
+number in two representations on one screen**.
+
+## THE CREDIT LINE HAD SIX IMPLEMENTATIONS AND ALL SIX SAID "PHOTOGRAPHS"
+
+Four were the same loop written out four times; two joined the links inline.
+The comment on the sixth **counted five of them as a fact rather than fixing
+it**: *"the homepage's row of eight, the destination rail, the country and
+theme strips, five call sites spelling `sheetcred rowcred`."*
+
+Measured on the built site, **12 credit lines across five pages**, and one of
+them credits a single photograph: the homepage's reading band draws the lead
+story's picture and published *"Photographs by Jean-Paul Wettstein on
+Pexels."* A count cannot assume a plural — already recorded here about a
+region holding one destination — and this is the one sentence on the band a
+provider's terms require to be right.
+
+`render.photo_credits()` is the one implementation, beside `credit_html()`,
+which is single by the same argument: **this is a licence obligation.** The
+plural is the number of PHOTOGRAPHS and the list is of PHOTOGRAPHERS, which
+are different counts — five pictures by three people is *Photographs by A, B,
+C* and one picture by one person is *Photograph by A* — so the names dedupe
+and the count does not. 11 plural and 1 singular, derived.
+
+### And the sixth copy was in a function nothing calls
+
+`pages.photostrip()` had **no caller**, and `.pstrip` / `.pstile` / `.psname`
+reached **zero pages** — on the build before this one and on every build since
+`ed_strip()` took that job.
+
+**It was invisible to every instrument here, including the one written for
+exactly this.** The dead-rule scan judges a rule on the pages it loads, so a
+rule whose class no page emits is not reported dead — *it is not reported at
+all*. What found it was converting the six copies into one: five of the call
+sites were on a page and the sixth was not. Removed, function and rules, with
+the finding kept in the stylesheet where the rules were.
+
+Two content changes across 1,033 rebuilt files, which is what a refactor of a
+shared line should produce: the singular credit, and the year lede.
+

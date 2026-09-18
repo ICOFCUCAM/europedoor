@@ -777,6 +777,56 @@ def credit_html(row):
             f'<a href="{esc(provider_url)}"{link}>{esc(row["licence"])}</a>')
 
 
+def photo_credits(images, keys, more=""):
+    """One credit line for a ROW of photographs, paid once.
+
+    SIX IMPLEMENTATIONS OF THIS LINE, AND THE COMMENT ON THE SIXTH COUNTED
+    FIVE OF THEM AS A FACT RATHER THAN FIXING IT: "the homepage's row of
+    eight, the destination rail, the country and theme strips, five call
+    sites spelling `sheetcred rowcred`". Four were the same loop written out
+    four times; the other two joined the links inline. *A second
+    implementation of a thing is a second chance to make its mistake*, and
+    this one is a LICENCE OBLIGATION, which is why `credit_html` one function
+    up is single by the same argument.
+
+    AND ALL SIX SAID "Photographs" WHATEVER THEY WERE CREDITING. The
+    homepage's reading band draws exactly one — the lead story's picture —
+    so it published *"Photographs by Jean-Paul Wettstein on Pexels"* over a
+    single photograph. A count cannot assume a plural, which this repository
+    already records about a region holding one destination; here it was the
+    one sentence on the band that a provider's terms require to be right.
+
+    THE PLURAL IS THE NUMBER OF PHOTOGRAPHS AND THE LIST IS OF
+    PHOTOGRAPHERS, which are different counts: five pictures by three people
+    is "Photographs by A, B, C" and one picture by one person is
+    "Photograph by A". So the names dedupe and the count does not.
+
+    A KEY THE REGISTER DOES NOT HOLD IS SKIPPED, NOT A KeyError. Every caller
+    passes the keys of a band it has already filtered, so that is unreachable
+    on the real register — and `contact_sheet.py` builds the homepage with a
+    register holding ONE row, which is the state this line exists to describe
+    honestly. A credit names the photographs that are ON the page; a key with
+    no row is a photograph that is not.
+    """
+    n, out, seen = 0, [], set()
+    for k in keys:
+        row = (images or {}).get(k)
+        if not row:
+            continue
+        n += 1
+        nm = row["photographer"]
+        if nm in seen:
+            continue
+        seen.add(nm)
+        out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
+                   f'target="_blank">{esc(nm)}</a>')
+    if not out:
+        return ""
+    return ('<p class="sheetcred rowcred">Photograph'
+            + ("s" if n != 1 else "") + " by " + ", ".join(out)
+            + " on Pexels." + (" " + more if more else "") + "</p>")
+
+
 def photo_href(images, key, width):
     """One derivative's URL, for a surface that cannot hold a <picture>.
 

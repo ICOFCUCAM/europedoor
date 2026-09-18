@@ -7600,26 +7600,22 @@ body[data-hero] .masthead { position: sticky; }
    drawing that is no longer there. */
 .movedraw { max-width: 52rem; }
 
-/* ══ THE PHOTOGRAPH RAIL ═══════════════════════════════════════════════
-   Four to six pictures of the things below. A map answers WHERE and a
-   photograph answers WHAT IT LOOKS LIKE, and the second is the question a
-   reader browsing a country is actually asking — so this is an addition to
-   the geography and never a replacement for it.
+/* ══ THE PHOTOGRAPH RAIL, REMOVED ══════════════════════════════════════
+   `.pstrip` / `.pstile` / `.psname` and `pages.photostrip()` drew four to
+   six pictures of the things below a country or a destination — and the
+   function had NO CALLER and the classes reached ZERO pages, on the build
+   before this one and on every build since `ed_strip()` took that job.
 
-   It draws only the slots the register holds and is not drawn at all when
-   it holds none: a row of six empty frames is a page saying the library is
-   thin, which is the hole the four homepage doors were measured for. */
-.pstrip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
-          gap: var(--s3); width: 100%; }
-.pstile { text-decoration: none; color: inherit; display: grid; gap: var(--s2);
-          min-width: 0; }
-.pstile picture { display: block; }
-.pstile img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
-.psname { font-family: var(--text); font-size: var(--t-xs); letter-spacing: .1em;
-          text-transform: uppercase; color: var(--ink-3); }
-.pstile:hover .psname { color: var(--door); }
-@media (max-width: 64rem) { .pstrip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 44rem) { .pstrip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+   IT WAS INVISIBLE TO EVERY INSTRUMENT HERE, including the one written for
+   exactly this. The dead-rule scan judges a rule on the pages it loads, so a
+   rule whose class no page emits is not reported dead — it is not reported
+   at all. What found it was converting the six copies of the photograph
+   credit line into one: five of the call sites were on a page and the sixth
+   was not.
+
+   Removed rather than kept as vocabulary: *a motif nothing reaches is dead
+   code that looks like a decision*. `ed_strip()` is the rail this site
+   draws, and its own rules are in the ed- layer. */
 
 
 /* ══ SPENDING THE ACCENT ═══════════════════════════════════════════════
