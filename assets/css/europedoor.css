@@ -10312,7 +10312,16 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .dcorner h3 a { color: inherit; text-decoration: none; }
 .dcorner h3 a:hover { text-decoration: underline;
   text-underline-offset: .2em; }
-.dcorner a { display: block; text-decoration: none; color: var(--ink-2);
+/* THE CHILD COMBINATOR IS LOAD-BEARING. `.dcorner a` also matches the
+   anchor inside the corner's own `<h3>`, so the heading's link became a
+   363-pixel block in a 363-pixel column: its hover and its focus ring spanned
+   the whole column rather than the words, and the browser suite reported the
+   heading as ending on a line under a third of its widest — a TRUE report of
+   a real defect naming the wrong cause, because what it measured as a second
+   line was the blockified anchor's own rect. `text-wrap: balance` was never
+   overridden. The country links are the direct children; the heading's is
+   not. */
+.dcorner > a { display: block; text-decoration: none; color: var(--ink-2);
   line-height: 1.5; }
 .dcorner > a:hover { color: var(--ink); text-decoration: underline;
   text-underline-offset: .2em; }

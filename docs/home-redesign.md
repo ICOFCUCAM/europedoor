@@ -546,3 +546,33 @@ inside the rendered page before it is live*; a focal anchor is exactly what a
 photo editor sets after looking, and the register had never had one set. It is
 the first non-default `focal` in 826 rows.
 
+## THE BROWSER SUITE'S ONE FAILURE WAS PLATE 05's, AND IT NAMED THE WRONG CAUSE
+
+11,371 browser checks, **one failure**, and it was mine:
+
+    1 heading(s) end on a line under a third of their widest at 1280:
+    / "The Nordics" 111/363px. text-wrap: balance is on every heading and
+    something is overriding it
+
+`text-wrap: balance` was never overridden. The corner heading is **one line**
+of 111 pixels, and the 363 the check read as a first line is a **box**:
+`.dcorner a { display: block }` was written for the fifty country links and
+also matched the anchor inside each corner's own `<h3>`, so the heading's link
+blockified to the full column width.
+
+| | before | after |
+|---|---|---|
+| The Nordics | `[363, 111]` | `[111, 111]` |
+| The Caucasus & the Bosphorus | `[363, 286]` | `[286, 286]` |
+
+**So the check was right that something was wrong and wrong about what** —
+the third time in this arc, after /journeys' *"balance being overridden"* and
+the masthead-versus-words report. What it measured as a second line was the
+blockified anchor's own rect.
+
+And the defect was real and not only an instrument artefact: the heading's
+hover and its focus ring spanned the whole 363-pixel column rather than the
+words. `.dcorner > a` is the fix — **the child combinator is load-bearing**,
+because the country links are the direct children and the heading's anchor is
+not.
+
