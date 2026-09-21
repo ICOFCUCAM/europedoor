@@ -2615,6 +2615,26 @@ async function main() {
           }
         };
         walk([...sheet.cssRules], true);
+        // AND THE SCAN READS A RESTING PAGE, BECAUSE A TRANSITIONED
+        // PROPERTY DOES NOT ANSWER THIS QUESTION. `getComputedStyle`
+        // returns the INTERPOLATED value while a transition is in flight,
+        // and removing the declaration behind it does not change that
+        // value in the same frame — so a rule that decides everything
+        // reads as a rule that changes nothing. Measured on the homepage's
+        // atlas band: `.atstage[data-at] .atname {opacity}` read 0.344667
+        // and then 0.665944 on two runs of the same build, where a single
+        // clean read of the same element returns exactly 0.34 and names
+        // that rule as the only one that matches it. Two live rules were
+        // reported dead, and the values differed between runs — which is
+        // the jitter this check already refuses in its own count.
+        // Inserted AFTER the walk so the guard is not itself scanned, and
+        // removed at the end; `insertRule` on a same-origin sheet rather
+        // than a `<style>` element, because this site's CSP has no
+        // `style-src` opening and the scan may not be the thing that
+        // needs one.
+        const stopIdx = sheet.cssRules.length;
+        sheet.insertRule("*, *::before, *::after { transition: none " +
+                         "!important; animation: none !important }", stopIdx);
         const out = [];
         for (const rule of flat) {
           const props = PROPS.filter((p) => rule.style.getPropertyValue(p));
@@ -2654,6 +2674,7 @@ async function main() {
           out.push([`${rule.selectorText} {${props.join(",")}}`,
                     before.some((b, i) => b !== after[i])]);
         }
+        sheet.deleteRule(stopIdx);
         return out;
       });
       for (const [k, won] of rows) {

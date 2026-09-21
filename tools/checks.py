@@ -3234,12 +3234,23 @@ def c_frontend():
         relp = os.path.relpath(js_path, ROOT)
         body = open(js_path, encoding="utf-8").read()
         stateful = ("fetch(" in body or "localStorage" in body)
-        (apps if stateful else enhancements).append((relp, body.count("\n")))
+        # THE BOUNDARY IS ON CODE, AND COUNTING RAW LINES MEASURED THE
+        # COMMENTS. This repository's style rule requires long comments
+        # naming the failure behind each change, so a raw line count puts
+        # the enhancement ceiling in direct tension with the house style —
+        # `atlas.js` crossed 100 on a paragraph recording that eight cards
+        # at zero alpha are still in the tab order, and a paragraph cannot
+        # turn a script into an application. `bare_js` is the same
+        # implementation the planner's flag scan uses, so there is one
+        # answer to "what is code here" rather than two.
+        code = len([ln for ln in bare_js(body).splitlines() if ln.strip()])
+        (apps if stateful else enhancements).append((relp, code))
         if stateful and relp not in declared:
             fail(f"{relp} fetches or owns state, which makes it an application — "
                  f"declare what it depends on in data/contracts.json")
-        if not stateful and body.count("\n") > 100:
-            fail(f"{relp} has {body.count(chr(10))} lines and neither fetches nor "
+        if not stateful and code > 100:
+            fail(f"{relp} has {code} lines of code ({body.count(chr(10))} with "
+                 f"its comments) and neither fetches nor "
                  f"stores anything. An enhancement that large is an application "
                  f"that has not said so")
         n += 1

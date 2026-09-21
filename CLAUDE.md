@@ -7067,6 +7067,87 @@ nothing is over the continent and a pan would only crop it — *a rule's reason
 can stop being true when the drawing changes*, which this stylesheet records
 about a glyph rule that outlived the 132-pixel drawing it was written for.
 
+
+**THE DRAWING WAS AN OBJECT ON THE PAGE AND IT SHOULD BE THE ROOM.** Plate
+05 held its map in a 1120x800 plate centred in the stage with a ruled
+outline and a reveal inside it, on a white wall — measured at 1440 as a
+rectangle from (409,133) to (1296,767) with the lead column's own figures
+running under its left edge. *Border, fill, radius and shadow each say
+"separate object, placed here by a system"*, which this stylesheet says
+about a search box and a rail and says here about the one thing the band
+exists to show. **Three ways out were rendered and two are refusals.**
+Taking the outline off alone leaves the `lyr-beyond` ground as its own
+rectangle — a slab of stone with three straight edges where it is clipped
+to the window, which is /plan's context-land finding arrived at from the
+other side. A second APERTURE is refused by `docs/signature-moments.md`:
+plate 01 cuts the largest arch on the site and two doors on one page is the
+wallpaper that rule warns about. What works is the one /plan already
+measured — **the band's paper IS the map's water**, so the drawing paints
+no ocean of its own and there is no seam to find — with the frame bled past
+the stage by `--page-gutter`, the token `.sheet` pads itself with, so the
+three edges where LAND meets it are off-screen. **White was rendered and
+refused too**: at 1.36 against the stone it is a handsome engraving and it
+makes a bay the same colour as the margin, which is the finding this
+drawing already paid for once.
+
+**AND THE PAN PUT LAND UNDER THE HEADLINE.** With the drawing filling the
+band, the eastern steps slide Iberia and Britain under a 76px serif. Ink on
+stone is 12.5:1, so this is composition rather than legibility — and the
+answer both the hero and /plan reached is to give the words a ground rather
+than to move them. `.atlead::before` belongs to the COLUMN rather than to
+the stage, so it is exactly as tall as the words: a stage-height wash ran
+over the scroll cue at the foot and read as the cue fading out.
+
+**EIGHT CARDS AT ZERO ALPHA ARE STILL IN THE TAB ORDER.**
+`pointer-events: none` stops a mouse and says nothing about a keyboard, so
+the browser suite measured **38 links of 5,391 painting nothing even with
+focus on them** — every country link and every corner heading in the eight
+cards that are not current. That is `.doorgo` for the third time here.
+Removing them from the tab order is worse, because this page is the only
+route to them, so **focus drives the stage**: tabbing into a corner makes it
+the corner being read, the card comes up, and the continent lights and pans
+to match. It is the rule this site already applies to every hover-revealed
+link it ships.
+
+**AND THE PHONE OVERRIDE LOST A SPECIFICITY FIGHT IT WAS WRITTEN TO WIN.**
+`.atlas[data-live] .atcorner:not([data-on]) .atcard` is (0,5,0) and the
+phone block's undo was (0,4,0), so for the life of that block the eight
+cards a reader scrolls past on a phone were at `opacity: 0` — present,
+placed, sized and unseeable. **Found by the dead-rule scan**, which reported
+the `opacity` declaration as changing nothing. Fourth specificity collision
+in this stylesheet to render as *the thing is simply not there*.
+
+**A TRANSITIONED PROPERTY CANNOT ANSWER THE DEAD-RULE SCAN'S QUESTION.**
+`getComputedStyle` returns the INTERPOLATED value while a transition is in
+flight, and removing the declaration behind it does not change that value
+in the same frame — so a rule that decides everything reads as a rule that
+changes nothing. Measured on this band: `.atstage[data-at] .atname
+{opacity}` read **0.344667 and then 0.665944 on two runs of the same
+build**, where a single clean read of the same element returns exactly 0.34
+and names that rule as the only one matching it. **Two live rules reported
+dead, with values that differed between runs** — the jitter this check
+already refuses in its own count, arriving in its verdicts. The scan
+inserts `transition: none` into the sheet it walks before it measures and
+deletes it after; proved by re-running the same removal on a resting page,
+where all three rules change every sampled element.
+
+**AND THE OPENING STATE MUST NOT ANIMATE.** `mark()` runs the moment the
+script does, so gating the transitions on `[data-live]` meant eight cards
+faded 1 → 0 and the continent slid to its first pan as the page arrived.
+`[data-ready]` is set two frames later — one is not enough, because the
+browser coalesces the style `mark()` wrote with the arrival of the
+transition rules and animates it anyway.
+
+**A LINE COUNT THAT INCLUDES COMMENTS MEASURES THE HOUSE STYLE.** The
+enhancement boundary — *a script that neither fetches nor stores and grows
+past a hundred lines is doing something that needs declaring* — counted raw
+lines, and this repository's style rule requires long comments naming the
+failure behind each change. `atlas.js` crossed 100 on a paragraph recording
+that eight cards at zero alpha are still in the tab order, and **a paragraph
+cannot turn a script into an application**. It counts `bare_js` now, which
+is the same implementation the planner's flag scan uses, and prints both
+figures. Proved red at 148 lines of code and green at 26.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

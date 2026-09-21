@@ -73,9 +73,37 @@
   }, { rootMargin: '-46% 0px -46% 0px', threshold: 0 });
   for (const s of steps) io.observe(s);
 
+  /* A CARD AT ZERO ALPHA IS STILL IN THE TAB ORDER, AND EIGHT OF THE NINE
+     ARE AT ZERO. `pointer-events: none` stops a mouse and says nothing
+     about a keyboard, so the browser suite measured **38 links of 5,391
+     painting nothing even with focus on them** — every country link and
+     every corner heading in the eight cards that are not current. That is
+     `.doorgo` for the third time here: present, placed, sized,
+     keyboard-reachable and unseeable.
+     Removing them from the tab order would be worse, because this page is
+     the only route to them. So focus DRIVES the stage: tabbing into a
+     corner makes it the corner being read, the card comes up, and the
+     continent lights and pans to match. The browser scrolls a focused
+     element into view by itself, and the card is sticky in the panel slot,
+     so the step arrives where the card already is. It is the rule this
+     site already applies to every hover-revealed link it ships: a link a
+     keyboard reaches has to become visible when it does. */
+  track.addEventListener('focusin', (e) => {
+    const step = e.target.closest && e.target.closest('.atcorner');
+    if (step && step.dataset.corner) mark(step.dataset.corner);
+  });
+
   /* THE FIRST CORNER IS MARKED BEFORE A READER SCROLLS, because the stage
      is pinned from the moment the section arrives and a panel slot with
      nothing in it is a hole where the composition promised a reading. The
      observer only fires on a CHANGE, so the opening state has to be set. */
   mark(steps[0].dataset.corner);
+
+  /* AND THE OPENING STATE IS SET BEFORE ANYTHING MAY ANIMATE. Two frames,
+     because one is not enough: the style that `mark()` just wrote has to
+     be computed once before the transition rules arrive, or the browser
+     coalesces both into a single change and animates it anyway. */
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    track.dataset.ready = '';
+  }));
 })();

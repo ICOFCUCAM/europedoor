@@ -11405,27 +11405,74 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    properties this stylesheet already carries three of. The window plate
    pays for a `clip-path` to make fixed work and a browser check to prove
    it; this needs neither. */
+/* THE BAND'S PAPER IS THE MAP'S WATER, which is /plan's own sentence and
+   the reason there is no seam anywhere on this plate: the drawing paints
+   no ocean of its own, so what a reader reads as sea IS the band. Written
+   at (0,2,0) because `.sheet-gal` binds the room's eleven tokens and the
+   ink is right — only the ground moves — and a room and a composition at
+   the same specificity is the collision this stylesheet has lost four
+   times. WHITE WAS RENDERED AND REFUSED: at 1.36 against the stone it is a
+   handsome engraving and it makes a bay the same colour as the margin,
+   which is the finding this drawing already paid for once. The atlas's own
+   1.18 is the printed-atlas separation, and the coastline is what carries
+   it. */
+.sheet.sheet-atlas { background: var(--map-water); }
 .atlas { position: relative; }
 .atstage { position: sticky; top: 0; height: 100svh; }
-/* The plate keeps its 1120x800 rather than filling the box, because an SVG
-   with no `preserveAspectRatio` letterboxes inside a wider container and
-   the padding reads as more sea — the `.card-art` finding, measured twice
-   in this file. Height-led and centred: the drawing is as large as the
-   stage allows and never a different shape. */
-.atwin { position: absolute; inset: 5svh 0 5svh 23%;
-         display: grid; place-items: center; }
-/* CAPPED ON BOTH AXES, because `height: 100%` with an aspect ratio sets
-   the WIDTH and the box does not stop it: the continent ran off the right
-   edge of the stage at 1440. `width: 100%` with the ratio and a
-   `max-height` lets whichever axis binds first do the binding. */
-.atwin .atplate { width: 100%; height: auto; max-height: 100%;
-                  max-width: 100%; }
+/* THE DRAWING IS THE ROOM, NOT AN OBJECT IN IT.
+   For three commits this was a 1120x800 plate centred in the stage with a
+   ruled outline and a reveal inside it, on a white wall — measured at 1440
+   as a rectangle from (409,133) to (1296,767) with the lead column's own
+   figures running under its left edge. **Border, fill, radius and shadow
+   each say "separate object, placed here by a system"**, which this
+   stylesheet says about a search box and a rail and says here about the
+   one thing the band exists to show: a picture of Europe pasted onto a
+   page. Three ways out were rendered and two are recorded as refusals.
+
+   Taking the OUTLINE off is not enough and the render says why: with no
+   frame the `lyr-beyond` ground becomes its own rectangle, a slab of stone
+   with three straight edges where it is clipped to the window — /plan's
+   own finding about the context land, arrived at from the other side. And
+   a second APERTURE is refused by `docs/signature-moments.md`: plate 01
+   already cuts the largest arch on the site, and two doors on one page is
+   the wallpaper that rule warns about.
+
+   What works is the one /plan already measured: **the band's paper IS the
+   map's water**, so the drawing's own ocean and the ground it sits on are
+   the same colour and there is no seam to find — and the frame is pushed
+   past the edges of the stage, so the three edges where LAND meets it are
+   outside the viewport. The bleed is `--page-gutter`, the token `.sheet`
+   pads itself with, rather than the usual `100vw` arithmetic: a viewport
+   unit includes a classic scrollbar and this one cannot. */
+.atwin { position: absolute;
+         inset: 0 calc(-1 * var(--page-gutter)) 0 calc(-1 * var(--page-gutter)); }
+.atwin .atplate { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* THE EDITORIAL COLUMN IS INSIDE THE STAGE, which is the half of the
    brief's composition this band did not have at all. It was a full-width
    `.atopen` above the stage, so the head scrolled away before the first
    corner arrived and the reader met the nine with nothing above them. */
 .atlead { position: absolute; left: 0; top: 7svh; z-index: 3;
           width: min(29%, 25rem); }
+/* AND THE LEAD COLUMN CARRIES ITS OWN GROUND, BECAUSE THE PAN PUTS LAND
+   UNDER IT. Before the drawing filled the band the left column stood on
+   the page; now, on the eastern steps, the continent slides west and the
+   headline sets across Iceland, Britain and Iberia. Ink on stone measures
+   12.5:1, so this is composition rather than legibility — but a 76px
+   serif over a coastline is the *type over a drawing* problem this
+   repository has measured on the hero and on /plan, and the answer both
+   times was to give the words a ground rather than to move them.
+   It belongs to the COLUMN rather than to the stage, so it is exactly as
+   tall as the words are: a stage-height wash would run over the scroll cue
+   at the foot, which the first version did and which read as the cue
+   fading out. Bled left by the gutter for the same reason the drawing is,
+   so it starts at the edge of the screen rather than at the edge of the
+   measure. */
+.atlead::before { content: ""; position: absolute; z-index: -1;
+                  inset: calc(-1 * var(--s5)) calc(-1 * var(--s7))
+                         calc(-1 * var(--s5)) calc(-1 * var(--page-gutter));
+                  pointer-events: none;
+                  background: linear-gradient(270deg, transparent,
+                    color-mix(in srgb, var(--map-water) 92%, transparent) 38%); }
 .atlead .mega { margin: var(--s3) 0 0; }
 .ateyebrow { margin: 0; font-size: var(--t-xs); font-family: var(--text);
              letter-spacing: .24em; text-transform: uppercase;
@@ -11440,8 +11487,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .atstats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
            gap: var(--s3) var(--s5); margin: var(--s6) 0 0;
            padding-top: var(--s3); border-top: 1px solid var(--rule); }
+/* `color` IS NOT RESTATED HERE. The band already binds `--ink` and a `<dt>`
+   inherits it, so the declaration could never move a pixel — named by the
+   dead-rule scan in the run that shipped this band. */
 .atstats dt { font-family: var(--display); font-size: var(--t-xl);
-              line-height: 1; color: var(--ink);
+              line-height: 1;
               font-variant-numeric: tabular-nums; }
 .atstats dd { margin: .3em 0 0; font-size: var(--t-xs);
               letter-spacing: .18em; text-transform: uppercase;
@@ -11475,10 +11525,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    wash is doing separation rather than legibility and 62% is enough for
    that. Sized from the panel's own width so the two cannot drift. */
 .atstage::after { content: ""; position: absolute; z-index: 3;
-                  inset: 0 0 0 auto; width: min(36%, 28rem);
+                  inset: 0 calc(-1 * var(--page-gutter)) 0 auto;
+                  width: min(32%, 26rem);
                   pointer-events: none;
                   background: linear-gradient(90deg, transparent,
-                    color-mix(in srgb, var(--paper) 62%, transparent) 84%); }
+                    color-mix(in srgb, var(--map-water) 92%, transparent) 62%); }
 .atread { position: relative; z-index: 4; margin-top: -100svh;
           margin-left: auto; width: min(31%, 24rem); }
 /* ONE CORNER AT A TIME, AND ONLY WHERE SOMETHING IS CHOOSING ONE. Nine
@@ -11488,7 +11539,17 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    the alternative — eight invisible blocks in a document nothing is
    driving — is the *present, placed, sized and unseeable* fault this
    stylesheet records five times. */
-.atlas[data-live] .atcard { transition: opacity .45s ease; }
+/* AND THE OPENING STATE DOES NOT ANIMATE. `mark()` runs the moment the
+   script does, so gating the transitions on `[data-live]` meant eight
+   cards faded from 1 to 0 and the continent slid to its first pan as the
+   page arrived — a flash of nine panels on a band a reader has not
+   scrolled to yet. `[data-ready]` is set two frames later, so the first
+   state is simply the state and every state after it moves.
+   It also un-blinded an instrument: the dead-rule scan reads a computed
+   value, and a property with a transition IN FLIGHT reads its
+   interpolated value and does not change when the declaration is removed
+   — so two live rules on this band were reported as changing nothing. */
+.atlas[data-ready] .atcard { transition: opacity .45s ease; }
 .atlas[data-live] .atcorner:not([data-on]) .atcard {
   opacity: 0; pointer-events: none; }
 /* A PLATE THAT IS NOT ITS DRAWING'S PROPORTION IS A LETTERBOX, and this
@@ -11499,25 +11560,16 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    and the ruled edge is the drawing's edge rather than a box around it.
    Capped by the viewport as well, because a sticky window taller than the
    screen is a window a reader cannot see the whole of. */
-.atplate { margin: 0; position: relative; aspect-ratio: 1120 / 800;
-           max-height: calc(100svh - var(--mast) - var(--s7));
-           /* WATER. The ground was `--paper-2` — the page's own paper —
-              so the Adriatic, the Aegean and the Baltic were the same tone
-              as the margin and a bay read as a hole in the land. That is
-              this stylesheet's own recorded finding about the body glyph
-              family, which got `--map-water` at the cartography split
-              while this figure never did. */
-           background: var(--map-water);
-           outline: 1px solid var(--map-border); outline-offset: 0; }
-/* THE REVEAL, WHICH IS THE WHOLE OF THE ARCHITECTURE HERE. One hairline
-   says "a border"; the wall's face and a fine line just inside it say "two
-   surfaces at different depths" — the masthead and the footer already draw
-   exactly this pair at their own edges, and the aperture draws it at every
-   cut on this site. `inset` rather than a second element, because the
-   register counts shadows and two is the whole vocabulary. */
-.atplate::after { content: ""; position: absolute; inset: 3px;
-                  pointer-events: none;
-                  border: 1px solid color-mix(in srgb, var(--map-border) 38%, transparent); }
+/* NO GROUND AND NO FRAME ON THE PLATE ITSELF: the BAND paints the water
+   now, which is the whole of the repair above. A background here would be
+   a rectangle of the same colour as the band — invisible until the pan
+   moved it, and then a seam. */
+.atplate { margin: 0; }
+/* THE REVEAL WENT WITH THE FRAME. It is what a cut edge shows and there is
+   no cut here any more — a reveal drawn on a drawing that runs past the
+   edges of the screen would be a line across the middle of the continent.
+   The aperture is ABSENT on this band, which its own rule allows: explicit,
+   subtle, implied or absent, recognition rather than repetition. */
 .atplate svg { display: block; width: 100%; height: 100%; }
 /* THE CONTINENT MOVES, AND THREE POSITIONS CARRY IT.
    `.atcue` says *scroll to move through the continent*, and for one commit
@@ -11535,11 +11587,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    `overflow` on the plate rather than a wrapper, because the plate is
    already the frame: what the pan reveals on the far side is the plate's
    own `--map-water`, which is open sea and says so. */
-.atpan { transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
+.atlas[data-ready] .atpan { transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
 .atstage[data-pan="w"] .atpan { transform: translateX(105px); }
 .atstage[data-pan="e"] .atpan { transform: translateX(-140px); }
 @media (prefers-reduced-motion: reduce) {
-  .atpan { transition: none; }
+  .atlas[data-ready] .atpan { transition: none; }
 }
 .atplate .lyr-land path { fill: var(--map-land);
                           stroke: var(--map-border); stroke-width: .6;
@@ -11633,9 +11685,11 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    register caught and this stylesheet removed TWO COMMITS AGO, from
    `.atsum`, six rules down. A rule recorded is not a rule inherited, and
    the guard is what noticed both times. */
+/* `color` IS NOT RESTATED HERE EITHER — `h1, h2, h3` already take the
+   band's ink and the scan named this in the same run as `.atstats dt`. */
 .atcorner h3 { font-family: var(--display); font-size: var(--ed-display-3);
                line-height: .96; letter-spacing: -.02em;
-               color: var(--ink); margin: var(--s2) 0 var(--s3); }
+               margin: var(--s2) 0 var(--s3); }
 .atcorner h3 a { text-decoration: none; }
 .atcorner h3 a:hover { text-decoration: underline; text-underline-offset: .2em; }
 .atsay { font-family: var(--display); font-size: var(--t-md);
@@ -11707,6 +11761,15 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      UNDER a pinned map, and a z-index left behind drew the headline
      straight through the continent. */
   .atlead { position: static; width: auto; z-index: auto; }
+  /* AND ITS GROUND COMES OFF WITH IT. `.atlead::before` is bled left by
+     `--page-gutter` so the wash reaches the edge of the screen; with the
+     column static that box has no positioned ancestor to resolve against
+     and the bleed became 48 pixels of sideways scroll on every phone —
+     caught at 320, 360 and 390 in the run that shipped the full-bleed
+     drawing. Below this width nothing is under the words: the stage is
+     undone, the map is a sticky band above them, and a wash over paper is
+     a wash over nothing. */
+  .atlead::before { display: none; }
   .atcue, .atrail { display: none; }
   .atstats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .atstage::after { display: none; }
@@ -11728,6 +11791,16 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      and the stage is not live here — *a half-undone stage is a panel
      pinned over nothing*, written one block up about position and true of
      visibility in exactly the same way. */
+  /* AND IT HAD TO OUT-SPECIFY THE RULE IT UNDOES. `.atlas[data-live]
+     .atcorner:not([data-on]) .atcard` is (0,5,0) and this was (0,4,0), so
+     for the life of the phone block the eight cards a reader scrolls past
+     on a phone were at `opacity: 0` — present, placed, sized and
+     unseeable, with the override that was written to stop exactly that
+     losing the fight silently. Found by the dead-rule scan, which reported
+     the `opacity` declaration as changing nothing. The fourth specificity
+     collision in this stylesheet to render as *the thing is simply not
+     there*. */
+  .atlas[data-live] .atcorner:not([data-on]) .atcard,
   .atlas[data-live] .atcorner .atcard { opacity: 1; pointer-events: auto;
                                         transition: none; }
 }
