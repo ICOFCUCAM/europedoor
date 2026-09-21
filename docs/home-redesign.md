@@ -1668,3 +1668,47 @@ measure until the page is a wall of type, which is the opposite of this
 product, and a 200-pixel run at 8% is right where the thing above it is a
 closing statement. What the number is for is the outlier, and for the
 before-and-after of a composition change.
+
+## Menu 01 — thirteen links a mouse could not reach
+
+The masthead names six rooms and three of them carry a field: Discover's four
+links, Atlas's four, Europe's five. The field is `display: none` until
+`:hover` or `:focus-within`, with no JavaScript — which is right, and which
+had one thing wrong with it that no gate here could see.
+
+`.navfield` is `position: absolute` at `top: calc(100% + var(--s3))`. An
+absolutely positioned child is out of flow, so it contributes nothing to
+`.navroom`'s own box: the twelve pixels between the room and the panel belong
+to neither element. `.navroom:hover` stops matching the moment the pointer
+enters them, and `display: none` takes the panel away before the hand
+arrives.
+
+Measured at 1280, moving from the middle of the word to the first link in the
+panel, in Playwright's `steps` — which is what makes a movement a hand rather
+than a teleport:
+
+| mouse events | Discover | Atlas | Europe |
+|---|---|---|---|
+| 1 | opens | opens | opens |
+| 5 | closed | closed | closed |
+| 12 | closed | closed | closed |
+| 30 | closed | closed | closed |
+
+The same at 1440, 1152, 1024 and 960. **The keyboard route works because it
+never crosses the gap** — Tab moves focus from the room straight into the
+field, `:focus-within` matches throughout — which is exactly why the suite's
+existing assertion was green: it presses Tab, on purpose, and that is the
+route that was never broken.
+
+The bridge is a transparent strip that belongs to the **field**, so it exists
+only while the field does and there is no phantom hover target at rest. 13px
+rather than 12, because `top` resolves against the padding box and the field's
+own 1px border sits between that and the gap.
+
+And the check is the movement, because a promise about movement cannot be
+proved any other way. It pushes the pointer in 5, 12 and 30 steps, asserts the
+panel survives and that the point under the cursor is inside it, and asserts
+the room's own word is still the element under the pointer when it is hovered
+— because the obvious bridge is one that covers the link that opens the menu.
+Proved red both ways: 9 of 15 assertions with the bridge collapsed to zero
+height, 3 of 15 with it four times too tall.

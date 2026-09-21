@@ -6767,6 +6767,43 @@ box paints is the whole of its CLIPPING ancestor. **The first correction read
 is the parent — the walk goes up the whole chain. *The eye finds a defect and
 it does not confirm one*, applied to an instrument rather than to a page.
 
+
+**A TWELVE-PIXEL GAP BETWEEN A MENU AND THE WORD THAT OPENS IT IS A MENU NO
+POINTER CAN REACH.** The bar names six rooms and three of them carry a field
+of four or five links, revealed by `.navroom:hover` with no JavaScript
+anywhere. **An absolutely positioned child is out of flow and contributes
+nothing to its parent's box**, so the twelve pixels between the room's bottom
+edge and the panel's top edge belonged to NEITHER element: the instant the
+pointer entered that band `:hover` stopped matching and the panel went to
+`display: none`. Measured in Chromium, moving from the middle of the word to
+the first link in the panel:
+
+| mouse events | the panel |
+|---|---|
+| 1 (a teleport) | survives |
+| 5 | gone |
+| 12 | gone |
+| 30 | gone |
+
+on all three rooms at 1280, 1440, 1152, 1024 and 960. **Thirteen links
+reachable with a keyboard and not with a mouse, on 1,032 pages** — and the
+keyboard route works precisely BECAUSE `:focus-within` never crosses the gap:
+Tab moves focus straight from the room into the field. The suite already
+asserted that sequence and was right to; it could not see this, because it is
+the same promise asked of the other input device. Every link was present,
+named, sized, focusable and `checkVisibility` true.
+
+**The bridge belongs to the FIELD rather than to the room**, so it exists only
+while the field does and there is no phantom hover target at rest — and it is
+13px rather than 12 because `top` resolves against the padding box and the
+field's own 1px border sits between that and the gap. A promise about movement
+is proved by moving: the check pushes the pointer in 5, 12 and 30 steps and
+asserts the panel is still there and the point under the cursor is inside it.
+**It also asserts the room's own word is still the thing under the pointer**,
+because the obvious bridge is one that covers the link that opens the menu —
+proved red both ways, 9 of 15 with the bridge collapsed and 3 of 15 with it
+four times too tall.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

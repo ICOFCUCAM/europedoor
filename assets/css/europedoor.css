@@ -1300,6 +1300,42 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   background: var(--paper-2); border: 1px solid var(--rule);
   text-transform: none; letter-spacing: 0; font-size: var(--t-sm);
 }
+/* A TWELVE-PIXEL GAP BETWEEN A MENU AND THE WORD THAT OPENS IT IS A MENU
+   NO POINTER CAN REACH. The field is revealed by `.navroom:hover`, and an
+   absolutely positioned child is out of flow — so it contributes nothing to
+   `.navroom`'s own box, and the 12px between the room's bottom edge and the
+   panel's top edge belongs to NEITHER element. The instant the pointer
+   enters that band `:hover` stops matching, the panel goes to
+   `display: none`, and it is gone before the hand arrives.
+
+   Measured in Chromium at 1280, moving from the middle of the word to the
+   first link in the panel:
+
+     steps=1    the panel survives   (a teleport: no hand moves like this)
+     steps=5    display: none
+     steps=12   display: none
+     steps=30   display: none
+
+   on all three rooms, at 1280, 1440, 1152, 1024 and 960 — so THIRTEEN links
+   (Discover's four, Atlas's four, Europe's five) were reachable with a
+   keyboard and not with a mouse, on 1,032 pages. Nothing here could see it:
+   every link was present, named, sized, focusable and `checkVisibility`
+   true, and the keyboard route works BECAUSE `:focus-within` never crosses
+   the gap — Tab moves focus straight from the room into the field. The
+   browser suite's own hover-reveal sweep focuses first, on purpose, which
+   is exactly the route that was never broken.
+
+   The bridge is a transparent strip that belongs to the FIELD, so it exists
+   only while the field does and there is no phantom hover target at rest.
+   13px rather than 12 because the field's 1px border sits between its
+   padding box — which `top` resolves against — and the gap. It cannot
+   overlap the room link: the strip's top edge lands exactly on the room's
+   bottom edge, which is where the gap begins. */
+.navroom:hover > .navfield::before,
+.navroom:focus-within > .navfield::before {
+  content: ""; position: absolute; left: 0; right: 0;
+  top: calc((var(--s3) + 1px) * -1); height: calc(var(--s3) + 1px);
+}
 /* THE FIELD SAYS WHAT KIND OF SET IT IS, ONCE. Four links under a room
    called ATLAS could be four more rooms; "The geography" is the line that
    makes them a directory, and it is a label rather than a heading because

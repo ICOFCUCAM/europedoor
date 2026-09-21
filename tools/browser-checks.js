@@ -6583,6 +6583,74 @@ async function main() {
     await kp.close();
   }
 
+  /* ── AND A POINTER HAS TO CROSS THE GAP THE KEYBOARD NEVER TOUCHES ──
+   * The field sits `calc(100% + var(--s3))` below its room, and an
+   * absolutely positioned child contributes nothing to its parent's box —
+   * so those twelve pixels belonged to neither element, `.navroom:hover`
+   * stopped matching the instant the pointer entered them, and the panel
+   * was `display: none` before the hand arrived. Measured at 1280 by
+   * moving from the middle of the word to the first link in the panel:
+   * with ONE mouse event the panel survived and with five, twelve or
+   * thirty it did not, on all three rooms, at every width. Thirteen links
+   * reachable with a keyboard and not with a mouse, on 1,032 pages.
+   *
+   * The block above could not see it and is right not to: `:focus-within`
+   * never crosses the gap, because Tab moves focus straight from the room
+   * into the field. So this is the same promise asked of the other input
+   * device, and it is asked the only way a promise about movement can be —
+   * by moving. `steps` is what makes it a hand rather than a teleport: one
+   * event is the case that always worked and is the case no reader has.
+   *
+   * IT ALSO ASSERTS THE ROOM IS STILL CLICKABLE, because the obvious
+   * bridge — a transparent strip — is one that covers the word that opens
+   * the menu if it is given a pixel too many. */
+  {
+    const hp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await hp.goto(base + "/", { waitUntil: "load" });
+    const nrooms = await hp.locator(".nav .navroom").count();
+    for (let i = 0; i < nrooms; i++) {
+      const room = hp.locator(".nav .navroom").nth(i);
+      const name = (await room.locator(".navtop").textContent()).trim();
+      await hp.mouse.move(5, 500);
+      const tb = await room.locator(".navtop").boundingBox();
+      await hp.mouse.move(tb.x + tb.width / 2, tb.y + tb.height / 2);
+      const fb = await room.locator(".navfield").boundingBox();
+      checked++;
+      ok(fb !== null, `${name}: the field did not open under a pointer at all`);
+      if (!fb) continue;
+      for (const steps of [5, 12, 30]) {
+        await hp.mouse.move(5, 500);
+        await hp.mouse.move(tb.x + tb.width / 2, tb.y + tb.height / 2);
+        await hp.mouse.move(fb.x + fb.width / 2, fb.y + 30, { steps });
+        const land = await hp.evaluate(([x, y, n]) => {
+          const f = document.querySelectorAll(".nav .navroom")[n].querySelector(".navfield");
+          const e = document.elementFromPoint(x, y);
+          return { display: getComputedStyle(f).display,
+                   inField: !!(e && f.contains(e)),
+                   hit: e ? e.tagName + "." + (e.className || "") : "nothing" };
+        }, [fb.x + fb.width / 2, fb.y + 30, i]);
+        checked++;
+        ok(land.display !== "none" && land.inField,
+           `${name}: moving a pointer into its field in ${steps} steps left ` +
+           `display:${land.display} and the point under the cursor is ` +
+           `${land.hit} — the gap between the room and the panel belongs to ` +
+           `neither, so the menu closes before the hand gets there`);
+      }
+      // the bridge must not steal the word it hangs from
+      await hp.mouse.move(5, 500);
+      await hp.mouse.move(tb.x + tb.width / 2, tb.y + tb.height / 2);
+      const own = await hp.evaluate(([x, y]) => {
+        const e = document.elementFromPoint(x, y);
+        return e ? (e.classList.contains("navtop") ? "navtop" : e.tagName + "." + e.className) : "nothing";
+      }, [tb.x + tb.width / 2, tb.y + tb.height / 2]);
+      checked++;
+      ok(own === "navtop",
+         `${name}: the element under the pointer on the room's own word is ` +
+         `${own} — the hover bridge is covering the link that opens the menu`);
+    }
+    await hp.close();
+  }
+
   {
     const NAVPAGES = ["/", "/europe/austria/", "/journeys/", "/stories/", "/events/",
                       "/europe/france/alps-and-east/chamonix/"];
