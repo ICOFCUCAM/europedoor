@@ -7703,6 +7703,19 @@ having a second implementation. `checks.py` reads all three from the register,
 each proved red by lowering it.
 
 
+**AND CENTRING THE ARRIVAL COPY WAS THE SAME EXPIRED ANCHOR ONE PROPERTY
+OVER.** `.ed-arrival-copy` carried `justify-content: flex-end`, written when
+the media column was the photograph alone and the band was its own 620px. The
+map is inside that column now, so the band is 939px at 1280 and the bottom the
+copy was pinned to is the bottom of the MAP — which put Innsbruck's eyebrow at
+732 against a map starting at 705, and the browser suite caught it by id in
+the run after the photograph's aspect was declared and the column got shorter:
+*a reader meets the instrument before they are told what the place is.* It had
+been passing by fourteen pixels. Centred, the copy sits against the middle of
+the photograph (164–705, middle 434) at 496 and 475 on the two pages the check
+reads — **the thing it is actually beside.**
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

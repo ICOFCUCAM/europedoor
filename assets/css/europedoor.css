@@ -8802,7 +8802,18 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-arrival-media { min-height: 38.75rem; }
 .ed-arrival-copy {
   padding: clamp(2.25rem, 5vw, 5rem) clamp(1.5rem, 2vw, 2.25rem);
-  display: flex; flex-direction: column; justify-content: flex-end;
+  /* CENTRED RATHER THAN BOTTOM-PINNED, BECAUSE THE ANCHOR'S REASON EXPIRED
+     WHEN THE MAP JOINED THE MEDIA COLUMN. `justify-content: flex-end` was
+     written when that column was the photograph alone and the band was its
+     own 620px; the map is inside it now, so the band is 939px at 1280 and
+     the bottom the copy was pinned to is the bottom of the MAP. That put the
+     eyebrow at 732 against a map starting at 705 — the reader met the
+     instrument before the place's own sentence, which `browser-checks.js`
+     asserts by id and caught in the run after the photograph's aspect was
+     declared and the column got shorter. Centred, the copy sits against the
+     middle of the PHOTOGRAPH (164-705, middle 434) at 461, which is the
+     thing it is actually beside. */
+  display: flex; flex-direction: column; justify-content: center;
 }
 /* AND THE SIDE INSET COMES OFF ON A PHONE, THE SAME WAY THE MAP'S PAD DID.
    36 pixels inside a 288-pixel column is 12% of the width, and it puts the
