@@ -1789,6 +1789,54 @@ async function main() {
     }
   }
 
+  /* ── AND THE CEILING HAS TO BE ONE, WHICH NOTHING HAD EVER ASKED ──────
+   * `--mast`'s own comment says it is "a ceiling on the bar and a floor on
+   * everything that has to clear it", and no check asserted the first half.
+   * The bar then grew — `.masthead-in` went from --s3 to --s5 of block
+   * padding, 58 to 82 at desk width, with its own comment recording the
+   * move — and the token stayed at 60. Swept at twenty-seven widths:
+   *
+   *      >= 961   bar 82.0   --mast 60   OVER by 22.0
+   *   704..960    bar 90.4   --mast 60   OVER by 30.4
+   *      < 704    bar 90.4   --mast 92   ok
+   *
+   * and the 44rem breakpoint was wrong as well as the value, because the
+   * bar becomes TWO ROWS at 60rem. Nothing went red, because the three
+   * rules that read the token are offsets a section's own top margin was
+   * absorbing: a latent defect, of exactly the kind this token was invented
+   * to stop, in the token invented to stop it.
+   *
+   * The sweep is the check. It is cheap — one page, a `setViewportSize` per
+   * width — and it is the only thing that can catch a bar that grows a row
+   * at a width nobody photographs. 961 and 960 are both in it on purpose:
+   * the two-row transition is between them, and a defect that lives in one
+   * pixel of width is what the 834 finding is about. */
+  {
+    const mp = await browser.newPage({ viewport: { width: 1280, height: 844 } });
+    await mp.goto(base + "/europe/austria/", { waitUntil: "load" });
+    const over = [];
+    for (const W of [2560, 1920, 1440, 1280, 1152, 1024, 992, 961, 960, 900,
+                     834, 760, 705, 704, 600, 480, 390, 320]) {
+      await mp.setViewportSize({ width: W, height: 844 });
+      await mp.waitForTimeout(40);
+      const r = await mp.evaluate(() => {
+        const h = document.querySelector(".masthead").getBoundingClientRect().height;
+        const t = parseFloat(getComputedStyle(document.documentElement)
+                               .getPropertyValue("--mast")) * 16;
+        return { h: +h.toFixed(1), t };
+      });
+      checked++;
+      if (r.h > r.t + 0.5) over.push(`${W}: bar ${r.h} against --mast ${r.t}`);
+    }
+    checked++;
+    ok(over.length === 0,
+       `the masthead is taller than --mast at ${over.length} width(s) — ` +
+       `${over.slice(0, 4).join("; ")}. Every offset that clears the bar ` +
+       `reads that token, so a bar taller than it puts a heading, a sticky ` +
+       `rail and an essay margin behind the bar by the difference`);
+    await mp.close();
+  }
+
   // ── A <br> INSIDE A FLEX CONTAINER DOES NOTHING ────────────────────
   // Adding `display: flex` to `.rowmeta` for the state marks turned every
   // child and every text run into a flex ITEM, and a <br> between two items

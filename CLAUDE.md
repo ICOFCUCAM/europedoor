@@ -6898,6 +6898,34 @@ transparent border and the hover colour and no rule for `[aria-current]`, so
 /search and /my-europe announced a current page to a screen reader and showed
 nothing to anybody else. Present, correct, announced and invisible.
 
+
+**THE CEILING WAS TWENTY-TWO PIXELS UNDER THE BAR IT IS A CEILING ON.**
+`--mast` was invented because every in-page anchor scrolled its target to
+y=0, which is where the sticky masthead is; its own comment calls it *a
+ceiling on the bar and a floor on everything that has to clear it*, and the
+two values *the two measured heights rounded up*. **Then the bar grew** —
+`.masthead-in` went from `--s3` to `--s5` of block padding, 58 to 82 at desk
+width, with its own comment recording the move — and nothing moved the token.
+Swept at twenty-seven widths: **over by 22.0 at every width from 961 up and
+by 30.4 from 704 to 960**, correct only below 704. **The breakpoint was wrong
+as well as the value**, because the bar becomes two rows at 60rem and the
+token only noticed at 44. Nothing went red, because the three rules that read
+it are offsets a section's own top margin was absorbing — a latent defect of
+exactly the kind this token was invented to stop, in the token invented to
+stop it, and *a comment claiming a ceiling the measurement does not support
+is read as evidence*.
+
+**AND THE BAR'S HEIGHT WAS STATED TWICE MORE.** `scroll-padding-top: 5rem` is
+a third number for one height — 80 against 82 and 90 — and with
+`scroll-margin-top` ALSO carrying the bar an anchor landed at `padding +
+margin` = 156 pixels, 74 below a bar it had to clear once. **The two
+properties are different questions**: the SCROLLPORT's padding is what the
+bar covers and the TARGET's margin is the air above the heading. One copy
+each, and the landing is a uniform 24–25px at every width where it ran 65 to
+97. **The sweep is the check** — the half the token's comment promised and
+nobody wrote, with 961 and 960 both in it because the two-row transition is
+between them. Proved red on the old values at thirteen widths.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

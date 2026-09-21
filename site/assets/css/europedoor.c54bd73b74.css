@@ -1128,9 +1128,37 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
  * rather than behind it. The two rem values are the two measured heights
  * rounded up, and the sticky rail and the essay margin take their offsets
  * from the same token instead of the 5rem and 6rem they had guessed. */
-:root { --mast: 3.75rem; }
-@media (max-width: 44rem) { :root { --mast: 5.75rem; } }
-[id] { scroll-margin-top: calc(var(--mast) + var(--s4)); }
+/* AND THE CEILING WAS TWENTY-TWO PIXELS UNDER THE BAR IT IS A CEILING ON.
+ * The comment above says the two values are "the two measured heights
+ * rounded up" — and then the bar grew. `.masthead-in` went from `--s3` to
+ * `--s5` of block padding, with its own comment recording the move (58 ->
+ * 82 at desk width), and nothing moved this token with it. Swept in
+ * Chromium at twenty-seven widths from 320 to 2560:
+ *
+ *      >= 961   bar 82.0   --mast 60   OVER by 22.0
+ *   704..960    bar 90.4   --mast 60   OVER by 30.4
+ *      < 704    bar 90.4   --mast 92   ok
+ *
+ * That is the `--thumbbar` failure at the other end of the page for the
+ * second time, in the token written to fix it the first time — and the 44rem
+ * breakpoint was wrong as well as the value, because the bar becomes TWO
+ * ROWS at 60rem and the token only noticed at 44. Nothing went red because
+ * the three rules that read it are all offsets a section's own top margin
+ * was already absorbing: a latent defect, and a comment claiming a ceiling
+ * that the measurement does not support is read as evidence.
+ *
+ * AND THE BAR'S HEIGHT WAS STATED TWICE MORE. `scroll-padding-top: 5rem` is
+ * a third number for one thing — 80 against 82 and 90 — and with
+ * `scroll-margin-top` ALSO carrying the bar, an anchor landed at
+ * `padding + margin` = 156 pixels, 74 below a bar it only had to clear
+ * once. The two properties are different questions: the SCROLLPORT's
+ * padding is what the bar covers, and the TARGET's margin is the air a
+ * reader wants above the heading. One copy each.
+ *
+ * No new breakpoint: 60rem is already one of the six. */
+:root { --mast: 5.125rem; }
+@media (max-width: 60rem) { :root { --mast: 5.75rem; } }
+[id] { scroll-margin-top: var(--s5); }
 
 /* THE MASTHEAD STOPPED BEING THE LOUDEST THING ON EVERY PAGE.
  *
@@ -3908,8 +3936,10 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 
 /* The sticky masthead would otherwise cover any heading an in-page link
  * jumps to. This is the one line that makes every anchor on the site land
- * where the reader expects. */
-html { scroll-padding-top: 5rem; }
+ * where the reader expects — and it READS the bar's own token rather than
+ * carrying a third number for one height. 5rem was 80 against a bar of 82
+ * and 90. */
+html { scroll-padding-top: var(--mast); }
 
 /* ── the map, as a list ───────────────────────────────────────
  * The accessible alternative to a picture that cannot be read out. Two or

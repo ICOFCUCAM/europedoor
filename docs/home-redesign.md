@@ -1877,3 +1877,54 @@ markers.
 
 Both halves proved red: seven failures with the area-only test (naming
 /manifesto and /sources by name), one with the utility rule emptied.
+
+## Menu 04 — the ceiling was twenty-two pixels under the bar it is a ceiling on
+
+`--mast` exists because of a defect this repository already had: every
+in-page anchor scrolled its target to y=0, which is where the sticky masthead
+is, and on a phone a heading landed nine pixels behind it. The repair was one
+token, "a ceiling on the bar and a floor on everything that has to clear it",
+and its comment says the two values are the two measured heights rounded up.
+
+Then the bar grew. `.masthead-in` went from `--s3` to `--s5` of block padding
+— 58 to 82 at desk width, with its own comment recording the move — and
+nothing moved the token with it. Swept in Chromium at twenty-seven widths
+from 320 to 2560:
+
+| | bar | `--mast` | |
+|---|---|---|---|
+| ≥ 961 | 82.0 | 60 | **over by 22.0** |
+| 704–960 | 90.4 | 60 | **over by 30.4** |
+| < 704 | 90.4 | 92 | ok |
+
+**The breakpoint was wrong as well as the value.** The bar becomes two rows at
+60rem and the token only noticed at 44rem, so the widest gap is the 256 pixels
+of width between them — the range the contact sheet's own 834 finding exists
+to look at.
+
+Nothing went red, because the three rules that read the token are offsets a
+section's own top margin was already absorbing. That is a latent defect of
+exactly the kind this token was invented to stop, in the token invented to
+stop it — and a comment claiming a ceiling the measurement does not support is
+read as evidence.
+
+**And the bar's height was stated twice more.** `scroll-padding-top: 5rem` is
+a third number for one thing — 80 against 82 and 90 — and with
+`scroll-margin-top` ALSO carrying the bar, an anchor landed at
+`padding + margin` = 156 pixels, 74 below a bar it only had to clear once. The
+two properties are different questions: the **scrollport's** padding is what
+the bar covers, and the **target's** margin is the air a reader wants above the
+heading. One copy each.
+
+| jumping to a section on a destination page | before | after |
+|---|---|---|
+| clearance at 1280 | 74px | 24px |
+| at 960 | 65px | 25px |
+| at 390 | 97px | 25px |
+
+Uniform, and by construction rather than by three numbers happening to sum.
+
+**The sweep is the check**, and it is the half `--mast`'s own comment promised
+and nobody wrote: one page, a `setViewportSize` per width, eighteen widths
+with 961 and 960 both in it on purpose, because the two-row transition is
+between them. Proved red on the old values: thirteen widths over.
