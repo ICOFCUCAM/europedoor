@@ -6830,6 +6830,47 @@ own first version asked the wrong element**: `a.parentElement` is `.nav` for
 a room with no field, and `.nav` contains every other room's field, so it
 reported all six as carrying one and went red on the three that were correct.
 
+
+**THE ATLAS INDEX LISTED FIFTY COUNTRIES AND DREW NONE OF THEM.** The
+homepage's plate 05 carries the sentence *One continent. Fifty doors.* and
+drew nine headings over fifty names in the body serif, in three multicol
+columns: a sitemap, on a page whose argument is that geography IS the design.
+Every one of those countries has an outline in `data/geo/`. That is the
+/themes failure word for word — a page describing shapes its own closing
+sentence is about and drawing none. `country_mark` is `country_door` at the
+size of a word: the same own-frame fitting, the same `COUNTRY_DOOR_POINTS`
+floor deciding which six are a ringed point (READ rather than typed a second
+time), and no photograph, so no register row and no image request. **Three
+ways were costed before one was built** — 628 KB for the lod1 doors, 18.8 + 9.8
+for one shared silhouette and its lit rings, **8.4 KB** for fifty own-frame
+outlines — and the cheapest is the only one that draws fifty DIFFERENT SHAPES
+rather than nine pictures of Europe with different bits lit, which is the
+wallpaper the aperture's own rule warns about. **And the first size was the
+smudge**: a 2.1rem track renders a country 33 pixels wide, where Italy read
+and Greece was a blob.
+
+**AND A STRAY `*/` SWALLOWED THE RULE THAT LAID IT OUT, FOR THE THIRD TIME,
+BECAUSE THE REPAIR THIS FILE DESCRIBES WAS NEVER BUILT.** The comment above
+that size decision contained the characters `*/themes*`: the comment closed,
+the prose after it was read as a selector, and the next whole rule — the grid
+that puts a country's outline beside its name — was dropped. Every box was
+still the right size and the tell was a `getComputedStyle` reading
+`display: block` where the file says `grid`. This file already records the
+fault twice **with the fix written out** — *a four-line scan for a `*/`
+outside a comment finds both in a second* — and nobody ever wrote it, which
+is `data-rotate` arriving in this file's own documentation. **A described
+repair is not a repair.** `c_css_comments` is those four lines, both
+directions, 1,160 comments examined, proved red on a stray close and on an
+unterminated open.
+
+**AND `country_glyph` WAS ALREADY TAKEN, IN PYTHON.** The first version of
+that function carried the name of the country card's own picture eight hundred
+lines below it; Python resolves the LATER definition, so the build called that
+one and stopped on its signature. *Grep the stylesheet before naming a
+composition* is written here about a CSS class and is the same rule about a
+module-level function — loud this time only by luck, because the two
+signatures differ.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

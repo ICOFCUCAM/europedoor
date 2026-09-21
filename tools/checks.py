@@ -399,6 +399,64 @@ class Structure(html.parser.HTMLParser):
 
 # ── the checks ────────────────────────────────────────────────────────
 
+@check("every comment in the stylesheet opens and closes where it says it does")
+def c_css_comments():
+    """A STRAY `*/` SWALLOWS THE RULE AFTER IT, AND NOTHING ELSE HERE COUNTS
+    A DROPPED RULE.
+
+    An edit closes a comment one line early; the continuation prose then sits
+    in the stylesheet as raw text, and a CSS parser reads that as the start
+    of a selector until it finds a `{` — so the next WHOLE RULE is consumed
+    into an invalid selector and dropped. This repository has recorded that
+    twice, and the loss was severe both times: `.essay { --measure: 38rem }`,
+    the entire measure of the story family, and `.minilabel.here
+    { font-weight: 700 }`, which is how a map says which place you are
+    reading about.
+
+    THE NOTE RECORDING THAT SAYS *a four-line scan for a `*/` outside a
+    comment finds both in a second* — AND NOBODY EVER WROTE IT. It cost a
+    third occurrence: a comment about the country marks contained the
+    characters `*/themes*`, which closed it, and the rule underneath — the
+    grid that puts a country's outline beside its name — was dropped. Every
+    box was still the right size, the dead-rule scan walks rules the browser
+    PARSED so a rule that never existed is invisible to it, and the invariant
+    register counts declarations. The tell was a `getComputedStyle` reading
+    `display: block` where the file says `grid`.
+
+    *A repair that is described and not built is not a repair*, which is the
+    `data-rotate` finding arriving in this file's own documentation. Both
+    directions: a close with nothing open, and an open that never closes.
+    """
+    css = open(os.path.join(ROOT, "assets", "css", "europedoor.css"),
+               encoding="utf-8").read()
+    i, line, opened = 0, 1, None
+    stray, unclosed = [], None
+    while i < len(css):
+        if css[i] == "\n":
+            line += 1
+        if opened is None and css.startswith("/*", i):
+            opened = line; i += 2; continue
+        if opened is None and css.startswith("*/", i):
+            stray.append(line); i += 2; continue
+        if opened is not None and css.startswith("*/", i):
+            opened = None; i += 2; continue
+        i += 1
+    if opened is not None:
+        unclosed = opened
+    if stray:
+        fail("assets/css/europedoor.css closes a comment that was never "
+             "opened, at line(s) %s. Everything after it up to the next "
+             "brace is read as a selector, so the whole rule underneath is "
+             "dropped — and nothing else here counts a dropped rule: the "
+             "dead-rule scan walks rules the browser PARSED."
+             % ", ".join(str(n) for n in stray[:6]))
+    if unclosed is not None:
+        fail("assets/css/europedoor.css opens a comment at line %d and "
+             "never closes it, so every rule after it is inside it"
+             % unclosed)
+    return css.count("/*")
+
+
 @check("the planner's own two constants are declared once")
 def c_plan_constants():
     """THE PAGE AND THE PLANNER MUST AGREE ABOUT WHAT A STYLE IS.

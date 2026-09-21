@@ -2409,10 +2409,30 @@ def home(data):
     _by_macro = {}
     for c in sorted(data["countries"].values(), key=lambda c: c["name"]):
         _by_macro.setdefault(macro_of.get(c["slug"]), []).append(c)
+    # AND THE LIST WAS A SITEMAP ON THE BAND WHOSE OWN SENTENCE IS "FIFTY
+    # DOORS". Nine headings and fifty names, set in the body serif at reading
+    # size, in three multicol columns: nothing wrong and nothing drawn, on a
+    # page whose whole argument is that geography IS the design. Every
+    # country here has an outline in `data/geo/` and the band showed none of
+    # them — the /themes failure word for word, where the page described
+    # thirteen shapes its own closing sentence is about and drew none.
+    #
+    # `country_glyph` is `country_door` at the size of a word: the same
+    # outline, the same own-frame fitting, the same floor deciding which six
+    # countries are a ringed point, and no photograph, so it needs no
+    # register row and costs 8.4 KB for the whole set.
+    #
+    # AND EACH CORNER STATES ITS OWN EXTENT. The nine hold 2 to 9 countries
+    # and the headings read as nine equal claims, which is the /countries
+    # finding one page over — nine identical bands for regions that are not
+    # alike. The figure is derived from the grouping directly above, so it
+    # cannot disagree with the names under it.
     corners = "".join(
         f'<div class="dcorner">'
-        f'<h3><a href="{urls.macro(m)}">{esc(m["name"])}</a></h3>'
-        + "".join(f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
+        f'<h3><a href="{urls.macro(m)}">{esc(m["name"])}</a>'
+        f'<span class="dccount">{len(_by_macro.get(m["slug"], []))}</span></h3>'
+        + "".join(f'<a class="dc" href="{urls.country(c)}">'
+                  f'{country_mark(c)}<span class="dcname">{esc(c["name"])}</span></a>'
                   for c in _by_macro.get(m["slug"], []))
         + "</div>"
         for m in data.get("macros", []))
@@ -7421,6 +7441,77 @@ COUNTRY_DOOR_POINTS = 20
 # how many that turned out to be — which means the set grows on its own when
 # the geometry gets cheaper rather than when somebody edits a number.
 DOOR_BAND_KB = 90
+
+
+# THE GLYPH IS THE WORD'S OWN SHAPE, AND IT IS THE SAME DECISION AS THE DOOR
+# AT A HUNDREDTH OF THE BYTES.
+#
+# The homepage's atlas index listed fifty country names in three columns of
+# body serif under nine headings: a sitemap, on the one band whose own
+# sentence is "One continent. Fifty doors." Nothing on it was wrong and
+# nothing on it was drawn — the least designed surface on a page whose whole
+# argument is that geography IS the design.
+#
+# `country_door()` is the same idea at reading size and cannot be reused
+# here: it clips a licensed photograph into the outline, which is 15 KB of
+# lod1 geometry a piece and needs a register row. This needs neither. Each
+# country is fitted to ITS OWN extent, exactly as the fifty portraits and
+# the nine macro glyphs are — Luxembourg fills its box as Türkiye fills its
+# own, which is the decision `country_door` records and the reason a
+# continental frame cannot carry this: at about a pixel per unit Luxembourg
+# is eight of them there.
+#
+# THE THINNING IS THE FRAME'S OWN, so a glyph carries about two dozen
+# segments across whatever the country is. Measured over all fifty:
+# 8.4 KB of path data for the whole set, against 628 KB for the doors and
+# 18.8 KB for one shared continental silhouette that would then need the
+# lit rings on top of it.
+#
+# AND THE SIX THAT CANNOT BE DRAWN ARE THE SIX THAT ALREADY COULD NOT.
+# `COUNTRY_DOOR_POINTS` is the floor `country_door` derived — twenty
+# vertices on the country's own frame, which reproduces exactly the six this
+# repository records as having no polygon at 1:50m — and it is READ here
+# rather than a second threshold typed. A ringed point is what `/map` and
+# the region maps already draw for them: the measurement is real and the
+# outline is not, and inventing one is the failure the whole register
+# exists to refuse.
+def country_mark(c, w=100, h=70):
+    """One country, fitted to its own extent, at the size of a word.
+
+    NAMED `country_mark` BECAUSE `country_glyph` WAS ALREADY TAKEN, by the
+    country card's own picture eight hundred lines below — and Python
+    resolves the LATER definition, so the first build of this silently
+    called that one and stopped on its signature. *Grep before naming a
+    composition* is written in this repository about a CSS class; it is the
+    same rule about a module-level function, and here the collision was
+    loud rather than silent only by luck: the two signatures differ.
+    """
+    doc = geo.country(c["slug"])
+    ring = (f'<svg class="dcshape dcpoint" viewBox="0 0 {w} {h}" '
+            f'aria-hidden="true" focusable="false">'
+            f'<circle cx="{w / 2:g}" cy="{h / 2:g}" r="{h * 0.17:g}"/>'
+            f'<circle cx="{w / 2:g}" cy="{h / 2:g}" r="{h * 0.07:g}"/></svg>')
+    if not doc or not doc.get("bbox"):
+        return ring
+    bbox = geo.principal_frame(doc, c["slug"])[0] or list(doc["bbox"])
+    proj = geo.Projection(bbox, w, h, pad=0.04)
+    _ctx, full = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
+    here = re.findall(r'<path[^>]*class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]*)"',
+                      full)
+    if not here:
+        return ring
+    pts = re.findall(r"-?\d+(?:\.\d+)?", here[0])
+    if len(pts) // 2 < COUNTRY_DOOR_POINTS:
+        return ring
+    _ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"],
+                              thin_units=w / 24.0, min_units=w / 12.0)
+    thin = re.findall(r'<path[^>]*class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]*)"',
+                      land)
+    if not thin:
+        return ring
+    return (f'<svg class="dcshape" viewBox="0 0 {w} {h}" '
+            f'aria-hidden="true" focusable="false">'
+            f'<path d="{thin[0]}"/></svg>')
 
 
 def country_door(data, images, c, w=900, h=560, brief=True):

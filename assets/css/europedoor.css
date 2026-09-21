@@ -11262,6 +11262,61 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   line-height: 1.5; }
 .dcorner > a:hover { color: var(--ink); text-decoration: underline;
   text-underline-offset: .2em; }
+/* ── AND EVERY ONE OF THE FIFTY CARRIES ITS OWN SHAPE ───────────────────
+   The row is the country's outline, fitted to its own extent, and its name.
+   A GRID RATHER THAN AN INLINE MARK, because the shapes have to line up: a
+   glyph in the text flow sits on the baseline and Norway is twice as tall
+   as Belgium, so fifty names would step in and out by whatever each country
+   happens to be. One fixed track and one auto track puts every name on the
+   same left edge and lets every shape use the whole of its own box.
+
+   THE SHAPE IS THE PAGE'S INK AT A THIRD, NOT THE ACCENT. Fifty marks in
+   the accent is a texture rather than an accent — this repository's own
+   sentence about a kicker on every row of a list — and these are fifty
+   silhouettes, which is the most repeated thing on the page. They lift to
+   the accent under hover and focus with the name they belong to, which is
+   the one place a mark and a word have to agree.
+
+   AND `overflow: visible` IS DELIBERATE: the viewBox is the country's own
+   padded extent, so nothing reaches the edge and a clip would only ever
+   remove an island the thinning kept. */
+/* AND THE FIRST SIZE WAS THE SMUDGE THIS REPOSITORY ALREADY MEASURED.
+   A 2.1rem track renders the country 33 pixels wide at 1280, and *a
+   photograph clipped into Belgium renders about 40 pixels wide and is a
+   smudge with a coastline* is the same finding one drawing over, and so is
+   the /themes continent at 204 pixels. Measured by looking:
+   Italy was readable, Greece was a blob and Norway was a stroke. 3.4rem by
+   2.4rem is 54 x 38, where every one of the forty-four with a polygon is
+   its own country and not a grey mark. It costs the band about 300 pixels
+   and the band is the page's index of the whole atlas. */
+.dcorner > a.dc { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr);
+  align-items: center; gap: .8rem; padding-block: .18rem; }
+.dcshape { width: 100%; height: 2.4rem; overflow: visible; }
+.dcshape path { fill: color-mix(in srgb, var(--ink) 34%, transparent);
+  stroke: none; }
+/* A COUNTRY THIS ATLAS DRAWS AS A POINT IS DRAWN AS A POINT HERE. Six have
+   no polygon at 1:50m and `/map` already answers that with a ringed point;
+   an outline invented for them would be the one claim the register exists
+   to refuse. Two circles rather than a circle and a stroke, because a
+   1-unit stroke in a 100-unit viewBox is a third of a device pixel at this
+   size — the *eleven units is not eleven pixels* measurement, in a mark. */
+.dcpoint circle { fill: none; stroke: color-mix(in srgb, var(--ink) 34%, transparent);
+  stroke-width: 4; vector-effect: non-scaling-stroke; }
+.dcpoint circle + circle { fill: color-mix(in srgb, var(--ink) 34%, transparent);
+  stroke: none; }
+.dcorner > a.dc:hover .dcshape path,
+.dcorner > a.dc:focus-visible .dcshape path { fill: var(--door); }
+.dcorner > a.dc:hover .dcpoint circle,
+.dcorner > a.dc:focus-visible .dcpoint circle { stroke: var(--door); }
+.dcorner > a.dc:hover .dcpoint circle + circle,
+.dcorner > a.dc:focus-visible .dcpoint circle + circle { fill: var(--door); }
+/* THE COUNT IS THE CORNER'S OWN EXTENT, and it is the thing nine identical
+   headings could not say: these hold two countries and nine. It sits ON the
+   heading's line at the label step, tabular so nine numbers align down a
+   column of three. */
+.dcorner h3 { display: flex; align-items: baseline; gap: .6em; }
+.dccount { margin-left: auto; font-variant-numeric: tabular-nums;
+  color: var(--ink-3); letter-spacing: .04em; }
 /* The hoisted clause under the list, not on nine rows. */
 .doornote { margin-top: var(--s5); max-width: 46rem; color: var(--ink-3); }
 

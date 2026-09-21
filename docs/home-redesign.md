@@ -1759,3 +1759,74 @@ four with a mark on every room including the phone.
 field, and `.nav` contains every other room's field, so it reported all six as
 carrying one and went red on the three that are correct. The question is about
 THIS room and is asked of this room.
+
+## Home 27 — the atlas index listed fifty countries and drew none of them
+
+The owner pointed at plate 05: *the countries listed on section 5 of the home
+page are without design.* He is right, and the measurement is specific.
+
+The band's own sentence is **One continent. Fifty doors.** What it drew was
+nine headings and fifty names, set in the body serif at reading size, in three
+multicol columns — a sitemap, on a page whose whole argument is that geography
+IS the design. Every one of those fifty countries has an outline in
+`data/geo/`, and the band showed none of them. That is the /themes failure
+word for word: a page describing shapes its own closing sentence is about and
+drawing none.
+
+**`country_mark` is `country_door` at the size of a word.** Same own-frame
+fitting — Luxembourg fills its box as Türkiye fills its own, which is the
+decision `country_door` records and the reason a continental frame cannot
+carry this: at about a pixel per unit Luxembourg is eight of them there. Same
+`COUNTRY_DOOR_POINTS` floor deciding which six countries are a ringed point,
+**read** rather than typed a second time. No photograph, so no register row
+and no image request.
+
+Three ways to draw fifty countries were costed before one was built:
+
+| | bytes |
+|---|---|
+| the country doors at lod1, 41 of them | 628 KB |
+| one shared continental silhouette + the lit rings | 18.8 + 9.8 KB |
+| **fifty own-frame outlines, adaptively thinned** | **8.4 KB** |
+
+The cheapest is also the only one that draws fifty *different shapes* rather
+than nine pictures of Europe with different bits lit — which is the refusal
+this site already made for /interests, and the wallpaper the aperture's own
+rule warns about.
+
+**And the first size was the smudge this repository had already measured.** A
+2.1rem track renders a country 33 pixels wide: Italy was readable, Greece was
+a blob and Norway was a stroke. *A photograph clipped into Belgium renders
+about 40 pixels wide and is a smudge with a coastline* is the same finding one
+drawing over, and so is the /themes continent at 204 pixels. 3.4rem by 2.4rem
+is 54 × 38, and it costs the band about 300 pixels.
+
+**Each corner states its own extent**, which nine identical headings could not:
+they hold two countries and nine. The figure is derived from the grouping
+directly above it, so it cannot disagree with the names under it.
+
+`weight.home_kb` 148 → 151, recorded.
+
+### And a stray `*/` swallowed the rule that laid it out
+
+The comment above the size decision contained the characters `*/themes*`.
+That closed the comment, the prose after it was read as a selector, and the
+next whole rule — the grid that puts a country's outline beside its name —
+was dropped. The page rendered the name on one line and the shape centred on
+another, and every box was the right size.
+
+`CLAUDE.md` has recorded this failure twice, with the repair written out: *a
+four-line scan for a `*/` outside a comment finds both in a second.* **Nobody
+ever wrote it.** That is `data-rotate` arriving in this repository's own
+documentation — a described repair is not a repair — and it cost a third
+occurrence. `c_css_comments` is those four lines, both directions, examining
+1,160 comments, proved red on a stray close and on an unterminated open.
+
+### And `country_glyph` was already taken
+
+The first version of this function was called `country_glyph`, which is the
+name of the country card's own picture eight hundred lines below it. Python
+resolves the **later** definition, so the build called that one and stopped on
+its signature. *Grep the stylesheet before naming a composition* is written
+here about a CSS class; it is the same rule about a module-level function, and
+this time it was loud only by luck — the two signatures differ.
