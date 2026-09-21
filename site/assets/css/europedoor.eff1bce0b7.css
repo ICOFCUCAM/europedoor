@@ -3221,8 +3221,25 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    `--map-sea` through `.mapcut`, which is a different mechanism because it
    is a different drawing. */
 .datacut stop { stop-color: var(--atlas-sea); }
+/* THE GROUND BEYOND THE ATLAS IS DRAWN FLAT, WHICH IS THE PUBLISHED POLICY
+   AND WAS NOT THE RULE. `docs/boundary-policy.md` says of CONTEXT countries —
+   the ones with no EuropeDoor page, drawn so the Mediterranean has a far
+   shore — that "they are drawn FLAT, are not clickable and carry no link",
+   and names Northern Cyprus and Palestine as being in that list on exactly
+   the same terms as Tunisia. The rule stroked them in the coast ink at 32%,
+   which draws every INTERNAL FRONTIER between Morocco, Algeria, Tunisia,
+   Libya, Egypt and the Levant: borders, at a legible weight, in a region this
+   atlas holds no position on and publishes none about. Measured on the built
+   page: nine paths in `.context`, and not one of them carries a `<title>` —
+   they are anonymous by construction, and the stroke was the only thing
+   naming anything about them.
+   THE STROKE STAYS AND ITS COLOUR CHANGES, because it has a second job the
+   fill cannot do: two neighbours simplified independently do not share an
+   edge, which is the hairline-crack fault this repository already records
+   from Kraków, and `#heroland` closes it with a stroke IN ITS OWN FILL
+   COLOUR. That is what this is now — a seam weld, not a frontier. */
 .europemap .context path { fill: var(--atlas-land);
-  stroke: color-mix(in srgb, var(--atlas-coast) 32%, transparent);
+  stroke: var(--atlas-land);
   stroke-width: calc(0.8px / var(--z)); }
 /* ── /map IS DRAWN AS AN ATLAS ───────────────────────────────────── */
 /* THE FIVE CARTOGRAPHIC ROLES ARE REBOUND RATHER THAN RESTATED, which is
