@@ -2461,7 +2461,22 @@ def home(data):
     _missing = [c for c in data["countries"].values() if c["slug"] not in _drawn]
     _nadvisory = sum(1 for c in _missing if (c.get("advisory") or {}).get("level"))
     _nsmall = len(_missing) - _nadvisory
-    _atfig, _atcorners, _atdrawn = atlas_register(data)
+    _atfig, _atcorners, _atdrawn, _atcut = atlas_register(data)
+    # AND THE ONE COUNTRY THE CORNER LIGHT SKIPS SAYS SO. The sentence is
+    # composed here rather than inside the register because it is a
+    # statement about the whole band, and nine cards each carrying it is
+    # *never explain the constraint back*. It disappears by itself the day
+    # the dataset stops being cut.
+    _atcutsay = (("" if not _atcut else
+                  " " + (_atcut[0] if len(_atcut) == 1
+                         else ", ".join(_atcut[:-1]) + " and " + _atcut[-1])
+                  + (" is" if len(_atcut) == 1 else " are")
+                  + " drawn and named and not lit: this atlas holds "
+                  + ("a fragment of it" if len(_atcut) == 1
+                     else "a fragment of each") + ", cut at "
+                  + f"{(geo.load('europe-lod1.json') or {}).get('bbox', [0, 0, 52, 0])[2]:g}"
+                  + " degrees east, and a lit shape that stopped there would "
+                    "be drawing the edge of our data rather than a country."))
     _nmacro = len(data.get("macros", []))
     # THE OPENING IS FULL WIDTH AND THE STAGE IS UNDER IT, which the first
     # composition got the other way round and the render settled in one look:
@@ -2470,16 +2485,61 @@ def home(data):
     # largest typographic moments on the page. A headline in a rail is a
     # rail's headline. The window is present from the first corner on, which
     # is where the reading it belongs to starts.
+    # THE STAGE IS THE BRIEF'S OWN, AND WHAT MOVES IS THE PANEL. The first
+    # composition took the brief's idea and built the other pattern: a
+    # two-column grid with a sticky right track and nine blocks scrolling up
+    # the left. That is a sticky SIDEBAR, and it moves the headline, the
+    # extent and the reading all at once. The brief composes ONE stage the
+    # height of the viewport — the drawing, the head, the extent, the cue and
+    # the rail all pinned — and lets a single panel cross it. The reader's
+    # eye never leaves the continent, which is the point: *the drawing stays
+    # where it is; what changes is what you are reading* is a sentence this
+    # page was already printing about a layout that did not do it.
+    #
+    # AND THE PANEL IS SCROLL-NATIVE RATHER THAN SCRIPTED. The prototype
+    # swaps one panel's text from a scroll handler; this homepage's only
+    # `<script>` is the inert JSON-LD block, and a panel that exists only
+    # while JavaScript runs is nine corners of this atlas a reader without it
+    # never sees. So the nine are real blocks in the document, each a step of
+    # the track and each pinned in the panel slot for the length of its own
+    # step: the same reading happens with the stylesheet alone, and the nine
+    # are an ordinary list on a phone and in anything that ignores both.
+    # AND `data["cities"]` IS AN INDEX OF WRAPPERS, NOT OF CITIES. Its
+    # values are `{id, country, region, city}` — the first version read
+    # `t.get("places")` off the wrapper, which has no such key, and the
+    # stage shipped "0 PLACES" and "0 EXPERIENCES" beside four correct
+    # figures. A zero printed with confidence beside real numbers is worse
+    # than an absent row, and only rendering the band found it: the
+    # arithmetic is right, the sum is over the wrong object. 255 and 197,
+    # which are the figures /search publishes from its own index.
+    _nplaces = sum(len(t["city"].get("places") or []) for t in idx.values())
+    _nexper = sum(len(t["city"].get("experiences") or []) for t in idx.values())
+    # THE EXTENT IS SIX FIGURES AND EVERY ONE IS DERIVED, which is the half
+    # of the brief's editorial column this page did not have at all. A figure
+    # typed here is the figure that was true two hundred destinations ago —
+    # the rule this repository has now paid for in five families — so each is
+    # counted on the build that prints it.
+    _statrow = "".join(
+        f"<div><dt>{n}</dt><dd>{esc(label)}</dd></div>" for n, label in (
+            (ncountries, "Countries"), (nregions, "Regions"),
+            (ncities, "Destinations"), (_nplaces, "Places"),
+            (_nexper, "Experiences"), (len(data["journeys"]), "Journeys")))
     atlas = f"""
-  <div class="atopen">
-    <h2 class="mega">One continent. <br>{numword(ncountries, cap=True)} doors.</h2>
-    <p class="lede">{numword(_nmacro, cap=True)} corners of the continent,
-    {numword(ncountries)} countries, and every one of them a way in. The
-    drawing stays where it is; what changes is what you are reading.</p>
-    {golink('/countries', 'Open the atlas')}
-  </div>
+  <div class="atlas">
   <div class="atstage">
-  <div class="atwin">{_atfig}</div>
+    <div class="atwin">{_atfig}</div>
+    <div class="atlead">
+      <p class="ateyebrow">The Atlas</p>
+      <h2 class="mega">One continent. <br>{numword(ncountries, cap=True)} doors.</h2>
+      <p class="atintro">{numword(_nmacro, cap=True)} corners of the
+      continent, {numword(ncountries)} countries, and every one of them a way
+      in.</p>
+      {golink('/countries', 'Open the atlas')}
+      <dl class="atstats">{_statrow}</dl>
+    </div>
+    <p class="atcue">Scroll to move through the continent</p>
+    <p class="atrail" aria-hidden="true">Europe through the door</p>
+  </div>
   <div class="atread">
     {_atcorners}
   </div>
@@ -2490,7 +2550,8 @@ def home(data):
       <p class="lede">{numword(_atdrawn, cap=True)} of the
       {numword(ncountries)} are named on the drawing: a name that fits
       nowhere on its own ground is dropped rather than laid across its
-      neighbours, and every country is a link in the nine corners above.</p>
+      neighbours, and every country is a link in the nine corners above.
+      {_atcutsay}</p>
     {golink('/map', 'Open the map')}
   </div>
   <p class="small doornote">The picture at the top of this page opens
@@ -2691,6 +2752,14 @@ def home(data):
 
     return "/index.html", page(
         SITE_NAME, body, path="/", area=None, hero=True,
+        # THE FIRST SCRIPT ON THE HOMEPAGE, AND IT IS AN ENHANCEMENT. The
+        # atlas stage is scroll-native — sticky stage, nine real steps, each
+        # card pinned in the panel slot by the stylesheet — so this page is
+        # complete without it. What no selector can do is reach from a
+        # scrolled block to a `<text>` in the figure above it, and *the
+        # continent answers the reading* is the band's whole argument.
+        # `js.enhancements` moves 1 -> 2, recorded.
+        scripts=["/assets/js/atlas.js"],
         description="Discover, plan and experience Europe: an atlas of every country, region and city, a journey planner, curated cross-border routes and local experiences.",
         og=("europedoor:home", "peaks", "EuropeDoor — open the door to Europe"),
         ld_blocks=[
@@ -7547,6 +7616,15 @@ DOOR_BAND_KB = 90
 # them a link in the register column below, in geographic order by corner,
 # which is also the reading a keyboard and a screen reader get and the
 # whole of what the section is without JavaScript.
+# HOW MUCH SPARE GEOGRAPHY THE REGISTER'S FRAME CARRIES EITHER SIDE OF ITS
+# WINDOW, in the projection's own units. It is the pan's budget: the
+# stylesheet may move the drawing by at most this much before the margin
+# runs out and the plate's own background shows as an edge. Stated here
+# rather than in the stylesheet because the viewBox is written here, and
+# two copies of one number is what four typed dispatch caps already cost
+# this repository a sitting.
+
+
 def atlas_register(data):
     """The continent, the fifty names on it, and the nine corners beside it.
 
@@ -7573,9 +7651,54 @@ def atlas_register(data):
     # draws. `_ctx` is discarded rather than never asked for, because
     # `geo.landmass` returns both and a caller that ignores one is clearer
     # than a second entry point.
+    # EVERY COUNTRY CARRIES ITS CORNER, so the DRAWING can answer the
+    # reading and not just the typography. The first version lit the NAME
+    # and left the shape alone: the panel said Western Europe and the word
+    # FRANCE went dark ink while France itself stayed exactly the stone
+    # every other country was. The continent is the subject of this band —
+    # *the drawing stays where it is; what changes is what you are reading*
+    # — and a continent that does not move is a caption with a picture
+    # beside it. `bands` is `landmass`'s own hook for exactly this: it puts
+    # a class on each country's path, so nine rules light nine corners
+    # rather than fifty naming fifty countries.
+    # THE GEOMETRY IS CUT TO THE PANNED FRAME AND THE NAMES TO THE WINDOW.
+    # `landmass` clips to the view it is given, so generating over
+    # HERO_VIEW and then drawing inside a wider viewBox leaves the pan's
+    # margin EMPTY — the seam it exists to remove, moved a hundred units
+    # out. `name_countries` keeps the window, because a name placed in the
+    # margin is a name no reader ever sees at rest.
+    # A COUNTRY WHOSE RING ENDS ON OUR BBOX CANNOT BE LIT WITHOUT DRAWING
+    # THE BBOX. The frontier ink was clipped two units short of the 52
+    # degree meridian one commit ago because it drew *a fact about our
+    # dataset* as a ruled diagonal; the FILL was safe then, because the
+    # ground beyond the cut is the same stone and there was no step to see.
+    # Lighting a corner makes the fill differ across that edge, and the
+    # line came straight back — measured on the eastern step, a hard
+    # diagonal from the White Sea to the north Caspian between lit paper
+    # and stone. *The same defect arrived at from the other side*, which
+    # this repository has now recorded of a fade, a shore band and a
+    # scrim.
+    #
+    # So a cut country is CONTEXT on this band: it keeps its shape, its
+    # frontier, its name and its link, and it is not lit. Derived from the
+    # document's own rings against the document's own bbox, so a dataset
+    # that one day reaches the Urals stops excluding Russia without
+    # anybody editing a list — and the page SAYS which country it is,
+    # because /countries already settled that a set shown short says so
+    # rather than quietly showing 41 of 50.
+    cut_east = (doc.get("bbox") or [0, 0, 52.0, 0])[2]
+    cut_slugs = {e["slug"] for e in doc.get("countries", {}).values()
+                 if e.get("slug") and any(
+                     r[i] >= cut_east - 0.05
+                     for r in (e.get("rings") or []) for i in range(0, len(r), 2))}
     _ctx, land = geo.landmass(
-        MAPPROJ, HERO_VIEW, doc=doc, thin_units=3.0, min_units=6.0,
+        MAPPROJ, PAN_VIEW, doc=doc, thin_units=3.0, min_units=6.0,
+        bands={c["slug"]: "atc-" + macro_of[c["slug"]]
+               for c in data["countries"].values()
+               if macro_of.get(c["slug"]) and c["slug"] not in cut_slugs},
         path_id=lambda ent: ("at-" + ent["slug"]) if ent.get("slug") else "")
+    cut_names = sorted(c["name"] for c in data["countries"].values()
+                       if c["slug"] in cut_slugs)
 
     def _door(name, text):
         c = by_name.get(name)
@@ -7616,7 +7739,7 @@ def atlas_register(data):
     # `#heroland` is: two datasets simplified independently do not share an
     # edge, and along a 700-unit cut a tenth of a unit of paper is a bright
     # hairline exactly where the picture must not have one.
-    beyond = [b for b in geo.beyondmass(MAPPROJ, HERO_VIEW, thin_units=6.0,
+    beyond = [b for b in geo.beyondmass(MAPPROJ, PAN_VIEW, thin_units=6.0,
                                         min_units=200.0, pad=0.0) if b]
     ground = ('<g class="lyr lyr-beyond" aria-hidden="true">'
               + "".join(f'<path d="{d}"/>' for d in beyond) + "</g>") if beyond else ""
@@ -7677,17 +7800,82 @@ def atlas_register(data):
         # figure's class is `atplate`. /countries paid for the same slip one
         # commit over: a declared role on the wrong element is a map with no
         # declared role.
+        # THE FRAME IS WIDER THAN THE WINDOW, WHICH IS WHAT MAKES A PAN
+        # POSSIBLE AT ALL. Translating the `<svg>` ELEMENT moves its crop
+        # with it and reveals the plate's bare background on the far side —
+        # measured at the first attempt as a hard vertical seam at x=1163,
+        # stone on one side and water on the other, running the full height
+        # of the plate: *two treatments meeting on a straight line*, which
+        # is the rendering fault this drawing already removed once at the
+        # 52 degree cut. So the viewBox carries PAN_MARGIN units of spare
+        # geography on each side and `slice` crops it back to exactly the
+        # window every other measurement here is about — `xMidYMid slice`
+        # on a 1.4 box shows 0 to 1120 to within half a unit — and the pan
+        # translates a group INSIDE that window, where the margin is what
+        # comes into view.
         f'<figure class="atplate">'
         f'<svg class="instrmap atlas" data-role="illustration" '
-        f'viewBox="0 0 {HERO_VIEW[2]:g} '
-        f'{HERO_VIEW[3]:g}" role="img" aria-labelledby="atplate-t">'
+        f'viewBox="{-PAN_MARGIN:g} 0 {HERO_VIEW[2] + 2 * PAN_MARGIN:g} '
+        f'{HERO_VIEW[3]:g}" preserveAspectRatio="xMidYMid slice" '
+        f'role="img" aria-labelledby="atplate-t">'
         f'<title id="atplate-t">Europe, with the countries this atlas writes '
         f'about named on their own ground. Every country is listed under the '
         f'nine corners beside this drawing.</title>'
+        f'<g class="atpan">'
         f'{clip}{ground}'
         f'<g class="lyr lyr-land" clip-path="url(#{cut})">{land}</g>'
         f'<g class="lyr lyr-labels">{names}</g>'
-        f'</svg></figure>')
+        f'</g></svg></figure>')
+
+    # WHERE EACH CORNER SITS ON THE DRAWING, DERIVED FROM THE DRAWING.
+    #
+    # `.atcue` promises *scroll to move through the continent* and for one
+    # commit the continent did not move: the lighting changed and the
+    # picture stood still, which is a caption claiming something the page
+    # does not do — the fault this repository records about a journey
+    # caption promising a note that had been removed.
+    #
+    # And it cost more than a promise. Measured in Chromium at 1440 with
+    # the eastern step lit: the panel's own wash begins at x=760 of a plate
+    # running 409 to 1296, so it covers the EASTERN HALF of the drawing at
+    # 90% paper, and the card itself sits over Ukraine's centre (989, 482)
+    # — `elementsFromPoint` returns `.atkick`. Four of the nine corners are
+    # eastern or south-eastern, so on nearly half the sequence the band lit
+    # ground a reader could not see. **A scrim that runs over the part of
+    # the drawing the band is about deletes the band's subject**, which is
+    # /plan's own finding one page over, where the answer was to stop the
+    # overlap rather than to tune the wash. Here the overlap is the
+    # composition, so what moves is the continent.
+    #
+    # THREE POSITIONS, NOT NINE OFFSETS. Nine translate values would be
+    # nine numbers typed into a stylesheet, wrong the day a country moves
+    # between corners — *a figure typed into prose is the figure that was
+    # true two hundred destinations ago*. So the build DERIVES which third
+    # of the drawn continent each corner's mass sits in and writes a
+    # classification; the stylesheet holds three rules. Authoring the
+    # vocabulary is allowed here and authoring the measurement is not.
+    #
+    # The span is the countries' own, rather than the canvas's: the frame
+    # is 1120 units and Europe does not fill it, so thirds of the CANVAS
+    # would put every corner in the middle one. And the mean is taken over
+    # the PATH the drawing actually emitted, so a corner cannot be placed
+    # by a geometry the reader is not looking at.
+    mid = {}
+    for mo in re.finditer(r'id="at-([a-z0-9-]+)"[^>]*\sd="([^"]+)"', land):
+        xs = [float(v) for v in re.findall(r"[ML](-?[\d.]+)", mo.group(2))]
+        if xs:
+            mid[mo.group(1)] = sum(xs) / len(xs)
+    corner_x = {}
+    for slug, mslug in macro_of.items():
+        if slug in mid:
+            corner_x.setdefault(mslug, []).append(mid[slug])
+    corner_x = {k: sum(v) / len(v) for k, v in corner_x.items() if v}
+    pan = {}
+    if corner_x:
+        lo, hi = min(corner_x.values()), max(corner_x.values())
+        third = (hi - lo) / 3.0 or 1.0
+        for k, v in corner_x.items():
+            pan[k] = "w" if v < lo + third else ("e" if v > hi - third else "c")
 
     blocks = []
     for m in sorted(data.get("macros", []), key=lambda x: macro_order[x["slug"]]):
@@ -7698,18 +7886,37 @@ def atlas_register(data):
         # WROTE. Inventing nine lines of travel copy here would be authoring
         # an editorial record, which is the one thing the Data Integrity Rule
         # forbids outright; the count beside it is derived.
+        # THE STEP IS THE TRACK AND THE CARD IS THE PANEL, which is why
+        # there are two elements where there was one. `.atcorner` is a
+        # measured step of the scroll — what gives the stage its length —
+        # and `.atcard` is what pins in the panel slot for the length of
+        # that step. One element cannot be both: a block that is the height
+        # of a step would put its text at the top of the step and drag it
+        # off the screen, and a block the height of its text gives the
+        # sequence no pace at all.
+        #
+        # AND THE BRIEF'S PANEL HAS A LABEL AND A TITLE WHERE THIS ATLAS
+        # HOLDS ONE NAME. Its prototype writes "The Nordics" over "The
+        # North" — two editorial strings per corner, eighteen in all, and
+        # authoring them here is authoring an editorial record, which is the
+        # one thing the Data Integrity Rule forbids outright. The name is
+        # the title and the KICKER is the corner's own extent, derived: a
+        # figure is the honest thing to put above a name this atlas already
+        # wrote.
         blocks.append(
             f'<section class="atcorner" data-corner="{esc(m["slug"])}" '
+            f'data-pan="{pan.get(m["slug"], "c")}" '
             f'aria-labelledby="atc-{esc(m["slug"])}">'
+            f'<div class="atcard">'
+            f'<p class="atkick"><span>{len(cs)}</span> countries</p>'
             f'<h3 id="atc-{esc(m["slug"])}"><a href="{urls.macro(m)}">'
-            f'{esc(m["name"])}</a>'
-            f'<span class="atcount">{len(cs)}</span></h3>'
+            f'{esc(m["name"])}</a></h3>'
             f'<p class="atsay">{esc(m.get("blurb") or "")}</p>'
             f'<p class="atlist">'
             + "".join(f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
                       for c in cs)
-            + "</p></section>")
-    return fig, "".join(blocks), drawn
+            + "</p></div></section>")
+    return fig, "".join(blocks), drawn, cut_names
 
 
 def country_mark(c, w=100, h=70):
@@ -12854,6 +13061,8 @@ MAP_W, MAP_H = 1000, 780
 # 50°E outward, so neither is inside (0, 0)-(1120, 800) at any latitude, and
 # no fade has to hide anything. Widening past this would put one back.
 HERO_VIEW = (0.0, 0.0, 1120.0, 800.0)
+PAN_MARGIN = 170.0
+PAN_VIEW = (-PAN_MARGIN, 0.0, HERO_VIEW[2] + 2 * PAN_MARGIN, float(HERO_VIEW[3]))
 LON0, LON1, LAT0, LAT1 = -25.0, 45.0, 33.0, 71.5
 
 

@@ -11383,11 +11383,114 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    wallpaper — the refusal `docs/signature-moments.md` asks question 2
    for. What frames this is what a reveal draws at a cut: the map's own
    border ink, on a rectangle, which is what an atlas plate is. */
-.atstage { display: grid; gap: var(--s7);
-           grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); }
-.atwin { grid-column: 2; position: sticky; align-self: start;
-         top: calc(var(--mast) + var(--s5)); }
-.atread { grid-column: 1; grid-row: 1; }
+/* THE STAGE IS THE VIEWPORT AND ONE PANEL CROSSES IT. The first
+   composition was a sticky SIDEBAR — a two-column grid with the drawing
+   held in the right track and nine blocks scrolling up the left — which
+   moves the headline, the extent and the reading all at once. The brief
+   pins the whole stage: the drawing, the head, the six figures, the cue
+   and the rail stay exactly where they are for the length of the section,
+   and the only thing that moves is the corner you are reading. That is
+   what makes it a window rather than a panel with a map in it.
+
+   THE TRACK IS THE NINE STEPS AND THE STAGE IS PULLED OVER THEM. `.atread`
+   is in normal flow, so its height IS the section's scroll length; the
+   negative margin lays it back over the stage it scrolls across. A height
+   typed on `.atlas` would be a second statement of how many corners there
+   are, and this page has nine because `data/taxonomy.json` says so.
+
+   NO `position: fixed` ANYWHERE. Sticky is bounded by its own parent and
+   needs no clip, where fixed is resolved against the viewport and is
+   killed silently by `transform`, `filter`, `backdrop-filter`,
+   `perspective`, `will-change` or `contain` on any ancestor — six
+   properties this stylesheet already carries three of. The window plate
+   pays for a `clip-path` to make fixed work and a browser check to prove
+   it; this needs neither. */
+.atlas { position: relative; }
+.atstage { position: sticky; top: 0; height: 100svh; }
+/* The plate keeps its 1120x800 rather than filling the box, because an SVG
+   with no `preserveAspectRatio` letterboxes inside a wider container and
+   the padding reads as more sea — the `.card-art` finding, measured twice
+   in this file. Height-led and centred: the drawing is as large as the
+   stage allows and never a different shape. */
+.atwin { position: absolute; inset: 5svh 0 5svh 23%;
+         display: grid; place-items: center; }
+/* CAPPED ON BOTH AXES, because `height: 100%` with an aspect ratio sets
+   the WIDTH and the box does not stop it: the continent ran off the right
+   edge of the stage at 1440. `width: 100%` with the ratio and a
+   `max-height` lets whichever axis binds first do the binding. */
+.atwin .atplate { width: 100%; height: auto; max-height: 100%;
+                  max-width: 100%; }
+/* THE EDITORIAL COLUMN IS INSIDE THE STAGE, which is the half of the
+   brief's composition this band did not have at all. It was a full-width
+   `.atopen` above the stage, so the head scrolled away before the first
+   corner arrived and the reader met the nine with nothing above them. */
+.atlead { position: absolute; left: 0; top: 7svh; z-index: 3;
+          width: min(29%, 25rem); }
+.atlead .mega { margin: var(--s3) 0 0; }
+.ateyebrow { margin: 0; font-size: var(--t-xs); font-family: var(--text);
+             letter-spacing: .24em; text-transform: uppercase;
+             color: var(--door-dark); }
+.atintro { font-family: var(--display); font-size: var(--t-md);
+           margin: var(--s4) 0 0; max-width: 22ch; }
+.atlead .golink { margin-top: var(--s4); }
+/* SIX FIGURES, TWO ACROSS, AND THEY ARE THE PAGE'S OWN EXTENT. A `<dl>`
+   because each one is a term and its figure; the figure is the `<dt>`
+   because it is what is read first, and a definition list does not care
+   which way round the type is. */
+.atstats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+           gap: var(--s3) var(--s5); margin: var(--s6) 0 0;
+           padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.atstats dt { font-family: var(--display); font-size: var(--t-xl);
+              line-height: 1; color: var(--ink);
+              font-variant-numeric: tabular-nums; }
+.atstats dd { margin: .3em 0 0; font-size: var(--t-xs);
+              letter-spacing: .18em; text-transform: uppercase;
+              color: var(--ink-3); }
+.atcue { position: absolute; left: 0; bottom: 5svh; margin: 0;
+         font-size: var(--t-xs); letter-spacing: .18em;
+         text-transform: uppercase; color: var(--ink-3); }
+/* THE RAIL IS THE ONE MARK ON THIS BAND THAT IS PURE ART DIRECTION, and it
+   is `aria-hidden` for that reason: rotated uppercase down the edge is a
+   texture rather than a sentence, and a screen reader reading "Europe
+   through the door" out of sequence between a map and a list of countries
+   is noise. Nothing else on the page depends on it. */
+.atrail { position: absolute; right: 0; top: 7svh; margin: 0;
+          writing-mode: vertical-rl; transform: rotate(180deg);
+          font-size: var(--t-xs); letter-spacing: .22em;
+          text-transform: uppercase; color: var(--ink-3); }
+/* THE PANEL GETS GROUND AND IT IS A SCRIM, NOT A CARD. Type over a
+   drawing needs the ratio to be a property of the design rather than of
+   whatever country happens to be under it — the rule this stylesheet
+   states about every photograph it carries — and a filled, bordered,
+   rounded box would say "separate object, placed here by a system" about
+   the one thing on this band that is the reading. A one-directional wash
+   off the right edge of the stage, ending before the middle, so the
+   continent stays luminous where there is no text on it. */
+/* AND IT IS NARROWED TO WHAT IT PROTECTS. The first version ran
+   `min(34%, 27rem)` from the right edge and reached 90% paper at 72% of
+   that — measured, x=760 of a plate spanning 409 to 1296, so it washed the
+   whole eastern half of the continent to near-paper. Its stated job is the
+   ratio under the panel, and the panel is `min(31%, 24rem)`: ink on
+   `--map-land` already measures 12.5:1 and on `--map-water` 14:1, so the
+   wash is doing separation rather than legibility and 62% is enough for
+   that. Sized from the panel's own width so the two cannot drift. */
+.atstage::after { content: ""; position: absolute; z-index: 3;
+                  inset: 0 0 0 auto; width: min(36%, 28rem);
+                  pointer-events: none;
+                  background: linear-gradient(90deg, transparent,
+                    color-mix(in srgb, var(--paper) 62%, transparent) 84%); }
+.atread { position: relative; z-index: 4; margin-top: -100svh;
+          margin-left: auto; width: min(31%, 24rem); }
+/* ONE CORNER AT A TIME, AND ONLY WHERE SOMETHING IS CHOOSING ONE. Nine
+   cards 40svh apart put three on a 900-pixel screen at once, each over a
+   different part of the continent, which is a list of nine panels rather
+   than the one panel the brief composes. Scoped to `[data-live]` because
+   the alternative — eight invisible blocks in a document nothing is
+   driving — is the *present, placed, sized and unseeable* fault this
+   stylesheet records five times. */
+.atlas[data-live] .atcard { transition: opacity .45s ease; }
+.atlas[data-live] .atcorner:not([data-on]) .atcard {
+  opacity: 0; pointer-events: none; }
 /* A PLATE THAT IS NOT ITS DRAWING'S PROPORTION IS A LETTERBOX, and this
    repository has measured that twice: `.card-art` is 16/9 because that is a
    PHOTOGRAPH's proportion and every drawing put inside one is 1.282, so a
@@ -11398,7 +11501,13 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    screen is a window a reader cannot see the whole of. */
 .atplate { margin: 0; position: relative; aspect-ratio: 1120 / 800;
            max-height: calc(100svh - var(--mast) - var(--s7));
-           background: var(--paper-2);
+           /* WATER. The ground was `--paper-2` — the page's own paper —
+              so the Adriatic, the Aegean and the Baltic were the same tone
+              as the margin and a bay read as a hole in the land. That is
+              this stylesheet's own recorded finding about the body glyph
+              family, which got `--map-water` at the cartography split
+              while this figure never did. */
+           background: var(--map-water);
            outline: 1px solid var(--map-border); outline-offset: 0; }
 /* THE REVEAL, WHICH IS THE WHOLE OF THE ARCHITECTURE HERE. One hairline
    says "a border"; the wall's face and a fine line just inside it say "two
@@ -11410,6 +11519,28 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                   pointer-events: none;
                   border: 1px solid color-mix(in srgb, var(--map-border) 38%, transparent); }
 .atplate svg { display: block; width: 100%; height: 100%; }
+/* THE CONTINENT MOVES, AND THREE POSITIONS CARRY IT.
+   `.atcue` says *scroll to move through the continent*, and for one commit
+   it did not: only the lighting changed. Measured in Chromium at 1440 with
+   the eastern step lit, the panel's wash starts at x=760 of a plate running
+   409 to 1296 and the card's own words sit over Ukraine's centre — so four
+   of the nine corners lit ground a reader could not see. A scrim over the
+   part of the drawing a band is ABOUT deletes that band's subject, which is
+   /plan's finding one page over; there the overlap went, and here the
+   overlap IS the composition, so the picture pans instead.
+   The value is a CLASSIFICATION the build derives from the mean of the
+   paths it emitted — which third of the drawn continent that corner's mass
+   sits in — rather than nine offsets typed here, because nine numbers in a
+   stylesheet are nine numbers wrong the day a country changes corner.
+   `overflow` on the plate rather than a wrapper, because the plate is
+   already the frame: what the pan reveals on the far side is the plate's
+   own `--map-water`, which is open sea and says so. */
+.atpan { transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
+.atstage[data-pan="w"] .atpan { transform: translateX(105px); }
+.atstage[data-pan="e"] .atpan { transform: translateX(-140px); }
+@media (prefers-reduced-motion: reduce) {
+  .atpan { transition: none; }
+}
 .atplate .lyr-land path { fill: var(--map-land);
                           stroke: var(--map-border); stroke-width: .6;
                           vector-effect: non-scaling-stroke; }
@@ -11438,6 +11569,24 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    reading about would be a different Europe on every screen — which is the
    same argument `/discover` settled about an unlit destination taking the
    land's own tone rather than vanishing. */
+/* THE GROUND LIGHTS, NOT ONLY THE NAME. `--atlas-here` is the token that
+   exists for a lit country and has been the fill on all fifty portraits
+   and the nine macro maps since the cartography split; this figure is the
+   third drawing on the site that names a corner and the first that had it
+   light nothing. The unlit countries keep the LAND's own tone rather than
+   dimming — a map that faded its unlit places would be a different Europe
+   on every step, which is the argument `/discover` settled about an unlit
+   destination. */
+.atstage[data-at="nordic"] .lyr-land path.atc-nordic,
+.atstage[data-at="baltic"] .lyr-land path.atc-baltic,
+.atstage[data-at="british-isles"] .lyr-land path.atc-british-isles,
+.atstage[data-at="western"] .lyr-land path.atc-western,
+.atstage[data-at="alpine-central"] .lyr-land path.atc-alpine-central,
+.atstage[data-at="mediterranean"] .lyr-land path.atc-mediterranean,
+.atstage[data-at="adriatic-balkans"] .lyr-land path.atc-adriatic-balkans,
+.atstage[data-at="eastern"] .lyr-land path.atc-eastern,
+.atstage[data-at="caucasus-bosphorus"] .lyr-land path.atc-caucasus-bosphorus {
+  fill: var(--atlas-here); }
 .atstage[data-at] .atname { opacity: .34; }
 .atstage[data-at="nordic"] .atdoor[data-corner="nordic"] .atname,
 .atstage[data-at="baltic"] .atdoor[data-corner="baltic"] .atname,
@@ -11449,12 +11598,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .atstage[data-at="eastern"] .atdoor[data-corner="eastern"] .atname,
 .atstage[data-at="caucasus-bosphorus"] .atdoor[data-corner="caucasus-bosphorus"] .atname {
   opacity: 1; fill: var(--pine-ink); }
-/* THE OPENING IS THE BAND'S OWN HEAD AND TAKES THE WHOLE COLUMN. Inside
-   the reading rail it set on three lines at 416 pixels — a headline in a
-   rail is a rail's headline, and this is the band the brief asks to be one
-   of the largest typographic moments on the page. */
-.atopen { padding-bottom: var(--s7); max-width: var(--page); }
-.atopen .mega { max-width: 18ch; }
 /* A SCROLL STATE IS A STEP RATHER THAN A BAND. Nine stacked blocks at
    their own content height made this section 3,683 pixels — four screens of
    homepage for a band whose brief asks for two and a bit. Each corner is a
@@ -11463,18 +11606,40 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    nine and a number rather than of nine paragraphs of different lengths.
    20svh, which is 180svh over the nine and inside the 180-240 the brief
    asks for once the head and the resolution are added. */
-.atcorner { min-height: 20svh; display: grid; align-content: center;
-            padding: var(--s5) 0; border-top: 1px solid var(--rule); }
-.atcorner h3 { display: flex; align-items: baseline; gap: .6em;
-               font-size: var(--t-xs); font-family: var(--text);
-               letter-spacing: .08em; text-transform: uppercase;
-               color: var(--door-dark); margin: 0 0 var(--s3); }
+/* A STEP OF THE TRACK, AND ITS HEIGHT IS THE PACE OF THE SECTION. Nine
+   steps at 34svh is a section about three screens long, which is what the
+   brief's own prototype spends (2,500px against a 700px viewport) and
+   nothing like the nine viewport-heights the obvious reading of a
+   scroll-driven stage produces. The step carries no rule and no padding of
+   its own: it is scroll distance, and everything a reader sees is on the
+   card inside it. */
+.atcorner { min-height: 40svh; }
+/* THE CARD IS THE PANEL, PINNED FOR THE LENGTH OF ITS OWN STEP. Sticky
+   inside the step means it arrives, holds in the slot while its step is
+   crossed, and leaves as the next one arrives — which is exactly what the
+   prototype's `show(key)` does to one panel from a scroll handler, and it
+   happens here with no JavaScript on the page at all. */
+.atcard { position: sticky; top: 34svh; padding-top: var(--s4); }
+/* The brief's 42-pixel accent rule above the kicker, as a pseudo-element
+   rather than the prototype's `<div class="rule">`: it is a mark and not
+   content, and this page has nine of them. */
+.atcard::before { content: ""; display: block; width: 2.6rem; height: 2px;
+                  background: var(--door); margin-bottom: var(--s3); }
+.atkick { margin: 0; font-size: var(--t-xs); letter-spacing: .18em;
+          text-transform: uppercase; color: var(--door-dark); }
+.atkick span { font-variant-numeric: tabular-nums; }
+/* `.96`, WHICH IS THE VALUE THIS FILE HAS FOR A TIGHT DISPLAY LINE. The
+   first version of this rule wrote 1.02 — the eighth line-height the
+   register caught and this stylesheet removed TWO COMMITS AGO, from
+   `.atsum`, six rules down. A rule recorded is not a rule inherited, and
+   the guard is what noticed both times. */
+.atcorner h3 { font-family: var(--display); font-size: var(--ed-display-3);
+               line-height: .96; letter-spacing: -.02em;
+               color: var(--ink); margin: var(--s2) 0 var(--s3); }
 .atcorner h3 a { text-decoration: none; }
 .atcorner h3 a:hover { text-decoration: underline; text-underline-offset: .2em; }
-.atcount { margin-left: auto; font-variant-numeric: tabular-nums;
-           color: var(--ink-3); }
 .atsay { font-family: var(--display); font-size: var(--t-md);
-         max-width: 30rem; margin: 0 0 var(--s4); }
+         max-width: 30rem; margin: 0 0 var(--s4); color: var(--ink-2); }
 /* A LIST OF NAMES IS NOT PROSE AND MUST NOT TAKE A MEASURE, which this
    stylesheet records about a middot list of place names broken at 544px
    inside a 948px column. `max-width: none` is a declaration rather than the
@@ -11518,12 +11683,56 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    four and a half pixels, which is not small type but type that does not
    resolve into glyphs. Every country is a link in the register under it. */
 @media (max-width: 62rem) {
-  .atstage { grid-template-columns: minmax(0, 1fr); }
-  .atwin { grid-column: 1; grid-row: 1; height: min(46svh, 22rem);
+  /* THE STAGE IS UNDONE RATHER THAN SHRUNK. A pinned viewport with a
+     drawing, a head, six figures and a panel over it needs two dimensions
+     of room and a narrow screen has one, so below this width the section
+     is what it has always been underneath: the drawing, then the head,
+     then the nine as a list. Every absolute position, the negative margin
+     and both sticky boxes come off together — a half-undone stage is a
+     panel pinned over nothing. */
+  .atlas { position: static; }
+  .atstage { position: static; height: auto; display: grid;
+             grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
+  .atwin { position: sticky; inset: auto; height: min(46svh, 22rem);
            top: calc(var(--mast) + var(--s3));
-           margin-bottom: var(--s6); z-index: 2;
+           margin-bottom: var(--s5); z-index: 2;
            background: var(--paper); }
-  .atread { grid-column: 1; grid-row: 2; }
+  /* AND THE PLATE IS CAPPED BY THE BOX RATHER THAN BY ITS HEIGHT. A
+     `height: 100%` on a 1.4 ratio sets the WIDTH to 1.4 screens and the
+     continent ran off the right edge at 390 — the same arithmetic that put
+     it off the right of the stage at 1440, made twice in one commit. */
+  .atwin .atplate { margin-inline: auto; }
+  /* THE LEAD DROPS ITS STACKING ORDER WITH ITS POSITION. It sits above the
+     window on the desk because it is beside it; on a phone it scrolls
+     UNDER a pinned map, and a z-index left behind drew the headline
+     straight through the continent. */
+  .atlead { position: static; width: auto; z-index: auto; }
+  .atcue, .atrail { display: none; }
+  .atstats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .atstage::after { display: none; }
+  /* AND THE PAN GOES WITH THE STAGE. It exists because the panel sits ON
+     the drawing and covers the corner being lit; below this width the
+     stage is undone, the map is a sticky band and the cards are a column
+     under it, so nothing is over the continent and a pan would only crop
+     it — a repair applied where its reason has expired, which this
+     stylesheet already records about a glyph rule that outlived the
+     132-pixel drawing it was written for. */
+  .atstage[data-pan] .atpan { transform: none; }
+  .atread { margin: 0; width: auto; }
+  .atcorner { min-height: 0; padding-top: var(--s5); }
+  .atcard { position: static; padding-top: 0; }
+  /* AND THE ONE-CARD RULE COMES OFF WITH THE STAGE, which the first run
+     shipped without and the phone showed in one look: with the composition
+     flowing, hiding every card but the current one leaves EIGHT HOLES down
+     the page and one corner visible. The rule is scoped to a live stage
+     and the stage is not live here — *a half-undone stage is a panel
+     pinned over nothing*, written one block up about position and true of
+     visibility in exactly the same way. */
+  .atlas[data-live] .atcorner .atcard { opacity: 1; pointer-events: auto;
+                                        transition: none; }
+}
+@media (max-width: 44rem) {
+  .atstats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 44rem) {
   .atplate .lyr-labels { display: none; }

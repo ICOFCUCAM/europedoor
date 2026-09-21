@@ -1996,3 +1996,84 @@ Two more the run caught: the role was declared on the `<figure>` where
 `c_map_roles` reads the `<svg>`, which is the slip /countries already paid
 for; and `.atsum` carried an eighth `line-height`, a hundredth from two the
 file already had.
+
+---
+
+## Plate 05 — the drawing answers the reading, and the line came back as a fill
+
+The register lit the NAME and left the shape alone: the panel said Western
+Europe, the word FRANCE went to ink, and France itself stayed exactly the
+stone every other country was. The continent is the subject of this band, and
+a continent that does not move is a caption with a picture beside it. Every
+country carries its corner now — `geo.landmass`'s own `bands` hook — so nine
+rules light nine corners rather than fifty naming fifty countries.
+
+| | |
+|---|---|
+| the water | the plate's ground was `--paper-2`, the page's own paper, so the Adriatic, the Aegean and the Baltic were the same tone as the margin and a bay read as a hole in the land. `--map-water`, which the body glyph family got at the cartography split and this figure never did |
+| the lit ground | `--atlas-here` against `--map-land`, which is the step the fifty country portraits already ship and the register the arithmetic of |
+| the line | lighting a country whose ring ends on our bbox drew the bbox |
+
+### The line
+
+Two commits, two mechanisms, one diagonal.
+
+| | what drew it | why it was invisible before |
+|---|---|---|
+| ink | `.lyr-land path` strokes every ring edge, and Russia's ring has one edge that is a meridian | nothing — it was plain, and it was fixed by clipping the land group two units short of the cut |
+| fill | the corner light made Russia `--atlas-here` where the ground beyond stayed `--map-land` | the fill had matched on both sides of the cut since the ground beyond was drawn in the same stone |
+
+A cut country is context: shape, frontier, name and link, and no light.
+Derived from `europe-lod1.json`'s own rings against its own bbox — one named
+country reaches 52.0°E, and Azerbaijan, the next furthest east, stops at 50.6
+— so the exclusion lifts itself if the dataset ever reaches the Urals. The
+resolve band names it, because /countries already settled that a set shown
+short says so.
+
+### The panel was standing on the answer
+
+Measured in Chromium at 1440 with the eastern step lit:
+
+| | |
+|---|---|
+| plate | x 409 → 1296 |
+| the panel's wash begins | x 760 — the eastern **half** of the drawing, at 90% paper |
+| the card's own words | over Ukraine's centre (989, 482); `elementsFromPoint` → `.atkick` |
+| corners east or south-east | 4 of 9 |
+
+So on nearly half the sequence the band lit ground a reader could not see.
+/plan's answer to a scrim over the thing it covers was to stop the overlap;
+here the overlap is the composition the brief supplies, so the continent pans.
+`.atcue` had been saying *scroll to move through the continent* while the
+picture stood still, which is a caption claiming something the page does not
+do.
+
+| | before | after |
+|---|---|---|
+| Ukraine at the eastern step | 913 → 1066, under `.atcard` | 802 → 955, under its own lit path |
+| the scrim | `min(34%, 27rem)`, 90% paper at 72% | `min(36%, 28rem)`, 62% at 84% |
+
+Ink on `--map-land` measures 12.5:1 and on `--map-water` 14:1, so the wash was
+never doing legibility; 62% is what separation costs.
+
+### Three positions, derived
+
+`data-pan` is a classification the build writes on each step from the mean of
+the paths it emitted for that corner's countries — which third of the drawn
+span the mass sits in. Four west, three centre, two east. `atlas.js` copies
+one attribute to the stage; the stylesheet holds three rules and no geography.
+
+### And the pan revealed the frame
+
+Translating the `<svg>` element moves its crop with it, so the plate's own
+`--map-water` showed on the far side as a hard vertical seam at x=1163 — stone
+one side, water the other, the full height of the plate. The frame is 1120×800
+and the geometry fills it exactly. `PAN_MARGIN` is 170 units of spare
+geography each side, `xMidYMid slice` crops the wider viewBox back to 0–1120
+to within half a unit, and the pan translates a group inside it. **The
+geometry is generated over the panned frame too** — `landmass` clips to the
+view it is given, so widening only the viewBox moves the seam a hundred units
+out instead of removing it. `weight.home_kb` 174 → 179.
+
+Below 62rem the pan is undone with the stage: nothing is over the continent
+there, so a pan would only crop it.

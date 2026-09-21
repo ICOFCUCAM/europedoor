@@ -7000,6 +7000,73 @@ rule on its word put an underline back under two homepage story links.
 Verified the way this repository requires: plate 05 shot at 1280 and 390
 before and after, byte-identical at both.
 
+
+**THE LINE THROUGH RUSSIA CAME BACK AS A FILL ONE COMMIT AFTER IT WENT AS AN
+INK.** The frontier ink was clipped two units short of the 52 degree meridian
+because `.lyr-land path` strokes every edge a country ring has and Russia's
+ring has one edge that is not a frontier. The FILL was safe at the time and
+only at the time: the ground beyond the cut is the same stone, so there was no
+step to see. Then the register was made to ANSWER the reading — every country
+carries its corner's class, so scrolling to Eastern Europe lights the *shapes*
+of Belarus, Moldova, Russia and Ukraine and not just the words — and lighting
+Russia made its fill `--atlas-here` where the ground east of the cut stayed
+`--map-land`. The diagonal from the White Sea to the north Caspian was back,
+as a tone step instead of a stroke, in the commit that improved the drawing.
+**The same defect arrived at from the other side**, which this file already
+records of a fade, a shore band and a scrim.
+
+**A COUNTRY WHOSE RING ENDS ON OUR BBOX CANNOT BE LIT WITHOUT DRAWING THE
+BBOX.** So a cut country is CONTEXT on this band: it keeps its shape, its
+frontier, its name and its link, and it is not lit. Derived from the
+document's own rings against the document's own bbox — one named country
+reaches 52.0°E and Azerbaijan, the next furthest, stops at 50.6 — so a dataset
+that one day reaches the Urals stops excluding Russia without anybody editing
+a list. And the resolve band NAMES it, because /countries already settled that
+a set shown short says so rather than quietly showing 41 of 50.
+
+**THE PANEL WAS DELETING THE THING IT DESCRIBES, AND `.atcue` WAS PROMISING A
+MOVEMENT THE PAGE DID NOT MAKE.** Measured in Chromium at 1440 on the eastern
+step: the panel's wash begins at x=760 of a plate running 409 to 1296 — the
+whole eastern half at 90% paper — and the card's own words sit over Ukraine's
+centre at (989, 482), `elementsFromPoint` returning `.atkick`. Four of the
+nine corners are eastern or south-eastern, so on nearly half the sequence the
+band lit ground a reader could not see. **A scrim that runs over the part of
+the drawing a band is ABOUT deletes that band's subject** — /plan's finding one
+page over, where the answer was to stop the overlap. Here the overlap IS the
+composition the brief supplies, so the continent pans instead, which is also
+what *Scroll to move through the continent* had been claiming while the
+picture stood still. Ukraine 913–1066 becomes 802–955 and the topmost element
+at its centre becomes its own lit path.
+
+**THREE POSITIONS, NOT NINE OFFSETS.** Nine translate values would be nine
+numbers typed into a stylesheet, wrong the day a country changes corner. The
+build derives which third of the DRAWN span each corner's mass sits in — the
+mean of the paths it actually emitted, so a corner cannot be placed by a
+geometry the reader is not looking at — writes `data-pan` on the step, and
+`atlas.js` copies one attribute to the stage. Four west, three centre, two
+east. Authoring the vocabulary is allowed here and authoring the measurement
+is not.
+
+**AND A PAN ON A FRAME-FILLING DRAWING REVEALS THE FRAME.** Translating the
+`<svg>` ELEMENT moves its crop with it, so the plate's own `--map-water`
+showed on the far side as a hard vertical seam — measured at x=1163, stone one
+side and water the other, the full height of the plate. The frame is 1120×800
+and the geometry fills it exactly, so there is no margin to pan into. The
+viewBox carries `PAN_MARGIN` units of spare geography each side now and
+`xMidYMid slice` crops it back to 0–1120 to within half a unit, which is the
+window every other measurement on this plate is about; the pan translates a
+group INSIDE that window, where the margin is what comes into view. The
+geometry has to be GENERATED over the wider frame as well — `landmass` clips
+to the view it is given, so generating over `HERO_VIEW` and drawing inside a
+wider viewBox moves the seam a hundred units out rather than removing it.
+`weight.home_kb` 174 → 179, recorded.
+
+**AND THE PAN IS UNDONE WHERE ITS REASON EXPIRES.** Below 62rem the stage is
+undone, the map is a sticky band and the cards are a column under it, so
+nothing is over the continent and a pan would only crop it — *a rule's reason
+can stop being true when the drawing changes*, which this stylesheet records
+about a glyph rule that outlived the 132-pixel drawing it was written for.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
