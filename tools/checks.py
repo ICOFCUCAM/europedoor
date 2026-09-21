@@ -4248,16 +4248,33 @@ def c_design_assets():
             if stem not in html:
                 continue
             n += 1
+            # THE BAND IT IS IN, NOT A WINDOW OF CHARACTERS AROUND IT.
+            # This read 1,200 characters either side, which is a proxy for
+            # "the same surface" — and the proxy broke the moment the plate
+            # ABOVE this one gained a credit line of its own: the hero's six
+            # country photographs are licensed and their credit names six
+            # photographers, none of whom shot the design asset one band
+            # down. The check was right that something new had happened and
+            # wrong about what, which is the shape this repository already
+            # records about an outbound link and a subresource load.
+            #
+            # A `<section>` is what a band IS here, so slicing to the
+            # enclosing one is the claim itself rather than a stand-in for
+            # it — and it is STRICTER as well as more accurate, because a
+            # long band is no longer partly out of reach.
             i = html.index(stem)
-            near = html[max(0, i - 1200):i + 1200]
+            start = html.rfind("<section", 0, i)
+            end = html.find("</section>", i)
+            near = html[start if start >= 0 else 0:
+                        end + 10 if end >= 0 else len(html)]
             for word in ("Photograph ", "Photo by", "class=\"credit\"",
                          "pexels.com", "licence", "Licence"):
                 if word in near:
-                    fail(f"{rel(f)}: the design asset {key} is rendered with "
-                         f"{word!r} within 1,200 characters of it. A design "
-                         f"asset shows a reader nothing about where it came "
-                         f"from — provenance belongs to the production "
-                         f"photograph, behind the gate")
+                    fail(f"{rel(f)}: the design asset {key} is rendered in a "
+                         f"band that also carries {word!r}. A design asset "
+                         f"shows a reader nothing about where it came from — "
+                         f"provenance belongs to the production photograph, "
+                         f"behind the gate")
                     break
     return n
 
@@ -8763,6 +8780,67 @@ def c_go_further():
         if doc["disclosure"] not in h:
             fail(f"{where}: carries the ecosystem column without its one "
                  f"hoisted disclosure")
+        n += 1
+    return n
+
+
+@check("a licensed photograph carries its credit however it is drawn")
+def c_svg_image_credit():
+    """The hero drew 41 Pexels photographs with no attribution at all.
+
+    `picture()` is the one function that knows whether the register holds a
+    photograph for a key, and it emits the two links Pexels' terms require
+    as part of the same markup — so every `<img>` on this site carries its
+    credit by construction. The hero does not use it: it writes SVG
+    `<image>` elements straight into the drawing, because the picture is
+    clipped to a country's own geometry and a `<picture>` cannot be. That
+    is the same shape as the runtime `<img>` this repository already
+    records as invisible to the guard that refuses an unregistered file,
+    arriving through a renderer rather than through a script.
+
+    NOTHING COULD SEE IT. Every one of those 41 had a register row, so
+    `c_photo_published` was satisfied; the rows were complete, so the
+    provenance checks were satisfied; and the credit is a property of a
+    function the hero never called. The defect was a LICENCE obligation —
+    somebody else's terms — on the most-visited page on the site.
+
+    So the promise is stated where it can be tested on the shipped HTML: a
+    page that draws a registered photograph as an SVG `<image>` must also
+    name a photographer and link to the provider. It counts pages rather
+    than images, because a check reporting `(0)` looks exactly like the two
+    this repository found examining nothing.
+    """
+    reg = json.load(open(os.path.join(ROOT, "data", "images.json"),
+                         encoding="utf-8"))
+    rows = reg.get("images", reg) if isinstance(reg, dict) else {}
+    # The derivative stems a registered photograph can be served under.
+    stems = set()
+    for key, row in rows.items():
+        if not isinstance(row, dict):
+            continue
+        f = row.get("file") or ""
+        base = os.path.basename(f).split(".")[0]
+        if base:
+            stems.add(base)
+    if not stems:
+        return 0
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        if "<image " not in h:
+            continue
+        hrefs = re.findall(r'<image [^>]*?href="([^"]+)"', h)
+        drawn = [u for u in hrefs
+                 if any(st in os.path.basename(u) for st in stems)]
+        if not drawn:
+            continue
+        where = os.path.relpath(f, OUT)
+        if "pexels.com" not in h and "Photograph" not in h:
+            fail(f"{where}: draws {len(drawn)} registered photograph(s) as an "
+                 f"SVG <image> and names no photographer and no provider. "
+                 f"picture() emits the credit and an <image> does not go "
+                 f"through it — the register row is not the obligation, the "
+                 f"credit on the page is")
         n += 1
     return n
 

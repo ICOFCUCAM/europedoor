@@ -1371,3 +1371,100 @@ were shot at 1280 and 390 on two families: **six of six byte-identical**.
 no `'unsafe-inline'` and refused the injected `<style>`, which is the policy
 working; `insertRule` writes into the stylesheet already loaded from this
 origin and is not an inline style.
+
+## Home 24 — the hero drew forty-one photographs and could show six
+
+`living_atlas`'s own comment states the measurement: *"a photograph clipped
+into Belgium renders about 40 pixels wide at 1280 and is a smudge with a
+coastline"* — and it was the reason the cast was six. Forty lines later a
+second comment overrides it: *"every country that has a photograph is an
+aperture, and all fifty do"*, and all 41 went in. **The code stopped
+matching its own comment, two comments apart in one function.**
+
+Measured on the shipped page at 1280, where the drawing is 671px across a
+1,120-unit frame:
+
+| | |
+|---|---|
+| Portugal 158.6 · Türkiye 153.5 · Norway 145.0 | pictures |
+| Spain 97.9 · France 95.6 · Italy 90.7 | pictures |
+| Greece 75.3 · Germany 58.3 · Sweden 54.5 | smudges |
+| **Belgium 24.0** · Kosovo 12.8 · **Luxembourg 4.8** | pixels |
+
+**Belgium is 24 pixels, not the 40 its own comment claims** — and 18 of the
+41 were under that 40, with a median of **42**. At 390 the median was 22 and
+34 of 41 were under 40.
+
+**Zoomed 2× it is not a map.** Adjacent photographed countries in different
+tones read as a torn collage: the edges you can trace are a picture's edge
+rather than a border, and where two photographs happen to be similar the
+frontier vanishes. **And the lighting is inverted against the meaning** —
+the countries with no photograph are the palest, brightest things in the
+frame, so the eye reads the ones we have nothing of as the lit ones.
+
+**THE FLOOR IS THE BREAK IN THE DISTRIBUTION RATHER THAN A NUMBER PICKED BY
+EYE.** 90.7 to 75.3 is a 17% step, the largest relative gap anywhere in the
+top half of that list, and it falls exactly where looking says the picture
+stops being one. `HERO_SHOT_MIN_UNITS` is 150 units — 89.9px at 1280 — so it
+is a statement about the drawing rather than about one viewport.
+
+| | before | after |
+|---|---|---|
+| photographs drawn | 41 | **6** |
+| median drawn width at 1280 | 42px | **145px** |
+| under 40px | 18 | **0** |
+| under 80px | 35 | **0** |
+| median at 390 | 22px | **77px** |
+| homepage | 145.6 KB | **135.0 KB** |
+
+And **35 image fetches came off the most-visited page** — the invariant
+register already recorded that the page asks for its country photographs at
+the ladder's 480 step, about 950 KB, *"and most of these countries render
+under 150px"*. Six do not.
+
+**SIX IS NOT "SIX THAT MATTER AND FORTY-FOUR THAT DO NOT"**, which is the
+reading the override was written against. It is /countries' own rule — 41 of
+50 can be a door and nine cannot, six for want of a polygon and three for an
+advisory — applied to a frame where the whole continent is 1,120 units
+instead of one country. Every other country keeps its shape, its frontier,
+its name and its link, in the atlas's own stone.
+
+### And the hero had been drawing licensed photographs with no credit at all
+
+`_lzpanel` was the literal empty string. It is where the living atlas's
+credit used to live; the panel went when the rotator was costed and refused,
+**and the photographs it credited stayed on the drawing**. So the most-visited
+page on this site drew 41 licensed Pexels photographs and named no
+photographer and no provider, for the life of the living atlas. That is
+*removing a claim leaves surfaces pointing at it* the other way round — a
+surface removed, and the thing it made a claim about left behind. It is a
+breach of somebody else's terms rather than a defect of taste.
+
+**NOTHING HERE COULD SEE IT.** Every one of those 41 had a register row, so
+`c_photo_published` was satisfied; the rows were complete, so every
+provenance check was satisfied; and the credit is a property of `picture()`,
+which the hero never calls — it writes SVG `<image>` straight into the
+drawing, because a picture clipped to a country's own geometry cannot be a
+`<picture>`. **That is the runtime-`<img>` finding arriving through a
+renderer instead of a script.**
+
+`c_svg_image_credit` is the guard: a page that draws a registered photograph
+as an SVG `<image>` must also name a photographer and link to the provider.
+It counts PAGES, because a check reporting `(0)` looks exactly like the two
+this repository found examining nothing. Proved red by removing the line.
+The credit itself is `photo_credits`, the one implementation, so it cannot
+say *Photographs* over one picture or name a photographer twice — and the
+`.lzcred` rule was still in the stylesheet, written for this line, waiting
+for markup that had been deleted.
+
+**And the design-asset check went red on a proximity heuristic that had just
+broken.** It read 1,200 characters either side of the asset's own filename,
+which is a proxy for *the same surface* — and the plate ABOVE the window
+gained a credit line of its own, naming six photographers none of whom shot
+the design asset one band down. Right that something new had happened, wrong
+about what, which is the shape already recorded here about an outbound link
+and a subresource load. A `<section>` is what a band IS on this site, so the
+test slices to the enclosing one: the claim itself rather than a stand-in
+for it, and **stricter as well as more accurate**, because a band longer than
+1,200 characters is no longer partly out of reach. Proved red by putting a
+credit inside the window's own band.

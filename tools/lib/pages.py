@@ -530,6 +530,48 @@ LAND_PATH = re.compile(
 LIVING_MAX = 6
 LIVING_FRAMES = 5
 
+# ── AND A COUNTRY IS AN APERTURE ONLY WHERE IT CAN HOLD A PICTURE ────────
+#
+# `living_atlas` already measured this, in its own comment, and then a later
+# decision overrode it: *"a photograph clipped into Belgium renders about 40
+# pixels wide at 1280 and is a smudge with a coastline"* was the reason the
+# CAST was six, and *"every country that has a photograph is an aperture,
+# and all fifty do"* put all forty-one back. The code stopped matching its
+# own comment, two comments apart in one function.
+#
+# Measured on the shipped page at 1280, where the drawing is 671px across a
+# 1,120-unit frame — 0.599 px per unit:
+#
+#   Portugal 158.6   Türkiye 153.5   Norway 145.0
+#   Spain     97.9   France   95.6   Italy    90.7
+#   Greece    75.3 … Belgium 24.0 … Kosovo 12.8 … Luxembourg 4.8
+#
+# **Belgium is 24 pixels, not 40** — the function's own example is under
+# half the width its comment claims — and 18 of the 41 are under that 40.
+# Zoomed 2x, Italy at 90.7 reads as a photograph, Greece at 75.3 is
+# marginal, and Germany at 58.3 and Sweden at 54.5 are coloured smudges: a
+# torn collage where the frontier you can trace is a picture's edge rather
+# than a border, and where the countries with NO photograph are the
+# brightest things in the frame, which inverts the lighting against the
+# meaning.
+#
+# THE FLOOR IS THE BREAK IN THE DISTRIBUTION RATHER THAN A NUMBER PICKED
+# BY EYE. 90.7 to 75.3 is a 17% step, the largest relative gap anywhere in
+# the top half of that list, and it falls exactly where looking says the
+# picture stops being one. 150 units is 89.9px at 1280 and scales with the
+# frame, so it is a statement about the drawing rather than about one
+# viewport.
+#
+# AND SIX IS NOT "SIX THAT MATTER AND FORTY-FOUR THAT DO NOT", which is the
+# reading the override was written against. It is the same rule /countries
+# states out loud about its own doors — 41 of 50 can be an aperture and
+# nine cannot, six because they have no polygon at 1:50m and three because
+# they carry an advisory — applied to a frame where the whole continent is
+# 1,120 units instead of one country. The page says how many and why, as
+# that one does. Every other country keeps its shape, its frontier, its
+# name and its link, drawn in the atlas's own stone.
+HERO_SHOT_MIN_UNITS = 150.0
+
 
 def living_atlas(data, images, doc):
     """The featured countries, their geometry, and their photographs.
@@ -643,8 +685,18 @@ def living_atlas(data, images, doc):
     # photograph it has, and gains a sequence on the build after `stage:
     # fill` reaches its destinations. So the difference between them is a
     # fact about the register rather than a decision about the countries.
+    # THE CAST IS THE COUNTRIES WIDE ENOUGH TO HOLD A PICTURE. `box` below
+    # is computed per country from the same path; this is the same width,
+    # taken here so a country that cannot be an aperture never reaches the
+    # ladder and never costs a fetch.
+    def _drawn_width(d):
+        nums = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", d)]
+        xs = nums[0::2]
+        return (max(xs) - min(xs)) if xs else 0.0
+
     chosen = sorted((c for c in data["countries"].values()
-                     if c["slug"] in area),
+                     if c["slug"] in area
+                     and _drawn_width(paths[c["slug"]]) >= HERO_SHOT_MIN_UNITS),
                     key=lambda c: (-area[c["slug"]], c["slug"]))
 
     out = []
@@ -1899,7 +1951,31 @@ def home(data):
     # credited by `picture()` on its own country's page, with the
     # photographer, their profile and the licence. The link to Pexels is on
     # the page the photographs are on, which is what the guideline asks.
+    # ── THE CREDIT THE SIX APERTURES REQUIRE ─────────────────────────
+    #
+    # `_lzpanel` was an empty string, and the photographs it used to carry
+    # the credit for stayed on the drawing: the hero drew 41 licensed
+    # Pexels photographs with ZERO attribution, on the most-visited page on
+    # this site, for the life of the living atlas. *Removing a claim leaves
+    # surfaces pointing at it* — this is that rule the other way round, a
+    # surface removed and the thing it was making a claim ABOUT left behind.
+    #
+    # NOTHING HERE COULD SEE IT. `checks.py` refuses a page referencing a
+    # file with no register row, and every row exists; the credit itself is
+    # emitted by `picture()`, and the hero writes SVG `<image>` elements
+    # straight into the drawing, which is the same shape as the runtime
+    # `<img>` this repository already records as invisible to that guard —
+    # arriving here as an `<image>` that bypasses `picture()` and therefore
+    # `credit_html()`.
+    #
+    # `photo_credits` is the one implementation, so the line cannot say
+    # "Photographs" over one picture or name a photographer twice, and the
+    # two links Pexels' terms require are the ones every other band uses.
     _lzpanel = ""
+    if _lz:
+        _lzpanel = ('<p class="sheetcred rowcred lzcred">'
+                    + photo_credits(images, ["country:" + e["slug"] for e in _lz])
+                    + "</p>")
 
     # ── 01 · THE DOOR ────────────────────────────────────────────────
     # The wall is paper and the opening is the only dark thing on the
