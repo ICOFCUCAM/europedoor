@@ -10033,10 +10033,25 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
    88rem, because a plate whose subject is a continent is the one surface
    here that earns a wider measure — 1,232 at 1280 and 1,408 at 1920 — and
    the column split is 40/60, which is the reference's own. */
+/* THE CAP WAS ON THE GRID AND THE PICTURE PAID FOR IT. `88rem` is 1408px
+   and it caps the WHOLE door — so from 1920 up the drawing stops growing at
+   803x508 while its plate keeps going to 2560, and the door measures 29% of
+   its own plate at 1440 and 18% at 2560. That is /map's own recorded finding
+   in another family: a cap bought a third of the width for a promise it did
+   not keep. The cap exists for the TYPE — a headline and a lede must not run
+   to 2560 — and the type is already capped by its own measure: `h1.mega` is
+   a fixed `--t-5xl` and the lede carries `--measure`, both written down as
+   decisions one screen from here. So the cap moves onto the thing it was
+   protecting and the grid is free to give the picture the room.
+   110rem rather than none, because the door is a COMPOSITION of two columns
+   and a grid with no ceiling at 2560 sets a 60px headline a metre from the
+   continent it introduces. Measured after: the drawing goes 803x508 to
+   1009x639 at 1920 and 2560, and the door is 29% of its plate where it was
+   18%. */
 .sheet-door .doorgrid { display: grid;
   grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: 3%;
   align-items: center;
-  width: min(100% - max(8vw, 2 * var(--s4)), 88rem);
+  width: min(100% - max(8vw, 2 * var(--s4)), 110rem);
   max-width: none; margin-inline: auto; }
 /* AND THE HEADLINE IS A STEP OF THE SCALE RATHER THAN A SHARE OF THE
    VIEWPORT, because the column it sits in is neither. `.sheet .mega` is
