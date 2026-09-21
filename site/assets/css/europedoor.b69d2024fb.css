@@ -133,6 +133,18 @@
   --map-water:       #DDE8E7;
   --map-border:      #68716E;
   --map-ink:         #1A2725;
+  /* ONE HALO FOR EVERY LABEL FAMILY ON EVERY DRAWING, in DEVICE pixels.
+     A halo is what lets a name be read over a mark, a frontier or a river
+     without moving either — which is the only answer available where the
+     thing underneath is at a real coordinate. It is one value because a halo
+     is a legibility device and not a hierarchy device: the hierarchy is the
+     fill, the size and the weight. Each family keeps its own halo COLOUR,
+     chosen for the ground it sits on. Stated in px with
+     `vector-effect: non-scaling-stroke` on every user, because every one of
+     these labels lives in a scaled viewBox and a user-unit halo measured
+     0.64px at 390 and 1.63 at 1440 — thinnest exactly where the phone pass
+     makes the type largest. */
+  --halo:            2.5px;
 
   --map-dark-bg:     #07100F;
   --map-dark-land:   #F3F0E6;   /* 16.90 on the ground */
@@ -3317,8 +3329,8 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    user-unit halo would be a different weight at every render size. */
 .europemap :is(.lyr-labels .cname, .lyr-water-labels .seaname) {
   paint-order: stroke fill;
-  stroke: var(--map-land); stroke-width: 3px; stroke-linejoin: round;
-  vector-effect: non-scaling-stroke; }
+  stroke: var(--map-land); stroke-width: var(--halo);
+  stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 /* THE TYPE IS ON TOP OF THE DRAWING AND TAKES NO CLICKS, which is what a
    printed sheet does and what the first version got backwards: the names
    were emitted before the dots, so 319 destinations painted over the
@@ -5882,8 +5894,32 @@ body[data-hero] .masthead { position: sticky; }
    1.16:1 — a name that is placed, measured, decluttered and invisible,
    which is this stylesheet's most-repeated failure. The map's own ink, with
    the stone as the halo, exactly as the atlas skin sets it. */
+/* THE LABEL'S SIZE WAS COMPENSATED FOR THE VIEWBOX AND ITS HALO WAS NOT.
+   `.minilabel` is `calc(11px / var(--z))` because eleven units in a scaled
+   viewBox is not eleven pixels — the measurement that took the map labels off
+   narrow screens on eight hundred pages — and the halo beside it stayed in
+   USER UNITS. Measured in Chromium on a destination plate, `stroke-width:
+   1.6` renders:
+
+       390   type 10.42px   halo 0.64px      834   type  6.09   halo 0.89
+       480   type 13.04     halo 0.80       1280   type  9.92   halo 1.44
+       704   type 19.56     halo 1.20       1440   type 11.21   halo 1.63
+
+   A 2.6x swing, and SUB-PIXEL at 390 and 480 — which is where the phone pass
+   makes the type largest and the separation matters most. A stroke that does
+   not land on a device pixel renders as a faint wash rather than a halo, which
+   is this stylesheet's own sentence about the year band's axis: the ratio a
+   reader gets is the ratio of the pixel.
+   `--halo` is ONE width for every label family on the site, because a halo is
+   a legibility device and not a hierarchy device — the hierarchy is carried by
+   the fill, the size and the weight, and three near-neighbour stroke widths
+   are the rounding-error-with-a-token-name this file refuses for a surface
+   ladder. Each family keeps its own halo COLOUR, which is chosen for the
+   ground it sits on. */
 .minimap.arched .minilabel { fill: var(--map-ink); paint-order: stroke;
-                             stroke: var(--atlas-land); stroke-width: 1.6; }
+                             stroke: var(--atlas-land);
+                             stroke-width: var(--halo);
+                             vector-effect: non-scaling-stroke; }
 .minimap.arched .minilabel.here { font-weight: 600; }
 /* The region names, which the aperture left behind. .countrymap .rlabel
    still resolved --ink-2 against the drawing's INTELLIGENCE world and haloed
@@ -6175,7 +6211,8 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-labels .peakname {
   font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
   fill: var(--atlas-coast); paint-order: stroke;
-  stroke: var(--atlas-here); stroke-width: 2.2; }
+  stroke: var(--atlas-here); stroke-width: var(--halo);
+  vector-effect: non-scaling-stroke; }
 
 /* A SEA IS AN AREA, SO IT IS WIDELY TRACKED AND CARRIES NO MARK. In the
    water colour rather than in ink, because it names the water it sits in.
@@ -6185,7 +6222,13 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-labels .sname {
   font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
   letter-spacing: .32em; text-transform: uppercase;
-  fill: color-mix(in srgb, var(--atlas-land) 78%, transparent); }
+  fill: color-mix(in srgb, var(--atlas-land) 78%, transparent);
+  /* AND THE SEA NAMES WERE THE ONE FAMILY WITH NO HALO AT ALL. They are set
+     over water that carries rivers, lakes and the shore band, and over the
+     dots of any island destination — every other family on this drawing has
+     had one since it was written. The water tone is the ground here. */
+  paint-order: stroke; stroke: var(--map-water);
+  stroke-width: var(--halo); vector-effect: non-scaling-stroke; }
 
 /* A RIVER'S NAME, AND IT IS THE LAST PHYSICAL FAMILY TO GET ONE. Summits,
    ranges and seas have had labels since the plates were built; rivers were
@@ -6202,7 +6245,8 @@ body[data-hero] .masthead { position: sticky; }
   letter-spacing: .06em;
   fill: color-mix(in srgb, var(--atlas-land) 82%, transparent);
   paint-order: stroke;
-  stroke: color-mix(in srgb, var(--ocean-deep) 55%, transparent); stroke-width: 2.0; }
+  stroke: color-mix(in srgb, var(--ocean-deep) 55%, transparent);
+  stroke-width: var(--halo); vector-effect: non-scaling-stroke; }
 
 /* A PHYSICAL FEATURE IS SET APART FROM A POLITICAL ONE, which an atlas has
    always done with an italic serif. ALPS and PYRENEES are geography; a
@@ -6211,7 +6255,8 @@ body[data-hero] .masthead { position: sticky; }
   font-family: var(--display); font-size: calc(var(--t-xs) / var(--z)); font-style: italic;
   letter-spacing: .1em;
   fill: color-mix(in srgb, var(--atlas-hereline) 72%, transparent);
-  paint-order: stroke; stroke: var(--atlas-here); stroke-width: 2.2; }
+  paint-order: stroke; stroke: var(--atlas-here); stroke-width: var(--halo);
+  vector-effect: non-scaling-stroke; }
 
 /* A REGION IS A GROUPING, AND SPACED UPPERCASE IS HOW AN ATLAS SAYS SO —
    the same treatment a sea gets, because both name an area rather than a
@@ -6481,9 +6526,16 @@ body[data-hero] .masthead { position: sticky; }
    in, on a warm-stone continent — right by luminance and wrong by family,
    and `--map-ink` (#1A2725) is the value the owner's table gives for exactly
    this: type on the light map's land, 10.41 on the stone. */
+/* AND THE ATLAS VARIANT NEEDED THE SAME WIDTH, because it is a real variant
+   here where `.europemap`'s was not: 50 country maps ship `class="minimap
+   countrymap arched"` with no `.atlas`, so the base rule above is the one
+   that wins on them and this one wins on the other 767. Two live rules, one
+   halo. */
 .minimap.arched.atlas .lyr-labels .minilabel { fill: var(--map-ink);
                                    paint-order: stroke;
-                                   stroke: var(--atlas-land); stroke-width: 1.6; }
+                                   stroke: var(--atlas-land);
+                                   stroke-width: var(--halo);
+                                   vector-effect: non-scaling-stroke; }
 /* THE SIGNATURE IS A COLOUR THAT GETS DRAWN, NOT READ — the rule that
    already separated `--signature` from `--door` on the rest of the site,
    met again here. Cobalt-deep names the place you are reading about and
