@@ -72,14 +72,41 @@ const PROBE = (SL) => {
       if (paints) {
         const b = c.getBoundingClientRect();
         if (b.width > 0 && b.height > 0) {
-          let fx = null;
-          for (let a = c; a && a !== document.body; a = a.parentElement)
-            if (getComputedStyle(a).position === 'fixed') { fx = a; break; }
+          /* AND A STICKY BOX IS THE SAME FAULT ONE PROPERTY OVER. Its
+           * rect is where it happens to be RESTING when the page is
+           * measured, not the range a reader has it on screen for: the
+           * homepage's atlas register is a 900px sticky stage inside a
+           * 3,240px track of scroll steps, so the walk filed it in the
+           * first 900 and reported the remaining 1,600 as a run at 0%
+           * covered — a hole that does not exist, on the band this
+           * session had just rebuilt. It read the homepage at 34% and
+           * nearly sent its own author to fix a composition that is
+           * right, which is precisely the cost this instrument's own
+           * comment names for the fixed case.
+           *
+           * What a sticky element paints is its CONTAINING BLOCK's
+           * range, because that is the scroll distance it stays put
+           * over. THE ONE EXCEPTION IS MEASURED RATHER THAN NAMED: the
+           * masthead is sticky too and its containing block is the
+           * document, so attributing it would cover every slice of
+           * every page at full width and the instrument would report
+           * nothing anywhere. A sticky element whose range is the whole
+           * document is chrome — it is on every screen of the page and
+           * therefore says nothing about any part of it. */
+          let fx = null, sticky = null;
+          for (let a = c; a && a !== document.body; a = a.parentElement) {
+            const pos = getComputedStyle(a).position;
+            if (pos === 'fixed') { fx = a; break; }
+            if (pos === 'sticky' && !sticky) sticky = a;
+          }
           let host = c;
           if (fx) {
             let a = fx.parentElement;
             while (a && getComputedStyle(a).clipPath === 'none') a = a.parentElement;
             if (a) host = a;
+          } else if (sticky && sticky.parentElement
+                     && sticky.parentElement !== document.body) {
+            host = sticky.parentElement;
           }
           const hb = host === c ? b : host.getBoundingClientRect();
           const top = hb.top + scrollY, bot = hb.bottom + scrollY;

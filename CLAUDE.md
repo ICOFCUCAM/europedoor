@@ -7295,6 +7295,65 @@ suite already died on twice, arriving in a screenshot rather than in a gate,
 where it does not crash — **it produces an image that looks like a design
 regression.** Nothing may read `site/` while anything is writing it.
 
+**THE NEXT FOUR THINGS THIS SESSION PROPOSED WERE REFUSED BY ONE PARAGRAPH
+NOBODY HAD READ.** Rivers and lakes on the register, relief inside the lit
+corner, the shore band, sea names, and a photograph clipped into the lit
+corner's lead country — five upgrades, and `atlas_register`'s own comment
+refuses every one of them in a sentence written when the band was built:
+*Plate 01 is the continent as a PICTURE … this one is the continent as a
+REGISTER: no water, no relief, no rivers, no lakes, no photograph and no
+dusk.* Measured on the shipped page rather than taken on trust, and the
+premise holds exactly — plate 01 carries `lyr-terrain`, `lyr-rivers`, five
+sea names and **six photographs clipped into countries**, and plate 05
+carries `beyond`, `land` and `labels` and nothing else. **A recorded
+refusal is evidence**, and this is the second time one has stopped a
+good-looking change. `weight.home_kb` refuses it a second way on its own:
+the page sits at 181 against a ceiling of 181.
+
+**A PLATE MARK IS THE BAND'S KICKER, SO A BAND THAT CARRIES ITS OWN KICKER
+SAYS ITS NAME TWICE.** `actmark` is *the number is the position and the name
+is the caption*, and five of the ninety-eight plates on this site printed
+that caption again inside themselves, about a hundred pixels below it. The
+homepage's atlas register had `The atlas` over a hand-written `The Atlas`;
+/events took the phrase to **four occurrences in one `<main>`**. That is the
+two-numbering-systems finding in the NAME rather than in the number — each
+system internally correct, which is why nothing counted it.
+
+**WHICH OF THE TWO MOVES IS DECIDED BY THE PRIMITIVE RATHER THAN BY TASTE.**
+`ed_opening`'s eyebrow and a `pagehead`'s kicker are REQUIRED and are that
+head's own label, so on /events, /map, /interests and /my-europe the MARK
+moved; the register's eyebrow was a hand-written `<p>` inside a composition,
+so there the eyebrow went and the mark stayed. **And the hand sweep that
+found this found three fifths of it** — it read eight index pages and the
+FIRST kicker in each, where `c_plate_name_once` reads every page and every
+`<h1>`–`<span>` and found /map, /interests and /my-europe as well. An
+instrument narrower than the check it motivates is the same fault as an
+instrument that reads its own documentation. The test is an element whose
+WHOLE text is the name and never a substring, because a band may discuss its
+own subject in prose. Proved red on the state that shipped.
+
+**AND `density.js` REPORTED A 1,600-PIXEL HOLE THAT DOES NOT EXIST, ON THE
+BAND THIS SESSION HAD JUST REBUILT.** Its own comment records that *a fixed
+box's rect is viewport-relative* and walks the chain to the clipping
+ancestor for it — and **a sticky box is the same fault one property over**.
+The register is a 900px sticky stage inside a 3,240px track of scroll steps
+whose eight resting cards are at `opacity: 0`, so the walk filed everything
+in the first 900 pixels and read the remaining 1,600 as a run at 0% covered.
+The homepage measured **34%** where the honest figure is **19%**, and it
+nearly sent its own author to fix a composition that is right — which is the
+exact cost that comment names.
+
+**THE ONE EXCEPTION IS MEASURED RATHER THAN NAMED.** What a sticky element
+paints is its CONTAINING BLOCK's range, because that is the scroll distance
+it stays put over — and the masthead is sticky too, with the document as its
+containing block, so attributing it would cover every slice of every page at
+full width and the instrument would report nothing anywhere. A sticky
+element whose range is the whole document is chrome: it is on every screen
+of the page and therefore says nothing about any part of it. Verified from
+the other end, because a guard that silences an instrument looks exactly
+like a guard that fixes one — /404, /discover, /experiences and /plan still
+read 34, 31, 28 and 28.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

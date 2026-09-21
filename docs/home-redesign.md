@@ -2231,3 +2231,84 @@ on twice, arriving in a screenshot, where it does not crash: **it produces an
 image that looks like a design regression.**
 
 `weight.home_kb` 180 → 181, recorded.
+
+## Home 39 — the four next upgrades were refused, and two instruments were wrong
+
+### The register's own paragraph refuses five of them
+
+The next items on this session's own list were rivers and lakes on the
+register, relief inside the lit corner, the shore band, sea names, and a
+photograph clipped into the lit corner's lead country. `atlas_register`'s
+comment refuses all five in a sentence written when the band was built:
+
+> Plate 01 is the continent as a PICTURE — warm parchment on graphite, four
+> relief bands, rank-3 rivers and lakes … A second continent five plates
+> down is *the signature as wallpaper* … It is the continent as a REGISTER:
+> no water, no relief, no rivers, no lakes, no photograph and no dusk.
+
+Measured on the shipped page rather than taken on trust:
+
+| | plate 01 | plate 05 |
+|---|---|---|
+| layers | coastal-water, land, **terrain**, **rivers**, country-bounds, water-labels, labels | beyond, land, labels |
+| sea names | 5 | 0 |
+| photographs clipped into countries | **6** | 0 |
+
+The premise holds exactly, so the refusal survives. `weight.home_kb` refuses
+it a second way on its own: the page is at **181 against a ceiling of 181**.
+
+### A plate mark is the band's kicker
+
+`actmark` is *the number is the position and the name is the caption* — so a
+composition that carries its own kicker says the band's name twice. Five of
+ninety-eight plates did, about a hundred pixels apart:
+
+| page | mark | said again as |
+|---|---|---|
+| / | The atlas | `<p class="ateyebrow">The Atlas` |
+| /events | The European year | `ed-eyebrow` — **four occurrences in one `<main>`** |
+| /map | The map | `pagehead` kicker |
+| /interests | The interest atlas | `pagehead` kicker |
+| /my-europe | My Europe | `pagehead` kicker |
+
+**Which of the two moves is decided by the primitive rather than by taste.**
+`ed_opening`'s eyebrow and a `pagehead`'s kicker are required and are that
+head's own label, so on four pages the MARK moved — *The fixtures*, *The
+instrument*, *All seventeen*, *A private atlas*. The register's eyebrow was a
+hand-written `<p>` inside a composition, so there the eyebrow went.
+
+**And the hand sweep that found this found three fifths of it.** It read
+eight index pages and the first kicker in each; `c_plate_name_once` reads
+every page and every `<h1>`–`<span>`, and found /map, /interests and
+/my-europe as well. The test is an element whose WHOLE text is the name,
+never a substring, because a band may discuss its own subject in prose.
+Proved red on the state that shipped.
+
+### density.js reported a 1,600px hole that does not exist
+
+Its own comment records that a fixed box's rect is viewport-relative and
+walks to the clipping ancestor for it. **A sticky box is the same fault one
+property over.** The register is a 900px sticky stage inside a 3,240px track
+of scroll steps whose eight resting cards are at `opacity: 0`, so everything
+was filed in the first 900 pixels and the remaining 1,600 read as 0% covered.
+
+| | before | after |
+|---|---|---|
+| homepage slices under 20% covered | **34%** | **19%** |
+| worst run | 1,600px at 0% | 300px at 2% |
+
+**The exception is measured rather than named.** A sticky element paints over
+its containing block's range — and the masthead is sticky with the document
+as its containing block, so attributing it would cover every slice of every
+page at full width. A sticky element whose range is the whole document is
+chrome. Verified from the other end, because a guard that silences an
+instrument looks like one that fixes it: /404, /discover, /experiences and
+/plan still read 34, 31, 28 and 28.
+
+### And two things the eye got wrong
+
+The vertical rail at the right of the register looked clipped at 1440. It is
+not: measured at seven widths from 1024 to 2560 it sits inside the viewport
+at every one. And the static suite reported **43,558 dead links** — it was run
+while the background build was recreating `site/`, which is the concurrency
+failure recorded one screen above, three minutes after writing it down.

@@ -9000,6 +9000,52 @@ def c_svg_image_credit():
     return n
 
 
+@check("a plate names itself once")
+def c_plate_name_once():
+    # A PLATE MARK IS THE BAND'S KICKER, SO A COMPOSITION INSIDE IT MAY NOT
+    # PRINT THE SAME NAME AGAIN. Two of the sixty-one plates in the eight
+    # sequences did: the homepage's atlas register carried a hand-written
+    # `The Atlas` about a hundred pixels under a mark reading `The atlas`,
+    # and /events' opening carried an `ed-eyebrow` identical to its mark,
+    # which took that phrase to four occurrences in one `<main>`. Each
+    # system was internally right — the mark is furniture the sequence
+    # owns, the eyebrow is the head's own kicker — which is exactly the
+    # two-numbering-systems shape this repository already records, in the
+    # NAME rather than in the number, and nothing counted it.
+    #
+    # THE TEST IS AN ELEMENT WHOSE WHOLE TEXT IS THE NAME, never a
+    # substring: a band may of course discuss its own subject in prose, and
+    # a check that could not tell a label from a sentence would fire on
+    # every page that mentions what it is about. Case is folded because
+    # `The atlas` and `The Atlas` are the same claim to a reader and the
+    # difference between them is what made this pair look deliberate.
+    n = 0
+    for f in site_files():
+        html_ = open(f, encoding="utf-8").read()
+        for m in re.finditer(
+                r'<section class="sheet [^"]*" id="[^"]*">(.*?)'
+                r'(?=<section class="sheet |</main>)', html_, re.S):
+            body = m.group(1)
+            am = re.search(r'<span class="actname">([^<]*)</span>', body)
+            if not am:
+                continue
+            n += 1
+            name = html_unescape(am.group(1)).strip().lower()
+            if not name:
+                continue
+            for el in re.finditer(r'<(h[1-6]|p|span)\b[^>]*>([^<]+)</\1>',
+                                  body[am.end():]):
+                if html_unescape(el.group(2)).strip().lower() == name:
+                    fail(f"{rel(f)} plate '{am.group(1)}' prints its own "
+                         f"name again as a <{el.group(1)}> inside itself — "
+                         f"the mark is already this band's kicker")
+                    break
+    if n < 40:
+        fail(f"it examined only {n} plates — the plate-sequence pattern has "
+             f"stopped matching and this check is reading nothing")
+    return n
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

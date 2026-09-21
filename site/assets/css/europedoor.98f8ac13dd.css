@@ -11474,9 +11474,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
                   background: linear-gradient(270deg, transparent,
                     color-mix(in srgb, var(--map-water) 92%, transparent) 38%); }
 .atlead .mega { margin: var(--s3) 0 0; }
-.ateyebrow { margin: 0; font-size: var(--t-xs); font-family: var(--text);
-             letter-spacing: .24em; text-transform: uppercase;
-             color: var(--door-dark); }
 .atintro { font-family: var(--display); font-size: var(--t-md);
            margin: var(--s4) 0 0; max-width: 22ch; }
 .atlead .golink { margin-top: var(--s4); }

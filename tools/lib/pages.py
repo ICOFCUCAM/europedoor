@@ -1848,6 +1848,21 @@ def actmark(n, name):
     the finding that rebuilt this page. The number is set at reading size
     and the name at label size, because the number is the position and the
     name is the caption.
+
+    AND A CAPTION IS A KICKER, SO A BAND THAT CARRIES ITS OWN KICKER SAYS
+    ITS NAME TWICE. Measured across the eight plate sequences: two of the
+    sixty-one plates printed the mark's name again inside themselves, about
+    a hundred pixels below it — the homepage's atlas register (`The atlas`
+    over a hand-written `The Atlas`) and /events' opening, where the phrase
+    reached FOUR occurrences in one `<main>`. That is the two-numbering-
+    systems finding in the NAME rather than in the number, and each system
+    was internally correct, which is why nothing counted it.
+
+    WHICH OF THE TWO MOVES IS DECIDED BY THE PRIMITIVE RATHER THAN BY
+    TASTE. `ed_opening`'s eyebrow is a required argument and IS that head's
+    kicker, so on /events the MARK moved; the register's eyebrow was a
+    hand-written `<p>` inside a composition, so there the eyebrow went and
+    the mark stayed. `c_plate_name_once` holds it from here.
     """
     return (f'<p class="actmark"><span class="actno">{n:02d}</span>'
             f'<span class="actname">{esc(name)}</span></p>')
@@ -2529,7 +2544,6 @@ def home(data):
   <div class="atstage">
     <div class="atwin">{_atfig}</div>
     <div class="atlead">
-      <p class="ateyebrow">The Atlas</p>
       <h2 class="mega">One continent. <br>{numword(ncountries, cap=True)} doors.</h2>
       <p class="atintro">{numword(_nmacro, cap=True)} corners of the
       continent, {numword(ncountries)} countries, and every one of them a way
@@ -5654,7 +5668,7 @@ def interests_index(data, ranking):
     PLATES = [("iopen gal", "Ways to travel", iopen, "ways-to-travel"),
               ("firstact pine", "The question", firstact, "the-question"),
               ("lenses gal", "The wide end", lenses, "wide"),
-              ("reach paper", "The interest atlas", ledger, "reach"),
+              ("reach paper", "All seventeen", ledger, "reach"),
               ("narrow gal quiet", "The narrow end", narrowband, "narrow"),
               ("smallfilter gal", "A small filter", smallfilter, "small-filter"),
               ("istart pine", "Start here", istart, "start")]
@@ -13707,7 +13721,7 @@ def map_page(data):
     <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
   </div>"""
 
-    PLATES = [("mapopen", "The map", mapopen, "map"),
+    PLATES = [("mapopen", "The instrument", mapopen, "map"),
               # NOT "layers" — `id="layers"` IS THE INTEREST FILTER CONTAINER
               # AND map.js BINDS TO IT. A plate's anchor becomes an `id` on
               # the `<section>`, so naming this one after what it holds put
@@ -14139,7 +14153,7 @@ def events_page(data):
     # for — returned zero, because a plate class can be emitted by a page
     # builder and styled by nothing. **The built site is the other half of
     # that grep**, and `checks.py` now asks it on every build.
-    PLATES = [("evopen gal", "The European year", evopen, "what-is-on"),
+    PLATES = [("evopen gal", "The fixtures", evopen, "what-is-on"),
               ("euyear paper", "The year", year, "the-year"),
               ("months gal quiet", "Twelve doors", months, "the-months"),
               ("character gal", "What a month is made of", character,
@@ -14853,7 +14867,7 @@ def my_europe_page(data):
     <a class="storygo" href="/countries">Or open the atlas &rarr;</a></p>
   </div>"""
 
-    PLATES = [("meopen gal", "My Europe", meopen, "my-europe"),
+    PLATES = [("meopen gal", "A private atlas", meopen, "my-europe"),
               ("meatlas pine", "Your map", meatlas, "your-map"),
               ("melist gal", "What you kept", melist, "what-you-kept"),
               ("mekinds gal quiet", "Kinds of memory", mekinds, "kinds"),
