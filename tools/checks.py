@@ -9046,6 +9046,51 @@ def c_plate_name_once():
     return n
 
 
+@check("cutting a band orphans no figure")
+def c_home_extent_kept():
+    """THE ATLAS REGISTER PRINTED THE SITE'S EXTENT AND THE PAGE ALREADY DID.
+
+    Plate 05's lead column carried a six-figure `<dl>` — countries, regions,
+    destinations, places, experiences, journeys — derived and correct, and
+    an extent that is not that band's own. Counted on the built homepage,
+    every one of the six is stated twice more: the opening prints four of
+    them under the hero and the footer prints all six. So a reader met the
+    site's extent three times before they met a corner of Europe, and the
+    number the band IS about — fifty doors over nine corners — was a line a
+    thousand pixels below it.
+
+    *When a band goes, check what it was the ONLY home for* is this
+    repository's own rule, learned when the four doors left the homepage and
+    existed nowhere on the site for one build. This is that rule as a check
+    rather than as a memory: each figure the column used to print has to
+    still be on the page, beside the word it belongs to, and derived on the
+    build that prints it. It fails the day somebody thins the footer too.
+    """
+    d = D.load()
+    home = open(os.path.join(OUT, "index.html"),
+                encoding="utf-8").read()
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", home))
+    want = [
+        (len(d["countries"]), "countries"),
+        (sum(len(c["regions"]) for c in d["countries"].values()), "regions"),
+        (len(d["cities"]), "destinations"),
+        (len(D.all_places(d["countries"])), "places"),
+        (len(D.all_experiences(d["countries"])), "experiences"),
+        (len(d["journeys"]), "journeys"),
+    ]
+    for n, label in want:
+        # `130 regions` and `130 travel regions` are the same claim, so the
+        # test is the figure and then the word, with room for one qualifier
+        # between them — not the literal pair, which would pin a spelling.
+        if not re.search(rf"\b{n}\b(?: [a-z]+)? {label}\b", text, re.I):
+            fail(f"the homepage no longer states {n} {label} anywhere. "
+                 f"Plate 05's column used to print it and that column was "
+                 f"cut because the opening and the footer both said it "
+                 f"already; if neither does now, the cut orphaned a figure")
+    return len(want)
+
+
+
 def main():
     print(f"{SITE_NAME} — checks\n")
     total = 0

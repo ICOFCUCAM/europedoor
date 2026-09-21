@@ -18,7 +18,7 @@ from . import cartography
 from . import geo
 from . import stay as staylib
 from . import urls
-from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_rim, card, chips, crumbs,
+from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_path, arch_rim, card, chips, crumbs,
                      esc, factlist, grid, n_of,
                      jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
                      page, photo, picture, plate, section, arch_clip, arch_edge,
@@ -861,7 +861,7 @@ def sea_names(land, view, most=6, metric="seaname"):
     return seanames, [(bx, by, bx + bw, by + bh) for bx, by, bw, bh in boxes]
 
 
-def name_countries(land, view, max_names=16, reserved=(),
+def name_countries(land, view, max_names=16, reserved=(), boxes=None,
                    metric="cname", metric2="cname2", decorate=None):
     """Set a country's name across its own drawn shape, once, for anybody.
 
@@ -1064,6 +1064,22 @@ def name_countries(land, view, max_names=16, reserved=(),
                    .replace("&gt;", ">").replace("&quot;", '"'))
             names.append(decorate(raw, got[0]) if decorate else got[0])
             taken.append((got[1], got[2], got[1] + got[3], got[2] + got[4]))
+    # AND A CALLER THAT DRAWS A SECOND FAMILY ON THIS DRAWING GETS THE BOXES.
+    # `reserved` is this function taking the pinned family's ground as given;
+    # `boxes` is the other half of that conversation — what this pass placed,
+    # so whatever is composed next can avoid it instead of arranging half a
+    # layer, which is the fault the sea names cost two commits ago. The list
+    # is EXTENDED rather than returned, so the six callers that want only the
+    # markup are unchanged.
+    if boxes is not None:
+        # WHAT THIS PASS PLACED, NOT WHAT IT WAS GIVEN. `taken` starts as a
+        # copy of `reserved`, so handing the whole list back would tell the
+        # caller its own reserve is a name — and the atlas register's marks
+        # then treated the type zones as hard when the whole point of
+        # handing them over separately is that a mark may take that ground
+        # when it has nowhere else. It cost the British Isles both of their
+        # doors, silently, on a rung written to stop exactly that.
+        boxes.extend(taken[len(reserved):])
     names = "".join(names)
     return names
 
@@ -2476,7 +2492,7 @@ def home(data):
     _missing = [c for c in data["countries"].values() if c["slug"] not in _drawn]
     _nadvisory = sum(1 for c in _missing if (c.get("advisory") or {}).get("level"))
     _nsmall = len(_missing) - _nadvisory
-    _atfig, _atcorners, _atdrawn, _atcut = atlas_register(data)
+    _atfig, _atcorners, _atdrawn, _atcut, _atmarks = atlas_register(data)
     # AND THE ONE COUNTRY THE CORNER LIGHT SKIPS SAYS SO. The sentence is
     # composed here rather than inside the register because it is a
     # statement about the whole band, and nine cards each carrying it is
@@ -2527,18 +2543,30 @@ def home(data):
     # than an absent row, and only rendering the band found it: the
     # arithmetic is right, the sum is over the wrong object. 255 and 197,
     # which are the figures /search publishes from its own index.
-    _nplaces = sum(len(t["city"].get("places") or []) for t in idx.values())
-    _nexper = sum(len(t["city"].get("experiences") or []) for t in idx.values())
-    # THE EXTENT IS SIX FIGURES AND EVERY ONE IS DERIVED, which is the half
-    # of the brief's editorial column this page did not have at all. A figure
-    # typed here is the figure that was true two hundred destinations ago —
-    # the rule this repository has now paid for in five families — so each is
-    # counted on the build that prints it.
-    _statrow = "".join(
-        f"<div><dt>{n}</dt><dd>{esc(label)}</dd></div>" for n, label in (
-            (ncountries, "Countries"), (nregions, "Regions"),
-            (ncities, "Destinations"), (_nplaces, "Places"),
-            (_nexper, "Experiences"), (len(data["journeys"]), "Journeys")))
+    # THE SIX FIGURES CAME OUT, AND WHAT SETTLED IT WAS COUNTING THEM ON
+    # THE REST OF THE PAGE. They were in the lead column as a `<dl>` —
+    # derived, correct, and an extent that is not this band's own. Measured
+    # on the built homepage, every one of them is stated twice more: plate
+    # 01 prints 50 countries, 130 travel regions, 319 destinations and 17
+    # journeys under the opening, and the footer prints all six again. So a
+    # reader met the site's extent three times before meeting a corner of
+    # Europe, and the one number this band IS about — fifty doors over nine
+    # corners — was the closing line a thousand pixels below.
+    #
+    # `an index exists to say how big a set is` is the rule that put them
+    # there and it is the rule that takes them out: 130 regions, 255 places,
+    # 197 experiences and 17 journeys are other sets' extents, and a number
+    # that is not the set's own reads as one. `.atsum` already closes the
+    # band on `50 countries · 9 corners · 1 continent`, derived, which is
+    # this band's own extent and the chapter transition the composition was
+    # missing. Nothing is orphaned — the check below asserts every figure
+    # removed here is still on the page.
+    #
+    # AND THE VERTICAL RAIL WENT WITH THEM. `Europe through the door` was
+    # set down the right edge at caption size, `aria-hidden`, repeating the
+    # headline's own metaphor in smaller type — which is the fault
+    # `c_plate_name_once` exists for one level up, arriving as a paraphrase
+    # rather than as the name.
     atlas = f"""
   <div class="atlas">
   <div class="atstage">
@@ -2549,10 +2577,8 @@ def home(data):
       continent, {numword(ncountries)} countries, and every one of them a way
       in.</p>
       {golink('/countries', 'Open the atlas')}
-      <dl class="atstats">{_statrow}</dl>
     </div>
     <p class="atcue">Scroll, and each corner lifts out of the continent</p>
-    <p class="atrail" aria-hidden="true">Europe through the door</p>
   </div>
   <div class="atread">
     {_atcorners}
@@ -2562,9 +2588,11 @@ def home(data):
       <p class="atsum"><span>{ncountries}</span> countries ·
       <span>{_nmacro}</span> corners · <span>1</span> continent</p>
       <p class="lede">{numword(_atdrawn, cap=True)} of the
-      {numword(ncountries)} are named on the drawing: a name that fits
-      nowhere on its own ground is dropped rather than laid across its
-      neighbours, and every country is a link in the nine corners above.
+      {numword(ncountries)} are named on the drawing and {numword(_atmarks)}
+      carry the door: a name and a mark that fit nowhere on their own ground
+      are dropped rather than laid across a neighbour, so what a corner
+      shows is the doors that fit on it and never a count of what is behind
+      them. Every country is a link in the nine corners above.
       {_atcutsay}</p>
     {golink('/map', 'Open the map')}
   </div>
@@ -7639,6 +7667,214 @@ DOOR_BAND_KB = 90
 # this repository a sitting.
 
 
+# THE PAGE'S OWN TYPE STANDS OVER THIS DRAWING AND THE DRAWING DID NOT KNOW.
+#
+# Every label on this site goes through one machine: `place_label_box`
+# measures it, tests it against the frame, against its own country's ground
+# and against every box already `taken`, and tries its other anchors before
+# it drops it. What has always been in `taken` is the labels this drawing
+# placed itself. On the register that is half the picture — the headline
+# and the region card are set ON the continent, in the page's own grid, and
+# the name layer had never heard of either. Measured at 1280: ICELAND ran
+# 109 pixels through the headline and SPAIN 43 through the figures; at
+# 1920 six names collided; at 2560 UNITED KINGDOM ran 256 pixels through
+# `One continent. Fifty doors.` The wash under the column is why nobody
+# called it a contrast fault — the names are dimmed rather than deleted, so
+# what a reader gets is a place name arriving faintly through a 76px serif,
+# which is worse than either.
+#
+# THE RESERVE IS A UNION OVER VIEWPORTS, BECAUSE A NAME IS PLACED ONCE AND
+# READ AT EVERY WIDTH. The drawing is `xMidYMid slice` on a 1460x800 frame
+# inside a box whose aspect runs from 1.1 to 5.4, so the SCALE between the
+# page's pixels and the projection's units is different on every screen and
+# the same headline lands in a different part of Europe on each. `.mega`
+# measured [48, 67, 345, 326] at 1280x900 and [232, 186, 422, 353] at
+# 2560x900, in these units. A reserve fitted to one viewport is a fact
+# about that viewport; the union is the only box that is true of all of
+# them, which is the same reasoning that makes `phone_declutter` re-test
+# every label at the phone's scale rather than trusting the desk's.
+#
+# 385 samples: twelve widths from 992 to 3440 crossed with seven heights
+# from 640 to 1440, at five scroll positions each, taking the SVG's own
+# `getScreenCTM().inverse()` so the numbers are the drawing's rather than
+# the screen's. Below 62rem the stage is not sticky, the column is under
+# the map and nothing stands over it, so those viewports are outside the
+# sweep and outside the claim.
+#
+# AND THE UNION OF THE WHOLE COLUMN IS REFUSED, MEASURED. Adding the intro,
+# the action and the figures takes the left zone to y=846 and the right to
+# x=652: eleven of the seventeen names go, among them UNITED KINGDOM,
+# FRANCE, SPAIN, RUSSIA and TÜRKIYE — which is the exact list this
+# repository already records as the wrong answer, the countries a reader
+# orients by. What is reserved is the HEADLINE and the CARD, the two pieces
+# of type that are display-size and opaque; the figures are answered by
+# moving them off the drawing, which is the next commit.
+#
+# AND IT IS THE HULL OF TWO READINGS, BECAUSE THIS HEADLINE FILLS ITS OWN
+# MEASURE. An h1's box is wider than its glyphs — this repository already
+# records a contrast sweep that read 2.15:1 against a real 9.58 for exactly
+# that reason — so the sweep was run a second time over the headline's own
+# line boxes, expecting the reserve to shrink. It did not: the glyph union
+# is [-130.0, 59.3, 439.1, 442.1] against the box union's [-130.0, 62.7,
+# 457.3, 435.8], NARROWER by 18 units and DEEPER by 6. Neither contains the
+# other, and 76px display type set on three short lines is the one case
+# where the trap does not apply. What is reserved is the hull, so the claim
+# is true however the headline is measured, and it costs no name that the
+# box union did not already cost.
+#
+# `browser-checks.js` re-measures the two boxes at the viewports the sweep
+# found binding and fails when either leaves what is declared here, reading
+# these numbers out of this file rather than carrying a copy — because this
+# is a constant with a measurement behind it, and the measurement is the
+# only thing that keeps it true.
+ATLAS_TYPE_ZONES = (
+    (-130.0, 59.3, 457.3, 442.1),   # `One continent. Fifty doors.`
+    (652.9, 0.0, 1250.0, 371.2),    # the corner card
+)
+
+
+# THE MARK IS ON WHAT IS OPEN, AND FIFTY OF THEM WERE BUILT AND MEASURED OUT.
+#
+# The band says `One continent. Fifty doors.` and drew fifty country shapes
+# with nothing on them that is a door — the /themes fault, where a page
+# described thirteen shapes its own closing sentence is about and drew none.
+# The obvious repair is an arch on every country, and it was prototyped in
+# Chromium at 6, 9, 13 and 16 units and photographed at 1x and 2x before a
+# line of this was written. It does not work, for the reason the hero's nine
+# restraint marks were removed: **at the size that fits the smallest country
+# it is a texture, and at the size that reads as a door it does not fit.**
+# Luxembourg's largest ring spans 8 units; a mark has to reach about 13 to
+# resolve into an arch rather than a tick, and forty-four of those at one
+# weight read as a second frontier network laid over the first. `a signature
+# applied to everything is wallpaper` is the rule and this is what it looks
+# like.
+#
+# What ships is the same mark on the corner that is OPEN: five on the
+# Nordics, four on the British Isles, nine on the Mediterranean. It is a
+# STATE rather than a selection — every country carries one, and the
+# stylesheet reveals the lit corner's — so the count is never a judgement
+# about which countries matter, and `fifty doors` is demonstrated across the
+# nine steps instead of asserted all at once. At 20 units in `--pine` it is
+# unmistakably an arch and there are never more than nine on screen.
+#
+# THE CURVE IS `render.arch_path`, TRANSLATED. This is the site's signature
+# and it is cut three ways already; a fourth hand-written arc would be a
+# second implementation of the one shape every check in `signature` compares.
+#
+# AND IT SITS ON ITS OWN GROUND, WHICH IS `NameGround`'s RULE ONE FAMILY
+# OVER. The first prototype placed each mark at the middle of the country's
+# bounding box and walked outward to the first point inside the fill — and
+# put Denmark's in the Kattegat and Iceland's half off the coast, because a
+# bounding box is not a country and a point inside the fill is not a box
+# inside it. Five samples are tested, the middle and the four corners of the
+# mark pulled in, so the whole glyph is on the country it marks.
+# AND THE RISE IS STATED, BECAUSE THE DEFAULT IS FOR A MAP AND NOT FOR A
+# MARK. `arch_path` defaults to `min(h * .34, w * .5)`, which on a wide
+# shallow frame is the confident flat span a mason strikes over an opening —
+# right for an aperture cut across a 900x320 drawing and wrong for a glyph
+# the size of a word: at 20x16 it returned a rise of 5.4 and rendered a
+# rounded rectangle. The head is struck at half the span, which is the
+# semicircle the wordmark's own door has, and the jambs are what is left.
+ATLAS_MARK_W = 18.0
+ATLAS_MARK_H = 22.0
+ATLAS_MARK_RISE = ATLAS_MARK_W / 2.0
+
+
+def atlas_door_marks(land, slugs, names, zones):
+    """An arch on each of `slugs`, on its own ground, clear of `names`.
+
+    Returns {slug: markup}. A country that cannot hold the mark anywhere
+    inside itself does not get one — the same answer a name that fits
+    nowhere gets, and for the same reason: the country keeps its shape, its
+    frontier, its link and its row in the register column below.
+
+    TWO RUNGS, AND THE FIRST RUN HAD ONE AND LEFT A CORNER EMPTY. The type
+    zones are a UNION over viewports — the headline covers x 48 to 345 at
+    1280 and x 232 to 422 at 2560, and the reserve is the box that contains
+    both — which is right for a NAME, a bar of type with nine anchors and an
+    alternative, and far too blunt for a 20-unit glyph. Treating them as
+    hard left the British Isles with **no mark at all**: both its countries
+    sit inside the union, so the one step of the nine whose corner is two
+    islands said nothing, which is the promise kept eight times the lift
+    already records about `alpine-central`. So a mark avoids the zones where
+    it can and takes the ground under them where that is all there is — the
+    wash over the column dims it rather than letting it fight the headline,
+    and a corner that draws no door is worse than a door in shadow. It is
+    `NameGround`'s own shape, which tries zero crossings first and two only
+    if nothing fits.
+    """
+    ds, idx_of = [], {}
+    for i, m in enumerate(LAND_PATH.finditer(land)):
+        ds.append(m.group(1))
+        mo = re.search(r'id="at-([a-z0-9-]+)"', m.group(0))
+        if mo:
+            idx_of[mo.group(1)] = i
+    ground = NameGround(ds)
+    hw, hh = ATLAS_MARK_W / 2.0, ATLAS_MARK_H / 2.0
+    _arch = arch_path(ATLAS_MARK_W, ATLAS_MARK_H, ATLAS_MARK_RISE)
+    taken = [tuple(b) for b in names]
+    soft = [tuple(b) for b in zones]
+    out = {}
+    # Largest first, exactly as the names are placed: the order decides who
+    # gets the clean position when two marks want the same ground.
+    order = []
+    for slug in slugs:
+        i = idx_of.get(slug)
+        if i is None:
+            continue
+        best, bb = 0.0, None
+        for sub in ds[i].split("Z"):
+            pts = [(float(a), float(b)) for a, b
+                   in re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
+            if len(pts) < 3:
+                continue
+            xs = [q[0] for q in pts]
+            ys = [q[1] for q in pts]
+            a_ = (max(xs) - min(xs)) * (max(ys) - min(ys))
+            if a_ > best:
+                best, bb = a_, (min(xs), min(ys), max(xs), max(ys))
+        if bb:
+            order.append((best, slug, i, bb))
+    order.sort(key=lambda t: -t[0])
+
+    def _hits(box, boxes):
+        return any(not (box[2] < q[0] or box[0] > q[2]
+                        or box[3] < q[1] or box[1] > q[3]) for q in boxes)
+
+    for _a, slug, i, bb in order:
+        spots = []
+        for gx in range(9):
+            for gy in range(9):
+                x = bb[0] + (bb[2] - bb[0]) * (gx + 0.5) / 9.0
+                y = bb[1] + (bb[3] - bb[1]) * (gy + 0.5) / 9.0
+                spots.append((abs(gx - 4) + abs(gy - 4), x, y))
+        spots.sort()
+        fits = []
+        for _d, x, y in spots:
+            if not all(ground.own(i, x + dx, y + dy) for dx, dy in (
+                    (0, 0), (-hw * .7, -hh * .6), (hw * .7, -hh * .6),
+                    (-hw * .7, hh * .6), (hw * .7, hh * .6))):
+                continue
+            box = (x - hw - LABEL_CLEAR, y - hh - LABEL_CLEAR,
+                   x + hw + LABEL_CLEAR, y + hh + LABEL_CLEAR)
+            if _hits(box, taken):
+                continue
+            if _hits(box, soft):
+                fits.append((x, y, box))   # possible, and under the type
+                continue
+            fits = [(x, y, box)]
+            break
+        if not fits:
+            continue
+        x, y, box = fits[0]
+        taken.append(box)
+        out[slug] = (
+            f'<path class="atmark" aria-hidden="true" '
+            f'transform="translate({x - hw:.1f},{y - hh:.1f})" '
+            f'd="{_arch}"/>')
+    return out
+
+
 def atlas_register(data):
     """The continent, the fifty names on it, and the nine corners beside it.
 
@@ -7759,16 +7995,36 @@ def atlas_register(data):
     corner_pts = {}
     for s, q in liftable.items():
         corner_pts.setdefault(macro_of[s], []).append(q)
-    lift, reach = {}, {}
+    lift, reach, mid = {}, {}, {}
     if liftable:
         cx = sum(a for a, _ in liftable.values()) / len(liftable)
         cy = sum(b for _, b in liftable.values()) / len(liftable)
         for k, v in corner_pts.items():
-            dx = sum(a for a, _ in v) / len(v) - cx
-            dy = sum(b for _, b in v) / len(v) - cy
+            mid[k] = (sum(a for a, _ in v) / len(v),
+                      sum(b for _, b in v) / len(v))
+            dx = mid[k][0] - cx
+            dy = mid[k][1] - cy
             d = math.hypot(dx, dy) or 1.0
             reach[k] = d
             lift[k] = max(LIFTS, key=lambda o: (dx * o[1] + dy * o[2]) / d)[0]
+    # THE THIRD LABEL LEVEL, AND THE ONLY HONEST WAY TO GET ONE. The corner
+    # being read is at full ink and the rest of the continent is at a third
+    # — two levels, which is what a reader had. A middle rung needs to know
+    # which corners are NEXT to the one being read, and this atlas holds no
+    # adjacency: a macro region is a set of countries, and a hand-written
+    # list of neighbours would be an authored measurement, which the Data
+    # Integrity Rule forbids in as many words.
+    #
+    # It is derived instead, from the same means the lift is derived from:
+    # the two corners whose own middles are nearest this one's. Nine pairs
+    # from the drawn geometry, so a country moving corner moves the
+    # neighbours with it, and the stylesheet gets a set rather than eighty-
+    # one selectors — `data-near` is a space-separated list and `~=` reads
+    # it. TWO rather than three, because with three the rung covers more
+    # than half the continent and stops being a middle.
+    near = {k: " ".join(sorted(mid, key=lambda o: math.hypot(
+        mid[o][0] - mid[k][0], mid[o][1] - mid[k][1]))[1:3])
+        for k in mid}
 
     def _door(name, text):
         c = by_name.get(name)
@@ -7787,10 +8043,19 @@ def atlas_register(data):
         return (f'<a class="atdoor" data-corner="{esc(corner)}"{move} '
                 f'href="{urls.country(c)}">{text}</a>')
 
+    nameboxes = []
     names = name_countries(land, HERO_VIEW, max_names=99,
+                           reserved=ATLAS_TYPE_ZONES, boxes=nameboxes,
                            metric="atname", metric2="atname2",
                            decorate=_door)
     drawn = names.count("<text")
+    # THE NAMES GO DOWN FIRST AND THE MARKS AVOID THEM, because a name says
+    # which country and a mark says only that it is a door: where the two
+    # want one piece of ground the name is worth more. `nameboxes` already
+    # carries the two type zones, so a mark cannot land under the headline
+    # either.
+    marks = atlas_door_marks(land, liftable, nameboxes,
+                             ATLAS_TYPE_ZONES)
 
     # A LIT CORNER MUST PAINT ABOVE WHATEVER IT MOVES ONTO, AND SVG HAS NO
     # `z-index` TO DO IT WITH — probed in Chromium, on the element and with
@@ -7827,12 +8092,26 @@ def atlas_register(data):
     # both the source and the clone.
     land = land.replace('<g class="countries"', '<g class="atland"', 1)
     chunks = re.split(r'(<path\b[^>]*>(?:.*?</path>)?)', land, flags=re.S)
-    base, grouped = [], {}
+    base, grouped, cmarks = [], {}, {}
     for i in range(1, len(chunks), 2):
         mo = re.search(r'id="at-([a-z0-9-]+)"', chunks[i])
         slug = mo.group(1) if mo else ""
         if slug in liftable:
             grouped.setdefault(macro_of[slug], []).append(chunks[i])
+            # THE MARK TRAVELS WITH ITS OWN GROUND AND IS NOT IN THE SOCKET.
+            #
+            # It has to move with the corner — a corner that lifts eighteen
+            # units with its doors left behind is the defect nine country
+            # portraits were repaired for — so it goes inside `.atg`, which
+            # is what the transform rule targets. And it may NOT go inside
+            # `#atgi-`, which is what the socket clones: a `<use>` takes
+            # whatever matches the ORIGINAL in its own position, and
+            # `.atmark` is a bare class selector that matches the source, so
+            # a mark inside the clone would draw a second set of pine doors
+            # in the hole the corner has just lifted out of. Between the two
+            # groups is the one place that is inside the transform and
+            # outside the clone.
+            cmarks.setdefault(macro_of[slug], []).append(marks.get(slug, ""))
         else:
             base.append(chunks[i])
     # AND THE VOID A LIFTED CORNER LEAVES IS PAINTED SEA, WHICH IS A CLAIM
@@ -7876,7 +8155,7 @@ def atlas_register(data):
                if socket else "")
             + "".join(f'<g class="atg" data-corner="{esc(k)}" '
                       f'data-lift="{lift[k]}"><g id="atgi-{esc(k)}">'
-                      f'{"".join(v)}</g></g>'
+                      f'{"".join(v)}</g>{"".join(cmarks.get(k, ()))}</g>'
                       for k, v in sorted(grouped.items(),
                                          key=lambda kv: -reach[kv[0]]))
             + "".join(chunks[2::2]))
@@ -8021,6 +8300,7 @@ def atlas_register(data):
         # wrote.
         blocks.append(
             f'<section class="atcorner" data-corner="{esc(m["slug"])}" '
+            f'data-near="{esc(near.get(m["slug"], ""))}" '
             f'aria-labelledby="atc-{esc(m["slug"])}">'
             f'<div class="atcard">'
             f'<p class="atkick"><span>{len(cs)}</span> countries</p>'
@@ -8031,7 +8311,7 @@ def atlas_register(data):
             + "".join(f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
                       for c in cs)
             + "</p></div></section>")
-    return fig, "".join(blocks), drawn, cut_names
+    return fig, "".join(blocks), drawn, cut_names, len(marks)
 
 
 def country_mark(c, w=100, h=70):

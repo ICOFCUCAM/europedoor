@@ -2312,3 +2312,167 @@ not: measured at seven widths from 1024 to 2560 it sits inside the viewport
 at every one. And the static suite reported **43,558 dead links** — it was run
 while the background build was recreating `site/`, which is the concurrency
 failure recorded one screen above, three minutes after writing it down.
+
+## Home 40 — the headline is a protected zone, and the band stopped saying the page's extent a third time
+
+The owner's reading of the live plate 05 was that *the map is doing too much
+work, while the actual concept — "Fifty doors" — is not yet visually
+convincing*, with a specific rule under it: **no geographic label should ever
+cross the headline.** Measured before anything was written, and it is worse
+than the report:
+
+| viewport | what crossed what |
+|---|---|
+| 1280 | ICELAND through `One continent. Fifty doors.` by **109px**; SPAIN through the figures by 43 |
+| 1440 | the same two |
+| 1920 | **six** — RUSSIA through the card by 104, UNITED KINGDOM and IRELAND through the intro, FRANCE and SPAIN through the figures |
+| 2560 | UNITED KINGDOM through the headline by **256px** |
+
+**The drawing had never heard of the page.** `place_label_box` tests every
+label against the frame, against its own country's ground and against every
+box already `taken` — and `taken` held only what that drawing placed itself.
+The headline and the region card are set ON the continent, in the page's own
+grid. Nothing called it a contrast fault because the column's wash dims a
+name rather than deleting it, so what a reader got was a place name arriving
+faintly through a 76px serif, which is worse than either.
+
+### The reserve is a union over viewports, and it had to be
+
+The drawing is `xMidYMid slice` on a 1460×800 frame inside a container whose
+aspect runs 1.1 to 5.4, so the scale between the page's pixels and the
+projection's units differs on every screen and the same headline lands in a
+different part of Europe on each:
+
+| | in the drawing's own units |
+|---|---|
+| `.mega` at 1280×900 | [48, 67, 345, 326] |
+| `.mega` at 2560×900 | [232, 186, 422, 353] |
+| `.mega` at 1280×700 | [-97, 70, 284, 403] |
+
+A reserve fitted to one viewport is a fact about that viewport. 385 samples —
+twelve widths from 992 to 3440 crossed with seven heights from 640 to 1440,
+five scroll positions each, read through the SVG's own
+`getScreenCTM().inverse()`. The extremes are driven by ordinary screens: a
+1152×640 laptop sets the headline's depth, a 1024×1440 portrait monitor its
+width, a 3440×1080 ultrawide the card's left edge.
+
+**The union of the whole COLUMN is refused, measured.** Adding the intro, the
+action and the figures takes the left zone to y=846 and the right to x=652:
+**eleven of the seventeen names go**, among them UNITED KINGDOM, FRANCE,
+SPAIN, RUSSIA and TÜRKIYE — the exact list this repository already records as
+the wrong answer, the countries a reader orients by. What is reserved is the
+headline and the card, the two pieces of type that are display-size.
+
+**And it is the hull of two readings, because this headline fills its own
+measure.** An h1's box is wider than its glyphs — a contrast sweep here once
+read 2.15:1 against a real 9.58 for exactly that reason — so the sweep was run
+a second time over the headline's own line boxes, expecting the reserve to
+shrink. It did not: the glyph union is **narrower by 18 units and deeper by
+6**, and neither contains the other. 76px display type on three short lines is
+the one case where the trap does not apply. The hull costs no name the box
+union did not already cost.
+
+17 names → 11, and every collision with the headline and the card is gone at
+every width where the two-column composition applies. The six that went keep
+their shape, their frontier, their link and their row in the register column.
+
+### And the six figures came out, because the page says them three times
+
+The lead column carried a six-figure `<dl>` — countries, regions,
+destinations, places, experiences, journeys — derived, correct, and an extent
+that is not this band's own. Counted on the built homepage, **every one of
+them is stated twice more**: plate 01 prints four under the opening and the
+footer prints all six. A reader met the site's extent three times before
+meeting a corner of Europe, while the number this band IS about was the
+closing line a thousand pixels below — `.atsum` has printed *50 countries · 9
+corners · 1 continent* since the band was built, which is the chapter
+transition the owner asked for and it was already there.
+
+`an index exists to say how big a set is` is the rule that put them there and
+the rule that takes them out. `c_home_extent_kept` asserts each figure is
+still on the page beside its own word, because *when a band goes, check what
+it was the ONLY home for* — proved red by renaming one. The vertical rail went
+with them: `Europe through the door` set down the right edge, `aria-hidden`,
+repeating the headline's own metaphor in smaller type.
+
+## Home 41 — the door is drawn on what is open, and fifty of them were measured out
+
+The band's own sentence is *One continent. Fifty doors.* and it drew fifty
+country shapes with nothing on them that is a door. That is the /themes fault
+word for word — a page describing shapes its own closing sentence is about and
+drawing none.
+
+**Fifty arches were prototyped and refused on the measurement.** Rendered in
+Chromium at 6, 9, 13 and 16 units and photographed at 1× and 2× before a line
+of build code was written: at the size that fits the smallest country it is a
+texture, and at the size that resolves into an arch it does not fit.
+Luxembourg's largest ring spans 8 units and a mark needs about 13 to read as
+an arch rather than a tick — so forty-four at one weight draw a second
+frontier network over the first, which is *a signature applied to everything
+is wallpaper* exactly.
+
+What ships is the same mark on the corner that is **open**: 29 of 44, one per
+country that can hold one on its own ground, revealed only on the corner being
+read. Never more than nine on screen, and `fifty doors` is demonstrated across
+the nine steps rather than asserted all at once. It is a STATE rather than a
+selection — every country carries one — so the count is never a judgement
+about which countries matter.
+
+Four things had to be got right and three of them are faults this repository
+already records:
+
+- **The curve is `render.arch_path`, translated.** A hand-written arc would be
+  a fourth drawing of the one shape the aperture is cut from in three
+  renderers.
+- **The rise is stated.** `arch_path` defaults to `min(h × .34, w × .5)`,
+  which is the confident flat span a mason strikes over an opening cut across
+  a 900×320 drawing — at glyph size it rendered a **rounded rectangle**. The
+  head is struck at half the span, which is the semicircle the wordmark's own
+  door has.
+- **It sits on its own ground.** The first prototype walked out from the
+  bounding-box centre to the first point inside the fill and put Denmark's
+  mark in the Kattegat: *a bounding box is not a country*, and a point inside
+  the fill is not a box inside it. Five samples now — the middle and the four
+  corners of the glyph pulled in.
+- **It is inside the transform and outside the clone.** The mark has to move
+  with its corner, so it goes in `.atg`; it may NOT go in `#atgi-`, which is
+  what the socket clones, because *a `<use>` takes whatever matches the
+  ORIGINAL in its own position* and `.atmark` is a bare class selector — a
+  mark inside the clone draws a second set of pine doors in the hole the
+  corner has just lifted out of.
+
+**And the first run left the British Isles with no door at all.** The type
+zones are a union over viewports, which is right for a name with nine anchors
+and far too blunt for a 20-unit glyph: both British countries sit inside it,
+so the one step of the nine whose corner is two islands said nothing. There
+are two rungs now — a mark avoids the zones where it can and takes the ground
+under them where that is all there is — which is `NameGround`'s own shape,
+zero crossings first and two only if nothing fits.
+
+**The rung could not fire, because `boxes` handed back what it was given.**
+`name_countries` starts `taken` as a copy of `reserved`, so extending the
+caller's list with the whole of it told the register that its own reserve was
+a *name* — hard, not soft. It cost both British doors silently, on a rung
+written to stop exactly that. `boxes` is what the pass PLACED.
+
+## Home 42 — a middle rung, because two levels are a switch and not a reading
+
+The corner being read was at full ink and everything else at a third: the
+continent flicked between on and off nine times and nothing said where the
+corner SAT. A middle rung needs to know which corners are NEXT to the one
+being read, and this atlas holds no adjacency — a macro region is a set of
+countries, and a hand-written list of neighbours would be an authored
+measurement.
+
+It is derived from the same means the lift is: the two corners whose own
+middles are nearest this one's, nine pairs out of the drawn geometry. The
+result reads as geography — the Nordics next to the Baltic and the British
+Isles, the Mediterranean next to the Adriatic & Balkans and Alpine Central,
+the Caucasus next to Eastern Europe and the Balkans — and a country moving
+corner moves the neighbours with it. **Two rather than three**, because with
+three the rung covers more than half the continent and stops being a middle.
+
+`data-near` is a space-separated list and `~=` reads it, so the stylesheet
+gets nine selectors rather than eighty-one; `atlas.js` copies one attribute
+across, exactly as it copies the corner, and computes no distance of its own.
+Measured on the Mediterranean step: 3 names at full ink, 3 at .62, 5 at .34.

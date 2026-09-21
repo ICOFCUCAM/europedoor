@@ -56,9 +56,16 @@
        from the drawn geometry, so this file carries no geography, no
        direction and no number. It says which corner is being read. */
     stage.dataset.at = slug;
+    /* AND THE CORNERS NEXT TO IT, WHICH IS THE THIRD LABEL LEVEL. The build
+       derives each corner's two nearest from the drawn geometry and writes
+       them on the step; this copies one attribute across, exactly as it
+       copies the corner itself. No adjacency, no distance and no list is
+       computed here — the same reason this file carries no geography. */
     for (const s of steps) {
-      if (s.dataset.corner === slug) s.dataset.on = '';
-      else s.removeAttribute('data-on');
+      if (s.dataset.corner === slug) {
+        s.dataset.on = '';
+        stage.dataset.near = s.dataset.near || '';
+      } else s.removeAttribute('data-on');
     }
   };
 

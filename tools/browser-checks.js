@@ -6578,6 +6578,116 @@ async function main() {
     }
   }
 
+  /* THE PAGE'S OWN TYPE STANDS OVER THE REGISTER'S DRAWING, AND THE DRAWING
+   * DID NOT KNOW.
+   *
+   * `place_label_box` tests every label against the frame, against its own
+   * country's ground and against every box already taken — and what was in
+   * `taken` on plate 05 was only the labels that drawing placed itself. The
+   * headline and the region card are set ON the continent, in the page's
+   * own grid, and the name layer had never heard of either: measured at
+   * 1280, ICELAND ran 109 pixels through `One continent. Fifty doors.`; at
+   * 1920 six names collided; at 2560 UNITED KINGDOM ran 256 pixels through
+   * the headline. The wash under the column is why nobody called it a
+   * contrast fault — a name arrives faintly through a 76px serif rather
+   * than being deleted by it, which is worse than either.
+   *
+   * `pages.ATLAS_TYPE_ZONES` is the reserve, and it is a UNION over
+   * viewports rather than a box fitted to one. The drawing is `slice` on a
+   * 1460x800 frame inside a container whose aspect runs 1.1 to 5.4, so the
+   * scale between the page's pixels and the projection's units differs on
+   * every screen and the same headline lands in a different part of Europe
+   * on each. This end MEASURES, because arithmetic on a declared number
+   * proves nothing about a page — the palette register asserted a contrast
+   * for a colour the stylesheet no longer had, for exactly this reason.
+   *
+   * AND IT READS THE DECLARATION RATHER THAN CARRYING A COPY. Four typed
+   * dispatch caps cost this repository a whole sitting; the numbers are
+   * parsed out of `tools/lib/pages.py`, which is where the build reads
+   * them, so the two cannot disagree.
+   *
+   * The viewports are the ones the 385-sample sweep found BINDING — 1152
+   * x640 drives the headline's depth, 1024x1440 its width, 3440x1080 the
+   * card's left edge — plus the three a reader is most likely on. A check
+   * that sampled only the common widths would go green on a composition
+   * that is wrong on an ultrawide, which is the state this one was written
+   * from.
+   *
+   * PROVED RED by narrowing the declared headline box to 200x200 and
+   * running the whole suite: one failure of 13,160, naming the element,
+   * the viewport, the scroll position, the box measured and the box
+   * declared. A check is not proved by passing.
+   */
+  {
+    const src = fs.readFileSync(
+      path.join(__dirname, "lib", "pages.py"), "utf8");
+    const dec = src.match(
+      /ATLAS_TYPE_ZONES = \(\s*\(([^)]*)\),[^(]*\(([^)]*)\),/);
+    ok(!!dec,
+       "tools/lib/pages.py no longer declares ATLAS_TYPE_ZONES in a shape "
+       + "this check can read, so the protected zone under the homepage's "
+       + "atlas register is being measured against nothing");
+    if (dec) {
+      const want = [1, 2].map(i => dec[i].split(",").slice(0, 4)
+                                   .map(s => parseFloat(s)));
+      const VPS = [[1152, 640], [1024, 1440], [3440, 1080],
+                   [1280, 900], [1920, 1080], [2560, 900]];
+      let seen = 0, outside = [];
+      for (const [w, h] of VPS) {
+        const bp = await browser.newPage({ viewport: { width: w, height: h } });
+        await bp.goto(base + "/", { waitUntil: "load" });
+        for (const step of [0, 0.4, 0.85]) {
+          const got = await bp.evaluate((s) => {
+            const at = document.querySelector(".atlas");
+            window.scrollTo(0, at.offsetTop + s * (at.offsetHeight - innerHeight));
+            if (getComputedStyle(document.querySelector(".atstage")).position
+                !== "sticky") return null;
+            const svg = document.querySelector("#act5 svg.instrmap");
+            const m = svg.getScreenCTM().inverse();
+            const P = (x, y) => { const p = svg.createSVGPoint();
+              p.x = x; p.y = y; const q = p.matrixTransform(m);
+              return [q.x, q.y]; };
+            const U = (u, r) => u ? [Math.min(u[0], r[0]), Math.min(u[1], r[1]),
+                                     Math.max(u[2], r[2]), Math.max(u[3], r[3])]
+                                  : r;
+            const box = (e) => { if (!e) return null;
+              const b = e.getBoundingClientRect(); if (!b.width) return null;
+              const a = P(b.x, b.y), c = P(b.right, b.bottom);
+              return [a[0], a[1], c[0], c[1]]; };
+            let card = null;
+            for (const c of document.querySelectorAll(".atcard")) {
+              if (+getComputedStyle(c).opacity <= 0.5) continue;
+              const r = box(c); if (r) card = U(card, r);
+            }
+            return { mega: box(document.querySelector("#act5 .mega")), card };
+          }, step);
+          if (!got) break;
+          seen++;
+          for (const [k, i] of [["headline", 0], ["card", 1]]) {
+            const r = got[k === "headline" ? "mega" : "card"];
+            if (!r) continue;
+            const z = want[i];
+            if (r[0] < z[0] - 1 || r[1] < z[1] - 1
+                || r[2] > z[2] + 1 || r[3] > z[3] + 1)
+              outside.push(`${k} at ${w}x${h}+${step} measures [`
+                + r.map(v => v.toFixed(1)).join(", ") + "] against a declared ["
+                + z.join(", ") + "]");
+          }
+        }
+        await bp.close();
+      }
+      ok(seen >= 12,
+         `the atlas register's type zones were measured at only ${seen} `
+         + `samples of ${VPS.length * 3}. The two-column composition has `
+         + `stopped being sticky at widths this check assumes it is, so the `
+         + `reserve under the country names is being asserted about nothing`);
+      ok(outside.length === 0,
+         "the page's own type has left the box the label placer reserves "
+         + "for it, so a country name may now be set under it: "
+         + outside.slice(0, 4).join("; "));
+    }
+  }
+
   /* A PAGE'S BAND NUMBERS RUN 01, 02, 03 — AND ON 753 PAGES TWO OF THEM WERE
    * THE SAME NUMBER.
    *

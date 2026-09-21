@@ -11477,34 +11477,9 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .atintro { font-family: var(--display); font-size: var(--t-md);
            margin: var(--s4) 0 0; max-width: 22ch; }
 .atlead .golink { margin-top: var(--s4); }
-/* SIX FIGURES, TWO ACROSS, AND THEY ARE THE PAGE'S OWN EXTENT. A `<dl>`
-   because each one is a term and its figure; the figure is the `<dt>`
-   because it is what is read first, and a definition list does not care
-   which way round the type is. */
-.atstats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-           gap: var(--s3) var(--s5); margin: var(--s6) 0 0;
-           padding-top: var(--s3); border-top: 1px solid var(--rule); }
-/* `color` IS NOT RESTATED HERE. The band already binds `--ink` and a `<dt>`
-   inherits it, so the declaration could never move a pixel — named by the
-   dead-rule scan in the run that shipped this band. */
-.atstats dt { font-family: var(--display); font-size: var(--t-xl);
-              line-height: 1;
-              font-variant-numeric: tabular-nums; }
-.atstats dd { margin: .3em 0 0; font-size: var(--t-xs);
-              letter-spacing: .18em; text-transform: uppercase;
-              color: var(--ink-3); }
 .atcue { position: absolute; left: 0; bottom: 5svh; margin: 0;
          font-size: var(--t-xs); letter-spacing: .18em;
          text-transform: uppercase; color: var(--ink-3); }
-/* THE RAIL IS THE ONE MARK ON THIS BAND THAT IS PURE ART DIRECTION, and it
-   is `aria-hidden` for that reason: rotated uppercase down the edge is a
-   texture rather than a sentence, and a screen reader reading "Europe
-   through the door" out of sequence between a map and a list of countries
-   is noise. Nothing else on the page depends on it. */
-.atrail { position: absolute; right: 0; top: 7svh; margin: 0;
-          writing-mode: vertical-rl; transform: rotate(180deg);
-          font-size: var(--t-xs); letter-spacing: .22em;
-          text-transform: uppercase; color: var(--ink-3); }
 /* THE PANEL GETS GROUND AND IT IS A SCRIM, NOT A CARD. Type over a
    drawing needs the ratio to be a property of the design rather than of
    whatever country happens to be under it — the rule this stylesheet
@@ -11689,6 +11664,28 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .atstage[data-at="caucasus-bosphorus"] .atg[data-corner="caucasus-bosphorus"] {
   fill: var(--atlas-here); }
 .atstage[data-at] .atname { opacity: .34; }
+/* AND A MIDDLE RUNG, BECAUSE TWO LEVELS ARE A SWITCH AND NOT A READING.
+   The corner being read is at full ink and everything else was at a third,
+   so the continent flicked between on and off nine times and nothing said
+   where the corner SAT. The two corners nearest it — derived by the build
+   from the drawn geometry, never authored — sit between, so the light falls
+   off outward from what is being read.
+
+   THE ORDER IS THE WHOLE OF IT. This and the rule under it are both (0,5,0)
+   and a corner is never in its own `data-near` list, so nothing collides
+   today; written the other way round it would, and this stylesheet has lost
+   that fight four times in a way that renders as *the thing is simply not
+   there*. Near first, lit second. */
+.atstage[data-near~="nordic"] .atdoor[data-corner="nordic"] .atname,
+.atstage[data-near~="baltic"] .atdoor[data-corner="baltic"] .atname,
+.atstage[data-near~="british-isles"] .atdoor[data-corner="british-isles"] .atname,
+.atstage[data-near~="western"] .atdoor[data-corner="western"] .atname,
+.atstage[data-near~="alpine-central"] .atdoor[data-corner="alpine-central"] .atname,
+.atstage[data-near~="mediterranean"] .atdoor[data-corner="mediterranean"] .atname,
+.atstage[data-near~="adriatic-balkans"] .atdoor[data-corner="adriatic-balkans"] .atname,
+.atstage[data-near~="eastern"] .atdoor[data-corner="eastern"] .atname,
+.atstage[data-near~="caucasus-bosphorus"] .atdoor[data-corner="caucasus-bosphorus"] .atname {
+  opacity: .62; }
 .atstage[data-at="nordic"] .atdoor[data-corner="nordic"] .atname,
 .atstage[data-at="baltic"] .atdoor[data-corner="baltic"] .atname,
 .atstage[data-at="british-isles"] .atdoor[data-corner="british-isles"] .atname,
@@ -11699,6 +11696,38 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .atstage[data-at="eastern"] .atdoor[data-corner="eastern"] .atname,
 .atstage[data-at="caucasus-bosphorus"] .atdoor[data-corner="caucasus-bosphorus"] .atname {
   opacity: 1; fill: var(--pine-ink); }
+/* AND THE DOOR IS DRAWN ON WHAT IS OPEN. `One continent. Fifty doors.` was
+   set over fifty country shapes with nothing on them that is a door, which
+   is the /themes fault — a page describing shapes its own closing sentence
+   is about and drawing none.
+
+   FIFTY ARCHES WERE PROTOTYPED AND MEASURED OUT. Rendered in Chromium at 6,
+   9, 13 and 16 units, at 1x and at 2x: at the size that fits the smallest
+   country it is a texture, and at the size that resolves into an arch it
+   does not fit — Luxembourg's largest ring spans 8 units and a mark needs
+   about 13 to read. Forty-four of them at one weight draw a second frontier
+   network over the first, which is `a signature applied to everything is
+   wallpaper` exactly.
+
+   So the mark is a STATE: every country carries one and the corner being
+   read shows its own. Never more than nine on screen, at 20 units in the
+   family's own ink, and `fifty doors` is demonstrated across the nine steps
+   rather than asserted all at once. The curve is `render.arch_path` — the
+   same one the aperture is cut from in three renderers — so this is the
+   mark rather than a fourth drawing of it. */
+.atmark { fill: none; stroke: var(--pine-ink); stroke-width: 1.2;
+          vector-effect: non-scaling-stroke; opacity: 0;
+          transition: opacity .5s ease; }
+.atstage[data-at="nordic"] .atg[data-corner="nordic"] .atmark,
+.atstage[data-at="baltic"] .atg[data-corner="baltic"] .atmark,
+.atstage[data-at="british-isles"] .atg[data-corner="british-isles"] .atmark,
+.atstage[data-at="western"] .atg[data-corner="western"] .atmark,
+.atstage[data-at="alpine-central"] .atg[data-corner="alpine-central"] .atmark,
+.atstage[data-at="mediterranean"] .atg[data-corner="mediterranean"] .atmark,
+.atstage[data-at="adriatic-balkans"] .atg[data-corner="adriatic-balkans"] .atmark,
+.atstage[data-at="eastern"] .atg[data-corner="eastern"] .atmark,
+.atstage[data-at="caucasus-bosphorus"] .atg[data-corner="caucasus-bosphorus"] .atmark {
+  opacity: 1; }
 /* A SCROLL STATE IS A STEP RATHER THAN A BAND. Nine stacked blocks at
    their own content height made this section 3,683 pixels — four screens of
    homepage for a band whose brief asks for two and a bit. Each corner is a
@@ -11735,7 +11764,8 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    `.atsum`, six rules down. A rule recorded is not a rule inherited, and
    the guard is what noticed both times. */
 /* `color` IS NOT RESTATED HERE EITHER — `h1, h2, h3` already take the
-   band's ink and the scan named this in the same run as `.atstats dt`. */
+   band's ink, and the dead-rule scan named this declaration in the run
+   that shipped the band. */
 .atcorner h3 { font-family: var(--display); font-size: var(--ed-display-3);
                line-height: .96; letter-spacing: -.02em;
                margin: var(--s2) 0 var(--s3); }
@@ -11819,8 +11849,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      undone, the map is a sticky band above them, and a wash over paper is
      a wash over nothing. */
   .atlead::before { display: none; }
-  .atcue, .atrail { display: none; }
-  .atstats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .atcue { display: none; }
   .atstage::after { display: none; }
   /* AND THE PAN GOES WITH THE STAGE. It exists because the panel sits ON
      the drawing and covers the corner being lit; below this width the
@@ -11852,9 +11881,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .atlas[data-live] .atcorner:not([data-on]) .atcard,
   .atlas[data-live] .atcorner .atcard { opacity: 1; pointer-events: auto;
                                         transition: none; }
-}
-@media (max-width: 44rem) {
-  .atstats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 44rem) {
   .atplate .lyr-labels { display: none; }
