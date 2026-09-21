@@ -3291,6 +3291,34 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
   font-family: var(--display); font-size: calc(15px / var(--z));
   letter-spacing: .26em; text-transform: uppercase;
   fill: color-mix(in srgb, var(--atlas-coast) 82%, transparent); }
+/* AND A THIRD LABEL FAMILY WAS ON THIS DRAWING AND ONLY TWO HAD A BOX.
+   The comment above records the first half: the names were emitted BEFORE the
+   dots, so 319 destinations painted over the thirteen countries, and moving
+   them last fixed that. What it left is the other side of the same collision
+   — a name drawn ON a dot with nothing between them. Measured in Chromium at
+   1280, 1440 and 1920, identically: 14 of the 18 labels sit on a destination
+   dot and there are 44 label-on-dot overlaps, where label-on-LABEL is 0
+   because that pass exists. UNITED KINGDOM and SPAIN cross six dots each,
+   ITALY and FRANCE five, TYRRHENIAN SEA four.
+   The placer cannot answer this one. A dot is at a real coordinate and cannot
+   move, and seeding 319 of them into `taken` the way the sea names are seeded
+   would drop GERMANY for being full of destinations — which is the country a
+   reader orients by, and dropping it is the failure `name_countries` already
+   records from raising its own ceiling. What a printed atlas does instead is
+   give the name a HALO, so it reads over whatever is beneath it and the mark
+   underneath stays a mark rather than merging into the type.
+   ONE HALO SERVES BOTH FAMILIES, and the arithmetic is why: this palette's
+   land is #D8D4C7 and its water #DDE8E7, which measure 1.18 against each
+   other — the step the cartography block already declares and calls the point
+   — so a halo in the land tone is invisible on water as well as on land, and
+   strongly separated from the cobalt of a dot. `paint-order` puts it under
+   the fill; `non-scaling-stroke` states the width in device pixels, because
+   this type is sized `calc(15px / var(--z))` inside a scaled viewBox and a
+   user-unit halo would be a different weight at every render size. */
+.europemap :is(.lyr-labels .cname, .lyr-water-labels .seaname) {
+  paint-order: stroke fill;
+  stroke: var(--map-land); stroke-width: 3px; stroke-linejoin: round;
+  vector-effect: non-scaling-stroke; }
 /* THE TYPE IS ON TOP OF THE DRAWING AND TAKES NO CLICKS, which is what a
    printed sheet does and what the first version got backwards: the names
    were emitted before the dots, so 319 destinations painted over the
