@@ -1726,8 +1726,21 @@ a .kicker { color: var(--ink-3); }
    65 characters is the line length a reader can follow from end to start
    again; nobody reads a list of names that way, they scan it. The row's own
    grid is the constraint. */
+/* THE MEASURE COMES BACK FOR PROSE AND THE LIST KEEPS ITS EXEMPTION.
+   `max-width: none` was written with its reason on it — *`.rowsub` is a `<p>`
+   holding a middot-separated list of place names ... nobody reads a list of
+   names end to start, they scan it* — which is true, and was written for the
+   minority. Counted on the built site: 2,326 sublines carry a middot and
+   6,554 are prose, so a rule for one case in four was applied to all of them.
+   Measured before, a country page ran 132 characters to the line and
+   /beyond-the-obvious 131; /europe-in had already recorded the other half of
+   this — *a destination's SUMMARY is prose and 140 characters on one line is
+   what a measure exists to prevent; the generalisation was one family too
+   far.* Only the builder can tell the two apart, because CSS cannot match on
+   text, so `render.rowsub()` says which. */
 .row .rowsub { font-size: var(--t-sm); color: var(--ink-2); margin: var(--s1) 0 0;
                max-width: none; }
+.row .rowsub.rowsub-prose { max-width: 68ch; }
 .row .rowmeta { font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
 
 /* STATE IN THE FORM, NOT ONLY IN THE WORD. /how-it-works is three bands —

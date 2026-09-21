@@ -2274,6 +2274,43 @@ def ed_split(*, title, body, media="", reverse=False):
     )
 
 
+def rowsub(text):
+    """A row's subline, measured when it is prose and free when it is a list.
+
+    `.row .rowsub { max-width: none }` carries its own reason and the reason
+    is about a LIST: *`.rowsub` is a `<p>` holding a middot-separated list of
+    place names ... nobody reads a list of names end to start, they scan it.*
+    True, and written for the minority. Counted on the built site, **2,326
+    sublines carry a middot and 6,554 are prose** — a sentence about a place,
+    a theme's argument, a story's standfirst — so a rule for one case in four
+    was applied to all of them, and /europe-in already recorded one half of
+    this: *a destination's SUMMARY is prose and 140 characters on one line is
+    what a measure exists to prevent; the generalisation was one family too
+    far.* Measured before: a country page ran 132 characters to the line and
+    /beyond-the-obvious 131.
+
+    The builder is the only thing that can tell the two apart — CSS cannot
+    match on text — so it says which, and the exemption stays exactly where
+    its reason holds.
+    """
+    t = str(text or "")
+    if not t:
+        return ""
+    # THE MEASURE OPTS IN RATHER THAN OUT, AND THE FIRST VERSION HAD IT THE
+    # OTHER WAY ROUND. Capping `.rowsub` by default and exempting the lists
+    # looks equivalent and is not: the subline is emitted from about twenty
+    # further places that build it by joining rather than from one field, so a
+    # default cap reaches every one of them and a `rowsub-list` exemption
+    # reaches none — including `" \u00b7 ".join(stops)` on /journeys, which is
+    # the exact list the exemption was written for. Measured on the built site
+    # after that first attempt: zero pages carried the exemption class.
+    # Inverted, a site this helper has not reached keeps exactly the behaviour
+    # it has today, and the measure applies only where the builder has said
+    # the text is prose.
+    kind = "rowsub" if "\u00b7" in t else "rowsub rowsub-prose"
+    return f'<p class="{kind}">{esc(t)}</p>'
+
+
 def ed_rows(rows, *, numbered=True, level=3):
     """An index as a set of rules, not a grid of cards.
 
@@ -2302,7 +2339,7 @@ def ed_rows(rows, *, numbered=True, level=3):
         # a sentence that says what distinguishes this one from the fifty
         # under it, and three of them carry a travel advisory, which is a
         # STATE rather than a word and has its own tone.
-        sub = (f'<p class="rowsub">{esc(row["sub"])}</p>'
+        sub = (rowsub(row["sub"])
                if row.get("sub") else "")
         flag = (f' <span class="tag advisory">{esc(row["flag"])}</span>'
                 if row.get("flag") else "")

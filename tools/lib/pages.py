@@ -25,7 +25,7 @@ from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_path, a
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
                      ed_slot, photo_href, credit_html, ad_slot,
-                     photo_credits)
+                     photo_credits, rowsub)
 from .score import city_scores, country_scores, discoverability
 
 HOME = ("Europe", "/discover")
@@ -3144,7 +3144,7 @@ def countries_index(data):
             f'{n_of(mcity, "destination")} · '
             f'{round(kw, -1):,.0f}&thinsp;×&thinsp;{round(kh, -1):,.0f}&thinsp;km</p>'
             f'<h3><a href="{urls.macro(m)}" class="nodec">{esc(m["name"])}</a></h3>'
-            f'<p class="rowsub">{esc(m["blurb"])}</p></div>'
+            f'{rowsub(m["blurb"])}</div>'
             f'<figure class="macroshot">{pic}</figure>'
             f'<figure class="macroart">'
             f'{region_glyph(m["countries"], macro_frame(data, m), aspect="own")}'
@@ -4488,7 +4488,7 @@ def country_page(data, c):
         )
     festivals = "".join(
         f"""<a class="row" href="{urls.month(f['month'])}"><div><h3>{esc(f['name'])}</h3>
-        <p class="rowsub">{esc(f.get('where', ''))}</p></div>
+        {rowsub(f.get('where', ''))}</div>
         <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(data['taxonomy']['month_names'][f['month']])}</p></a>"""
         for f in c["festivals"]
     )
@@ -4531,7 +4531,7 @@ def country_page(data, c):
     popular = "".join(
         f'<a class="row" href="{urls.city(c, r, t)}">'
         f'<div><h3>{esc(t["name"])}</h3>'
-        f'<p class="rowsub">{esc(t["summary"])}</p></div>'
+        f'{rowsub(t["summary"])}</div>'
         f'<p class="rowmeta">{esc(r["name"])} · '
         f'{n_of(len(t.get("places", [])), "place")} · '
         f'{n_of(len(t.get("experiences", [])), "experience")}</p></a>'
@@ -4545,7 +4545,7 @@ def country_page(data, c):
     ][:8]
     cexps = "".join(
         f"""<a class="row" href="{urls.city(c, r, t)}#things-to-do">
-        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <div><h3>{esc(e['name'])}</h3>{rowsub(e['summary'])}</div>
         <p class="rowmeta">{esc(t['name'])} · {esc(kinds_map[e['kind']])}</p></a>"""
         for r, t, e in cexp_items
     )
@@ -4559,14 +4559,14 @@ def country_page(data, c):
                     continue
                 seen_j.add(j["slug"])
                 cjourneys += (f"""<a class="row" href="{urls.journey(j)}">
-                    <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
+                    <div><h3>{esc(j['name'])}</h3>{rowsub(j['strapline'])}</div>
                     <p class="rowmeta">{j['days']} days · via {esc(t['name'])}</p></a>""")
             for st in b["stories"]:
                 if st["slug"] in seen_s:
                     continue
                 seen_s.add(st["slug"])
                 cstories += (f"""<a class="row" href="{urls.story(st)}">
-                    <div><h3>{esc(st['title'])}</h3><p class="rowsub">{esc(st['standfirst'])}</p></div>
+                    <div><h3>{esc(st['title'])}</h3>{rowsub(st['standfirst'])}</div>
                     <p class="rowmeta">{esc(st['section'])} · {esc(st['reading'])}</p></a>""")
     know = "".join(f"<li>{esc(k)}</li>" for k in c["know"])
     food = "".join(f"<li>{esc(f)}</li>" for f in c["food"])
@@ -4843,13 +4843,13 @@ def region_page(data, c, r):
     rexps = [(t, e) for t in r["cities"] for e in t.get("experiences", [])]
     placerows = "".join(
         f"""<a class="row" href="{urls.place(c, r, t, pl)}">
-        <div><h3>{esc(pl['name'])}</h3><p class="rowsub">{esc(pl['summary'])}</p></div>
+        <div><h3>{esc(pl['name'])}</h3>{rowsub(pl['summary'])}</div>
         <p class="rowmeta">{esc(t['name'])} · {esc(PLACE_KIND_NAMES[pl['kind']])}</p></a>"""
         for t, pl in rplaces
     )
     exprows = "".join(
         f"""<a class="row" href="{urls.city(c, r, t)}#things-to-do">
-        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <div><h3>{esc(e['name'])}</h3>{rowsub(e['summary'])}</div>
         <p class="rowmeta">{esc(t['name'])} · {esc(kinds_map[e['kind']])}</p></a>"""
         for t, e in rexps
     )
@@ -4860,7 +4860,7 @@ def region_page(data, c, r):
                 continue
             seen.add(j["slug"])
             jrows += (f"""<a class="row" href="{urls.journey(j)}">
-                <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
+                <div><h3>{esc(j['name'])}</h3>{rowsub(j['strapline'])}</div>
                 <p class="rowmeta">{j['days']} days · via {esc(t['name'])}</p></a>""")
     # Named apart from `nights`, which the card loop below reuses for a
     # per-destination range — the collision made this a list at render time.
@@ -4893,7 +4893,7 @@ def region_page(data, c, r):
     destrows = "".join(
         f'<a class="row" href="{urls.city(c, r, t)}">'
         f'<div><h3>{esc(t["name"])}</h3>'
-        f'<p class="rowsub">{esc(t["summary"])}</p></div>'
+        f'{rowsub(t["summary"])}</div>'
         f'<p class="rowmeta">'
         f'{esc(CITY_TYPE_NAMES.get(t.get("city_type"), "Destination"))}<br>'
         f'<span class="small">{nights_line(t)}</span></p></a>'
@@ -5076,7 +5076,7 @@ def city_page(data, c, r, t):
     # each row had a stable id to point at.
     exps = "".join(
         f"""<div class="row" id="exp-{esc(e['slug'])}"><div><h3>{esc(e['name'])}</h3>
-        <p class="rowsub">{esc(e['summary'])}</p>{_where(e)}</div>
+        {rowsub(e['summary'])}{_where(e)}</div>
         <div class="rowside"><p class="rowmeta">{esc(kinds[e['kind']])} · {esc(e['band'])}</p>
         <button class="btn ghost tiny" type="button"
           data-save="experience:{esc(cid)}#{esc(e['slug'])}" data-kind="Experience"
@@ -5115,20 +5115,20 @@ def city_page(data, c, r, t):
         leg = next(l for l in j["legs"] if l["city"] == cid)
         edge_rows.append(
             f"""<a class="row" href="{urls.journey(j)}">
-            <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(leg['why'])}</p></div>
+            <div><h3>{esc(j['name'])}</h3>{rowsub(leg['why'])}</div>
             <p class="rowmeta">Journey · {n_of(leg['nights'], 'night')} here</p></a>"""
         )
     for th in b["themes"]:
         stop = next(x for x in th["stops"] if x["city"] == cid)
         edge_rows.append(
             f"""<a class="row" href="/themes/{esc(th['slug'])}">
-            <div><h3>{esc(th['name'])}</h3><p class="rowsub">{esc(stop['why'])}</p></div>
+            <div><h3>{esc(th['name'])}</h3>{rowsub(stop['why'])}</div>
             <p class="rowmeta">Theme</p></a>"""
         )
     for st in b["stories"]:
         edge_rows.append(
             f"""<a class="row" href="/stories/{esc(st['slug'])}">
-            <div><h3>{esc(st['title'])}</h3><p class="rowsub">{esc(st['standfirst'])}</p></div>
+            <div><h3>{esc(st['title'])}</h3>{rowsub(st['standfirst'])}</div>
             <p class="rowmeta">Story · {esc(st['reading'])}</p></a>"""
         )
     edges = section(
@@ -5145,7 +5145,7 @@ def city_page(data, c, r, t):
     ) + "</p>") if fkeys else ""
     placerows = "".join(
         f"""<a class="row" href="{urls.place(c, r, t, pl)}">
-        <div><h3>{esc(pl['name'])}</h3><p class="rowsub">{esc(pl['summary'])}</p></div>
+        <div><h3>{esc(pl['name'])}</h3>{rowsub(pl['summary'])}</div>
         <p class="rowmeta">{esc(PLACE_KIND_NAMES[pl['kind']])} · {esc(pl['duration'])}</p></a>"""
         for pl in t.get("places", [])
     )
@@ -5175,7 +5175,7 @@ def city_page(data, c, r, t):
     def _festrows(items):
         return "".join(
             f"""<div class="row"><div><h3>{esc(f['name'])}</h3>
-            <p class="rowsub">{esc(f.get('where', ''))}</p></div>
+            {rowsub(f.get('where', ''))}</div>
             <p class="rowmeta">{esc(data['taxonomy']['month_names'][f['month']])}</p></div>"""
             for f in items
         )
@@ -5565,7 +5565,7 @@ def interests_index(data, ranking):
             f'<div><p class="kicker">{n_of(f["n"], "destination")} &middot; '
             f'{f["pct"]}% of the Atlas &middot; {n_of(f["ncountry"], "country")}</p>'
             f'<h3>{esc(f["name"])}</h3>'
-            f'<p class="rowsub">{esc(where)}</p></div></a>')
+            f'{rowsub(where)}</div></a>')
 
     def _median(xs):
         xs = sorted(xs)
@@ -5819,7 +5819,7 @@ def interest_page(data, i, ranking):
         + "".join(
             f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
             f'<div><h2>{esc(n["city"]["name"])}</h2>'
-            f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+            f'{rowsub(n["city"]["summary"])}</div>'
             f'<p class="rowmeta">{esc(n["country"]["name"])} · '
             f'{esc(n["region"]["name"])}</p></a>'
             for n in by_macro[m["slug"]])
@@ -6444,7 +6444,7 @@ def journey_page(data, j):
     ][:10]
     jexps = "".join(
         f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}#things-to-do">
-        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <div><h3>{esc(e['name'])}</h3>{rowsub(e['summary'])}</div>
         <p class="rowmeta">{esc(n['city']['name'])} · {esc(kinds_map[e['kind']])}</p></a>"""
         for n, e in jexp_items
     )
@@ -10336,7 +10336,7 @@ def facet_page(data, c, r, t, key, payload):
 
     rowhtml = "".join(
         f"""<a class="row" href="{esc(href)}"><div><h2>{esc(title)}</h2>
-        <p class="rowsub">{esc(sub)}</p></div><p class="rowmeta">{esc(meta)}</p></a>"""
+        {rowsub(sub)}</div><p class="rowmeta">{esc(meta)}</p></a>"""
         for href, title, sub, meta in rows
     )
     extra = ""
@@ -10412,7 +10412,7 @@ def place_page(data, c, r, t, pl):
     HOW = {"at": "Happens here", "from": "Starts here", "about": "About this place"}
     doing = "".join(
         f"""<a class="row" href="{urls.experience(c, r, t, e)}">
-        <div><h3>{esc(e['name'])}</h3><p class="rowsub">{esc(e['summary'])}</p></div>
+        <div><h3>{esc(e['name'])}</h3>{rowsub(e['summary'])}</div>
         <p class="rowmeta">{esc(HOW[link['how']])}</p></a>"""
         for e in t.get("experiences", [])
         for link in e.get("at", []) if link["place"] == pl["slug"]
@@ -10437,7 +10437,7 @@ def place_page(data, c, r, t, pl):
     # the region page has always used for the same relation one level up.
     jrows = "".join(
         f"""<a class="row" href="{urls.journey(j)}">
-        <div><h3>{esc(j['name'])}</h3><p class="rowsub">{esc(j['strapline'])}</p></div>
+        <div><h3>{esc(j['name'])}</h3>{rowsub(j['strapline'])}</div>
         <p class="rowmeta">{j['days']} days</p></a>"""
         for j in b["journeys"]
     )
@@ -11705,7 +11705,7 @@ def business_page(data):
     rows = "".join(
         f"""<div class="row"><div><h3>{esc(p['name'])}
         <span class="tag {'verified' if p['tier'] == 'verified' else ''}">{esc(p['tier'])}</span></h3>
-        <p class="rowsub">{esc(p['summary'])}</p></div>
+        {rowsub(p['summary'])}</div>
         <p class="rowmeta">{esc(p['city'])}, {esc(data['countries'][p['country']]['name'])}</p></div>"""
         for p in provs
     )
@@ -11723,7 +11723,7 @@ def business_page(data):
     adrows = "".join(
         f'<div class="row"><div><p class="kicker">{esc(pl["disclosure"])}</p>'
         f'<h3>{esc(pl["name"])}</h3>'
-        f'<p class="rowsub">{esc(pl["brief"])}</p>'
+        f'{rowsub(pl["brief"])}'
         f'<p class="small">Never: {esc(pl["may_never"])}</p></div>'
         f'<p class="rowmeta">{esc(pl["page_type"])}<br>'
         f'<span class="small">{"running" if pl.get("enabled") else "off"}</span></p></div>'
@@ -11731,7 +11731,7 @@ def business_page(data):
     )
     adobject = "".join(
         f'<div class="row"><div><h3>{esc(pl["name"])}</h3>'
-        f'<p class="rowsub">{esc(pl["objection"])}</p></div>'
+        f'{rowsub(pl["objection"])}</div>'
         f'<p class="rowmeta">{esc(pl["page_type"])}</p></div>'
         for pl in ADS.placements() if pl.get("objection")
     )
@@ -11831,7 +11831,7 @@ def fund_index(data):
         f'<a class="row" href="{urls.fund_project(p)}">'
         f'<div><p class="kicker">{esc(data["countries"][p["country"]]["name"])}</p>'
         f'<h3>{esc(p["name"])}</h3>'
-        f'<p class="rowsub">{esc(p["summary"])}</p></div>'
+        f'{rowsub(p["summary"])}</div>'
         f'<p class="rowmeta">{esc(p["theme"])} · {esc(p["status"])}</p></a>'
         for p in data["fund"])
     # "THE FOUR THEMES" OVER SEVEN CARDS, AND FOUR OF THEM SAID "1 projects".
@@ -13097,7 +13097,7 @@ def theme_page(data, t):
         n = idx[stop["city"]]
         rows.append(
             f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
-            <div><h2>{esc(n['city']['name'])}</h2><p class="rowsub">{esc(stop['why'])}</p></div>
+            <div><h2>{esc(n['city']['name'])}</h2>{rowsub(stop['why'])}</div>
             <p class="rowmeta">{esc(n['country']['name'])}</p></a>"""
         )
     countries = []
@@ -13361,13 +13361,13 @@ def stories_index(data):
     <div><p class="kicker">{esc(lead["section"])} &middot; {esc(lead["reading"])} &middot;
     {esc(lead["published"])}</p>
     <h3>{esc(lead["title"])}</h3>
-    <p class="rowsub">{esc(lead["standfirst"])}</p>
+    {rowsub(lead["standfirst"])}
     <p class="storygo">Read the story &rarr;</p></div></a>
   <div class="rows">{"".join(
       f'<a class="row storyrow" href="{urls.story(s)}">'
       f'<div><p class="kicker">{esc(s["section"])}</p>'
       f'<h3>{esc(s["title"])}</h3>'
-      f'<p class="rowsub">{esc(s["standfirst"])}</p></div>'
+      f'{rowsub(s["standfirst"])}</div>'
       f'<p class="rowmeta">{esc(s["published"])}<br>'
       f'<span class="small">{esc(s["reading"])}</span></p></a>'
       for s in rest)}</div>
@@ -13680,7 +13680,7 @@ def story_page(data, s):
             seenj.add(j["slug"])
             jrows += (f'<a class="row" href="{urls.journey(j)}">'
                       f'<div><h3>{esc(j["name"])}</h3>'
-                      f'<p class="rowsub">{esc(j["strapline"])}</p></div>'
+                      f'{rowsub(j["strapline"])}</div>'
                       f'<p class="rowmeta">{j["days"]} days</p></a>')
     jband = section(
         "Journeys through these places", f'<div class="rows">{jrows}</div>',
@@ -14772,7 +14772,7 @@ def events_month_page(data, month):
     fixtures.sort(key=lambda p: p[1]["name"])
     rows = "".join(
         f"""<a class="row event" data-kind="{esc(f['kind'])}" href="{urls.country(c)}">
-        <div><h3>{esc(f['name'])}</h3><p class="rowsub">{esc(f.get('where', ''))}</p></div>
+        <div><h3>{esc(f['name'])}</h3>{rowsub(f.get('where', ''))}</div>
         <p class="rowmeta">{esc(EVENT_KIND_NAMES[f['kind']])} · {esc(c['name'])}</p></a>"""
         for f, c in fixtures
     )
@@ -14801,7 +14801,7 @@ def events_month_page(data, month):
     def country_rows(cs):
         return "".join(
             f"""<a class="row" href="{urls.country(c)}">
-            <div><h3>{esc(c['name'])}</h3><p class="rowsub">{esc(c['tagline'])}</p></div>
+            <div><h3>{esc(c['name'])}</h3>{rowsub(c['tagline'])}</div>
             <p class="rowmeta">€{c['daily_eur'][0]}–{c['daily_eur'][1]} a day</p></a>"""
             for c in cs
         )
@@ -14835,7 +14835,7 @@ def events_month_page(data, month):
     qrows = "".join(
         f'<a class="row" href="{urls.city(n["country"], n["region"], n["city"])}">'
         f'<div><h3>{esc(n["city"]["name"])}</h3>'
-        f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+        f'{rowsub(n["city"]["summary"])}</div>'
         f'<p class="rowmeta">{esc(n["country"]["name"])}<br>'
         f'<span class="small">{esc(n["region"]["name"])}</span></p></a>'
         for n in qshown)
@@ -15121,7 +15121,7 @@ def quiet_page(data):
                 f'<a class="row quietrow" '
                 f'href="{urls.city(n["country"], n["region"], n["city"])}">'
                 f'<div><h3>{esc(n["city"]["name"])}</h3>'
-                f'<p class="rowsub">{esc(n["city"]["summary"])}</p></div>'
+                f'{rowsub(n["city"]["summary"])}</div>'
                 f'<p class="rowmeta">{esc(n["country"]["name"])} &middot; '
                 f'{esc(n["region"]["name"])}</p></a>'
                 for n in got)
@@ -15156,7 +15156,7 @@ def quiet_page(data):
     swaps = "".join(
         f'<div class="row swaprow">'
         f'<div><p class="kicker">Instead of</p><h3>{esc(a)}</h3>'
-        f'<p class="rowsub">{esc(why)}</p></div>'
+        f'{rowsub(why)}</div>'
         f'<div class="swapto"><p class="kicker">Try</p><h3>{esc(b)}</h3></div>'
         f'</div>'
         for a, b, why in [
@@ -15207,17 +15207,17 @@ def quiet_page(data):
   </div>
   <div class="rows">
     <a class="row" href="/europe/albania/tirana-and-the-south/gjirokaster">
-    <div><h3>When to come</h3><p class="rowsub">The months a place is at its
+    <div><h3>When to come</h3><p class="rowsub rowsub-prose">The months a place is at its
     best and the ones it is quieter in, as a section on every one of the
     {total} destination pages.</p></div>
     <p class="rowmeta">Kept</p></a>
     <a class="row" href="/europe/albania/tirana-and-the-south/gjirokaster">
-    <div><h3>How to arrive without a car</h3><p class="rowsub">Getting there,
+    <div><h3>How to arrive without a car</h3><p class="rowsub rowsub-prose">Getting there,
     and getting near where there is no direct route &mdash; a section on every
     one of them too.</p></div>
     <p class="rowmeta">Kept</p></a>
     <div class="row"><div><h3>Who locally is worth your money</h3>
-    <p class="rowsub">Named people and businesses, chosen and checked rather
+    <p class="rowsub rowsub-prose">Named people and businesses, chosen and checked rather
     than ranked. It needs an operator field nothing here holds, and a way to
     choose that is not a ranking.</p></div>
     <p class="rowmeta">Not built</p></div>
@@ -15321,7 +15321,7 @@ def my_europe_page(data):
     ]
     kindrows = "".join(
         f'<a class="row mekind" href="{esc(u)}">'
-        f'<div><h3>{esc(k)}</h3><p class="rowsub">{esc(w)}</p></div>'
+        f'<div><h3>{esc(k)}</h3>{rowsub(w)}</div>'
         f'<p class="rowmeta">{("" if n is None else f"{n:,}")}<br>'
         f'<span class="small">{"built by the Planner" if n is None else "to choose from"}'
         f'</span></p></a>'
@@ -15573,17 +15573,17 @@ def method_page(data):
                 f'<span class="distnum">{lo}–{hi}, median {med}</span></span>')
 
     rows = "".join(
-        f'<div class="row"><div><h2>{esc(name)}</h2><p class="rowsub">{esc(formula)}</p></div>'
+        f'<div class="row"><div><h2>{esc(name)}</h2>{rowsub(formula)}</div>'
         f'<p class="rowmeta">{distbar(key)}</p></div>'
         for key, name, formula in methodology_rows()
     )
     refused = "".join(
-        f'<div class="row"><div><h2>{esc(name)}</h2><p class="rowsub">{esc(why)}</p></div>'
+        f'<div class="row"><div><h2>{esc(name)}</h2>{rowsub(why)}</div>'
         f'<p class="rowmeta">not computed</p></div>'
         for name, why in REFUSED.items()
     )
     discrows = "".join(
-        f'<div class="row"><div><h2>{esc(name)}</h2><p class="rowsub">{esc(why)}</p></div>'
+        f'<div class="row"><div><h2>{esc(name)}</h2>{rowsub(why)}</div>'
         f'<p class="rowmeta">+{pts}</p></div>'
         for name, pts, why in DISCOVER_TERMS
     )
@@ -15741,7 +15741,7 @@ def how_it_works_page(data):
 
     def table(rows):
         return '<div class="rows">' + "".join(
-            f'<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(b)}</p></div>'
+            f'<div class="row"><div><h3>{esc(a)}</h3>{rowsub(b)}</div>'
             f'<p class="rowmeta"><span class="statemark '
             f'sm-{STATEKIND.get(c, "off" if "blocked" in c else "draft")}"></span>'
             f'{esc(c)}</p></div>' for a, b, c in rows
@@ -15987,7 +15987,7 @@ def api_page(data):
     cards = "".join(
         f"""<div class="row db">
         <h2><code>{esc(u)}</code></h2>
-        <p class="rowsub">{esc(what)}</p>
+        {rowsub(what)}
         <p class="small"><strong>Holds:</strong> {esc(size)}</p>
         <p class="small"><strong>Note:</strong> {esc(note)}</p>
         <p class="small"><a href="{esc(u)}">Open it →</a></p></div>"""
@@ -17010,7 +17010,7 @@ def search_page(data):
         return ('<div class="rows">' + "".join(
             f'<a class="row" href="{href}">'
             f'<div><h{level}>{esc(label)}</h{level}>'
-            f'<p class="rowsub">{esc(what)}</p></div>'
+            f'{rowsub(what)}</div>'
             f'<p class="rowmeta">{count:,}</p></a>'
             for count, label, href, what in items) + "</div>")
 
@@ -17394,7 +17394,7 @@ def motion_page(data, m):
         body = "".join(
             f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
         <div><{lvl}>{esc(n['city']['name'])}</{lvl}>
-        <p class="rowsub">{esc(n['city']['summary'])}</p>
+        {rowsub(n['city']['summary'])}
         {f'<p class="whythis">{esc(and_list([c for c in why if c not in common]))}.</p>'
              if [c for c in why if c not in common] else ""}</div>
         <p class="rowmeta">{esc(n['country']['name'])}<br><span class="small">
@@ -17868,7 +17868,7 @@ def motion_index(data):
             f'<div><p class="kicker">{n_of(f["n"], "destination")} &middot; '
             f'{n_of(f["ncountry"], "country")} &middot; {f["pct"]}% of the Atlas</p>'
             f'<h2><a href="/europe-in/{m["slug"]}">{esc(m["name"])}</a></h2>'
-            f'<p class="rowsub">{esc(m["strapline"])}</p>'
+            f'{rowsub(m["strapline"])}'
             f'<p class="motionq">{esc(motion_query_words(data, m))}</p></div></div>')
     # NOT `ed_section_head()` HERE, AND THE REASON IS ALREADY WRITTEN ON IT:
     # `.ed-section` increments the same `band` counter a plate's `actmark`
@@ -18060,7 +18060,7 @@ def discover_page(data):
         f'<a class="row macrorow" href="{urls.macro(m)}">'
         f'<div class="rowart">{region_glyph(m["countries"], macro_frame(data, m))}</div>'
         f'<div><h3>{esc(m["name"])}</h3>'
-        f'<p class="rowsub">{esc(m["blurb"])}</p></div>'
+        f'{rowsub(m["blurb"])}</div>'
         # NO TRUNCATED LIST HERE, AND `c_cut_word` CAUGHT IT IN ONE RUN.
         # The first version printed the first three country names with an
         # ellipsis after them — a word cut in half and a count that is not
@@ -18702,7 +18702,7 @@ def tourism_boards_page(data):
     for n in data["cities"].values():
         counts[n["country"]["name"]] = counts.get(n["country"]["name"], 0) + 1
     body_rows = "".join(
-        f"""<div class="row"><div><h3>{esc(a)}</h3><p class="rowsub">{esc(b)}</p></div>
+        f"""<div class="row"><div><h3>{esc(a)}</h3>{rowsub(b)}</div>
         <p class="rowmeta">{esc(c)}</p></div>"""
         for a, b, c in [
             ("Destination profile", "A verified, editorially written presence for a region — written by us, corrected by you, never ghostwritten by you.", "would build"),
