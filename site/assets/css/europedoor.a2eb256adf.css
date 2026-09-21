@@ -11571,27 +11571,58 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    The aperture is ABSENT on this band, which its own rule allows: explicit,
    subtle, implied or absent, recognition rather than repetition. */
 .atplate svg { display: block; width: 100%; height: 100%; }
-/* THE CONTINENT MOVES, AND THREE POSITIONS CARRY IT.
-   `.atcue` says *scroll to move through the continent*, and for one commit
-   it did not: only the lighting changed. Measured in Chromium at 1440 with
-   the eastern step lit, the panel's wash starts at x=760 of a plate running
-   409 to 1296 and the card's own words sit over Ukraine's centre — so four
-   of the nine corners lit ground a reader could not see. A scrim over the
-   part of the drawing a band is ABOUT deletes that band's subject, which is
-   /plan's finding one page over; there the overlap went, and here the
-   overlap IS the composition, so the picture pans instead.
-   The value is a CLASSIFICATION the build derives from the mean of the
-   paths it emitted — which third of the drawn continent that corner's mass
-   sits in — rather than nine offsets typed here, because nine numbers in a
-   stylesheet are nine numbers wrong the day a country changes corner.
-   `overflow` on the plate rather than a wrapper, because the plate is
-   already the frame: what the pan reveals on the far side is the plate's
-   own `--map-water`, which is open sea and says so. */
-.atlas[data-ready] .atpan { transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
-.atstage[data-pan="w"] .atpan { transform: translateX(105px); }
-.atstage[data-pan="e"] .atpan { transform: translateX(-140px); }
+/* THE CORNER LIFTS OUT OF THE CONTINENT, AND THE CONTINENT HOLDS STILL.
+   The first repair panned the whole drawing, which answered a measured
+   fault with the wrong subject: the panel's wash starts at x=760 of a plate
+   running 409 to 1296 and the card's words sit over Ukraine's centre, so
+   four of the nine corners lit ground a reader could not see — and the
+   answer to that is not to slide Europe under the headline every time a
+   step is crossed. What the reader is being shown is a CORNER, so the
+   corner is what moves; everything else is where it was.
+   DIRECTION DERIVED, DISTANCE CONSTANT. `data-lift` is one of eight
+   compass points the build works out from the drawn geometry — the unit
+   vector from the mean of every liftable country to the mean of that
+   corner's own. Eight names are a vocabulary and may be authored here;
+   which corner takes which is a measurement and may not, because nine
+   offsets typed into a stylesheet are nine offsets wrong the day a country
+   changes corner.
+   A LENGTH IN AN SVG IS A USER UNIT, so 18px here is 18 of the frame's
+   1,460 — about 1.5% of the drawing and, at the widths this band is read
+   at, close to 18 device pixels. One number, because a lift that varied
+   with the corner would be nine numbers again.
+   AND THE NAMES TRAVEL WITH THEIR OWN GROUND: `.atdoor` carries the same
+   attribute, because a country name here is placed ON the country it names
+   and a shape that moves while its name does not is the defect nine
+   country portraits were repaired for.
+   AND THE EIGHT ARE SCOPED TO THE PLATE, because a bare attribute selector
+   is the same trap as a class name already in this file: `data-lift` reads
+   like a word anybody might reach for, and eight unscoped rules would set
+   two custom properties on whatever the next composition calls by that
+   name. Three of the eight match nothing today — which corners resolve to
+   which point is geography, and a country changing corner changes it. */
+.atplate [data-lift="e"]  { --lx:  1;   --ly:  0;   }
+.atplate [data-lift="se"] { --lx:  .71; --ly:  .71; }
+.atplate [data-lift="s"]  { --lx:  0;   --ly:  1;   }
+.atplate [data-lift="sw"] { --lx: -.71; --ly:  .71; }
+.atplate [data-lift="w"]  { --lx: -1;   --ly:  0;   }
+.atplate [data-lift="nw"] { --lx: -.71; --ly: -.71; }
+.atplate [data-lift="n"]  { --lx:  0;   --ly: -1;   }
+.atplate [data-lift="ne"] { --lx:  .71; --ly: -.71; }
+.atlas[data-ready] .atg,
+.atlas[data-ready] .atdoor { transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
+.atstage[data-at="nordic"] [data-corner="nordic"][data-lift],
+.atstage[data-at="baltic"] [data-corner="baltic"][data-lift],
+.atstage[data-at="british-isles"] [data-corner="british-isles"][data-lift],
+.atstage[data-at="western"] [data-corner="western"][data-lift],
+.atstage[data-at="alpine-central"] [data-corner="alpine-central"][data-lift],
+.atstage[data-at="mediterranean"] [data-corner="mediterranean"][data-lift],
+.atstage[data-at="adriatic-balkans"] [data-corner="adriatic-balkans"][data-lift],
+.atstage[data-at="eastern"] [data-corner="eastern"][data-lift],
+.atstage[data-at="caucasus-bosphorus"] [data-corner="caucasus-bosphorus"][data-lift] {
+  transform: translate(calc(var(--lx) * 18px), calc(var(--ly) * 18px)); }
 @media (prefers-reduced-motion: reduce) {
-  .atlas[data-ready] .atpan { transition: none; }
+  .atlas[data-ready] .atg,
+  .atlas[data-ready] .atdoor { transition: none; }
 }
 .atplate .lyr-land path { fill: var(--map-land);
                           stroke: var(--map-border); stroke-width: .6;
@@ -11780,7 +11811,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
      it — a repair applied where its reason has expired, which this
      stylesheet already records about a glyph rule that outlived the
      132-pixel drawing it was written for. */
-  .atstage[data-pan] .atpan { transform: none; }
+  .atstage[data-at] [data-corner][data-lift] { transform: none; }
   .atread { margin: 0; width: auto; }
   .atcorner { min-height: 0; padding-top: var(--s5); }
   .atcard { position: static; padding-top: 0; }

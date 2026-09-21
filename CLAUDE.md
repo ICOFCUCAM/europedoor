@@ -7148,6 +7148,68 @@ cannot turn a script into an application**. It counts `bare_js` now, which
 is the same implementation the planner's flag scan uses, and prints both
 figures. Proved red at 148 lines of code and green at 26.
 
+**THE WHOLE CONTINENT WAS MOVING AND THE THING BEING READ WAS A CORNER.** The
+pan was a correct repair to a measured fault — the panel's wash starts at
+x=760 of a plate running 409 to 1296 and the card's own words sit over
+Ukraine's centre, so four of the nine corners lit ground a reader could not
+see — and it answered it by sliding Europe under the headline every time a
+step was crossed. **What the reader is being shown is a corner, so the corner
+is what may move**: the lit one lifts out of the continent and everything else
+holds still, which is the exploded-atlas move and the one thing on this band
+that a picture of Europe can do and a list of countries cannot.
+
+**DIRECTION DERIVED, DISTANCE CONSTANT, EIGHT NAMES AUTHORED.** `data-lift` is
+one of eight compass points the build works out from the drawn geometry — the
+unit vector from the mean of every liftable country to the mean of that
+corner's own — and the stylesheet holds eight rules turning a name into a pair
+of components. Eight names are a vocabulary and may be authored; which corner
+takes which is a measurement and may not, which is the rule the pan was
+already written under. One distance for all nine, because a lift that varied
+with the corner would be nine numbers again. **And the names travel with their
+own ground**: `.atdoor` carries the same attribute, because a country name
+here is placed ON the country it names and a shape that moves while its name
+stays put is the defect nine country portraits were repaired for.
+
+**SVG HAS NO `z-index`, SO PAINT ORDER IS THE ONLY WAY TO PUT A LIFTED CORNER
+ABOVE WHAT IT MOVES ONTO — probed rather than assumed.** Two overlapping
+rects in Chromium, the earlier one given `z-index: 5` and then
+`z-index: 5; position: relative`: the later rect wins all three times.
+Document order is the whole of it. So the fifty countries are grouped by
+corner and **the groups are emitted most-peripheral-first**, because a corner
+lifts OUTWARD and everything it can slide onto is further out than it is —
+which makes the order a construction rather than a lookup table, and it is
+the two cases a document order in macro order gets wrong that prove it: the
+Baltic states move north onto Russia, and central Europe moves west onto
+France.
+
+**AND THE MIDDLE OF EUROPE HAS THE LEAST DEFINED DIRECTION OF THE NINE.**
+`alpine-central` measures 35 units from the mean against 324 for the Caucasus,
+so its lean is small and the vector it resolves to is the least meaningful
+one on the drawing. It still lifts, because a band that does nothing on one
+of its nine steps is a promise kept eight times; what makes that safe is the
+paint order, and the fact is recorded rather than tuned away.
+
+**AND THE REORDER IS NOT FREE, WHICH IS WHY IT WAS MEASURED.** Two adjacent
+countries each stroke their own ring, so on a shared frontier the later one
+wins — and the reorder changes which that is wherever the two sit in
+different corners. The plate was shot at 1280 and 390 with every transition
+and every lift frozen, before and after: **2,659 differing pixels of
+1,153,280, 0.23%, worst delta 89 of 255**, and the diff map is a set of
+hairlines along exactly those frontiers — the Scandinavian borders, the
+Alpine ones, the Balkan ones, one in the Caucasus. The first draft of that
+comment said *byte-identical*, which is what the argument predicted and not
+what the instrument said.
+
+**AND THE CUE HAD TO MOVE WITH THE MECHANISM.** `.atcue` said *Scroll to move
+through the continent*, which was written for the pan and became false in the
+commit that removed it — *removing a claim leaves surfaces pointing at it*,
+and this one was the surface whose whole job is to say what the scroll does.
+`EDGE_MARGIN` and `WIDE_VIEW` are renamed from `PAN_MARGIN` and `PAN_VIEW`
+for the same reason: the frame is still wider than the window, because
+`landmass` clips to the view it is given and a margin generated over the
+narrow frame comes out EMPTY, but nothing pans and a constant that says so is
+a comment claiming evidence.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

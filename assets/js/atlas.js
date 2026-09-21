@@ -49,22 +49,16 @@
   const mark = (slug) => {
     if (slug === at) return;
     at = slug;
+    /* ONE ATTRIBUTE ON THE STAGE IS THE WHOLE CONNECTION. The stylesheet
+       reads it to light that corner's countries, to lift them out of the
+       continent, and to bring their names to full ink — and every one of
+       those is keyed on a `data-lift` and a `data-corner` the BUILD wrote
+       from the drawn geometry, so this file carries no geography, no
+       direction and no number. It says which corner is being read. */
     stage.dataset.at = slug;
     for (const s of steps) {
-      if (s.dataset.corner === slug) {
-        s.dataset.on = '';
-        /* AND THE CONTINENT MOVES, which is the other half of what a
-           selector cannot reach. `data-pan` is DERIVED at build time from
-           the mean of the paths the drawing actually emitted for that
-           corner's countries — west, centre or east third of the drawn
-           span — so this file carries no geography and no number. It
-           copies one attribute from the step to the stage; the stylesheet
-           holds three rules. The reason it is needed at all is measured:
-           the panel's wash begins at the middle of the plate and the card
-           sits over Ukraine, so four of the nine corners were lighting
-           ground behind the panel. */
-        if (s.dataset.pan) stage.dataset.pan = s.dataset.pan;
-      } else s.removeAttribute('data-on');
+      if (s.dataset.corner === slug) s.dataset.on = '';
+      else s.removeAttribute('data-on');
     }
   };
 

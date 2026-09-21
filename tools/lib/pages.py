@@ -2537,7 +2537,7 @@ def home(data):
       {golink('/countries', 'Open the atlas')}
       <dl class="atstats">{_statrow}</dl>
     </div>
-    <p class="atcue">Scroll to move through the continent</p>
+    <p class="atcue">Scroll, and each corner lifts out of the continent</p>
     <p class="atrail" aria-hidden="true">Europe through the door</p>
   </div>
   <div class="atread">
@@ -7692,7 +7692,7 @@ def atlas_register(data):
                      r[i] >= cut_east - 0.05
                      for r in (e.get("rings") or []) for i in range(0, len(r), 2))}
     _ctx, land = geo.landmass(
-        MAPPROJ, PAN_VIEW, doc=doc, thin_units=3.0, min_units=6.0,
+        MAPPROJ, WIDE_VIEW, doc=doc, thin_units=3.0, min_units=6.0,
         bands={c["slug"]: "atc-" + macro_of[c["slug"]]
                for c in data["countries"].values()
                if macro_of.get(c["slug"]) and c["slug"] not in cut_slugs},
@@ -7700,18 +7700,122 @@ def atlas_register(data):
     cut_names = sorted(c["name"] for c in data["countries"].values()
                        if c["slug"] in cut_slugs)
 
+    # THE CORNER LIFTS OUT OF THE CONTINENT AND THE CONTINENT HOLDS STILL.
+    #
+    # The previous version panned the whole drawing, which answered the
+    # measured fault — the panel's wash covers the eastern half of the plate,
+    # so four of the nine corners lit ground a reader could not see — and
+    # answered it with the wrong subject. **What the reader is being shown is
+    # a corner, so the corner is what may move**, and a continent that slides
+    # under a headline every time a step is crossed is the picture reacting to
+    # the scrollbar rather than to the reading.
+    #
+    # The direction is DERIVED and the distance is one constant. A corner
+    # lifts away from the middle of the drawn continent: the unit vector from
+    # the mean of every liftable country to the mean of that corner's own,
+    # classified into one of eight compass points. Eight names are a
+    # vocabulary and may be authored; which corner takes which is a
+    # measurement and may not — nine translate values typed into a stylesheet
+    # are nine values wrong the day a country changes corner, which is the
+    # rule the pan was already written under.
+    #
+    # AND THE MIDDLE OF EUROPE HAS THE LEAST DEFINED DIRECTION OF THE NINE,
+    # which is a fact about the continent rather than a defect: alpine-central
+    # measures 35 units from the mean against 324 for the Caucasus, so its
+    # lean is small and the vector it resolves to is the least meaningful one
+    # here. It still gets a real lift, because a band that does nothing on one
+    # of its nine steps is a promise kept eight times; what makes that safe is
+    # the paint order below.
+    LIFTS = (("e", 1.0, 0.0), ("se", .71, .71), ("s", 0.0, 1.0),
+             ("sw", -.71, .71), ("w", -1.0, 0.0), ("nw", -.71, -.71),
+             ("n", 0.0, -1.0), ("ne", .71, -.71))
+    place = {}
+    for mo in re.finditer(r'id="at-([a-z0-9-]+)"[^>]*\sd="([^"]+)"', land):
+        n = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", mo.group(2))]
+        if n:
+            place[mo.group(1)] = (sum(n[0::2]) / (len(n) // 2),
+                                  sum(n[1::2]) / (len(n) // 2))
+    # THE MEAN IS TAKEN OVER THE PATHS THE DRAWING ACTUALLY EMITTED, so a
+    # corner cannot be placed by a geometry the reader is not looking at —
+    # and over the LIFTABLE countries only, because a cut country is context
+    # on this band and dragging the mean east with Russia would tilt every
+    # other corner's vector by a country that never moves.
+    liftable = {s: q for s, q in place.items()
+                if macro_of.get(s) and s not in cut_slugs}
+    corner_pts = {}
+    for s, q in liftable.items():
+        corner_pts.setdefault(macro_of[s], []).append(q)
+    lift, reach = {}, {}
+    if liftable:
+        cx = sum(a for a, _ in liftable.values()) / len(liftable)
+        cy = sum(b for _, b in liftable.values()) / len(liftable)
+        for k, v in corner_pts.items():
+            dx = sum(a for a, _ in v) / len(v) - cx
+            dy = sum(b for _, b in v) / len(v) - cy
+            d = math.hypot(dx, dy) or 1.0
+            reach[k] = d
+            lift[k] = max(LIFTS, key=lambda o: (dx * o[1] + dy * o[2]) / d)[0]
+
     def _door(name, text):
         c = by_name.get(name)
         if not c:
             return text
         corner = macro_of.get(c["slug"]) or ""
-        return (f'<a class="atdoor" data-corner="{esc(corner)}" '
+        # THE NAME TRAVELS WITH ITS OWN GROUND. A country name here is placed
+        # on the country it names — that is `NameGround`'s whole rule — so a
+        # shape that moves 18 units while its name stays put is a name on
+        # somebody else's ground, which is the defect nine country portraits
+        # were repaired for. A CUT country has a corner and no lift: its
+        # ring ends on our bbox, so it may not be moved and may not be lit,
+        # and its name un-dims with the rest of its corner exactly as before.
+        move = (f' data-lift="{lift[corner]}"'
+                if c["slug"] in liftable and corner in lift else "")
+        return (f'<a class="atdoor" data-corner="{esc(corner)}"{move} '
                 f'href="{urls.country(c)}">{text}</a>')
 
     names = name_countries(land, HERO_VIEW, max_names=99,
                            metric="atname", metric2="atname2",
                            decorate=_door)
     drawn = names.count("<text")
+
+    # A LIT CORNER MUST PAINT ABOVE WHATEVER IT MOVES ONTO, AND SVG HAS NO
+    # `z-index` TO DO IT WITH — probed in Chromium, on the element and with
+    # `position: relative` as well: document order is the only paint order
+    # there is. So the order is what carries it.
+    #
+    # A corner lifts OUTWARD, so everything it can slide onto is further out
+    # than it is. Draw the corners most-peripheral-first and the lifted one
+    # is always above the ground it arrives on, for every one of the nine,
+    # by construction rather than by a table: the Baltic states move
+    # north-east onto Russia, and central Europe — the corner whose own
+    # direction means least — moves south-west onto Italy, and both are the
+    # two cases a document order in macro order gets WRONG.
+    #
+    # AND THE REORDER IS NOT FREE, WHICH IS WHY IT WAS MEASURED RATHER THAN
+    # ASSERTED. Two adjacent countries each stroke their own ring, so on the
+    # frontier they share the later one wins — and the reorder changes which
+    # that is wherever the two sit in different corners. The plate was shot
+    # at 1280 and 390 with every transition and every lift frozen, before
+    # and after: **2,659 differing pixels of 1,153,280, 0.23%, worst delta
+    # 89 of 255**, and the diff map is a set of hairlines along exactly
+    # those frontiers — the Scandinavian borders, the Alpine ones, the
+    # Balkan ones, one in the Caucasus. One device pixel of anti-aliasing on
+    # a .6px stroke drawn in one ink at one width. Nothing else moved.
+    chunks = re.split(r'(<path\b[^>]*>(?:.*?</path>)?)', land, flags=re.S)
+    base, grouped = [], {}
+    for i in range(1, len(chunks), 2):
+        mo = re.search(r'id="at-([a-z0-9-]+)"', chunks[i])
+        slug = mo.group(1) if mo else ""
+        if slug in liftable:
+            grouped.setdefault(macro_of[slug], []).append(chunks[i])
+        else:
+            base.append(chunks[i])
+    land = (chunks[0] + "".join(base)
+            + "".join(f'<g class="atg" data-corner="{esc(k)}" '
+                      f'data-lift="{lift[k]}">{"".join(v)}</g>'
+                      for k, v in sorted(grouped.items(),
+                                         key=lambda kv: -reach[kv[0]]))
+            + "".join(chunks[2::2]))
     # THE LAND CARRIES ON, WHICH IS HOW THE HERO REMOVES THIS LINE AND WHY
     # THE FADE IS GONE RATHER THAN TUNED.
     #
@@ -7739,7 +7843,7 @@ def atlas_register(data):
     # `#heroland` is: two datasets simplified independently do not share an
     # edge, and along a 700-unit cut a tenth of a unit of paper is a bright
     # hairline exactly where the picture must not have one.
-    beyond = [b for b in geo.beyondmass(MAPPROJ, PAN_VIEW, thin_units=6.0,
+    beyond = [b for b in geo.beyondmass(MAPPROJ, WIDE_VIEW, thin_units=6.0,
                                         min_units=200.0, pad=0.0) if b]
     ground = ('<g class="lyr lyr-beyond" aria-hidden="true">'
               + "".join(f'<path d="{d}"/>' for d in beyond) + "</g>") if beyond else ""
@@ -7800,82 +7904,30 @@ def atlas_register(data):
         # figure's class is `atplate`. /countries paid for the same slip one
         # commit over: a declared role on the wrong element is a map with no
         # declared role.
-        # THE FRAME IS WIDER THAN THE WINDOW, WHICH IS WHAT MAKES A PAN
-        # POSSIBLE AT ALL. Translating the `<svg>` ELEMENT moves its crop
-        # with it and reveals the plate's bare background on the far side —
-        # measured at the first attempt as a hard vertical seam at x=1163,
-        # stone on one side and water on the other, running the full height
-        # of the plate: *two treatments meeting on a straight line*, which
-        # is the rendering fault this drawing already removed once at the
-        # 52 degree cut. So the viewBox carries PAN_MARGIN units of spare
-        # geography on each side and `slice` crops it back to exactly the
-        # window every other measurement here is about — `xMidYMid slice`
-        # on a 1.4 box shows 0 to 1120 to within half a unit — and the pan
-        # translates a group INSIDE that window, where the margin is what
-        # comes into view.
+        # THE FRAME IS WIDER THAN THE WINDOW, AND THE MARGIN IS DRAWN
+        # GEOGRAPHY RATHER THAN EMPTY FRAME. This band is full-bleed: the
+        # plate runs past the stage by the page's own gutter, so `slice`
+        # crops whichever axis is long and whatever it crops has to be a
+        # continent. Generating over HERO_VIEW and drawing inside a wider
+        # viewBox does not do that — `landmass` clips to the view it is
+        # given, so the margin would come out EMPTY and the crop would show
+        # the plate's own background meeting stone on a straight vertical
+        # line, which is the rendering fault this drawing removed once at
+        # the 52 degree cut and measured at x=1163 when it was reintroduced
+        # by a pan. EDGE_MARGIN units of spare geography each side, and a
+        # corner lifting toward the frame's edge moves through drawn land.
         f'<figure class="atplate">'
         f'<svg class="instrmap atlas" data-role="illustration" '
-        f'viewBox="{-PAN_MARGIN:g} 0 {HERO_VIEW[2] + 2 * PAN_MARGIN:g} '
+        f'viewBox="{-EDGE_MARGIN:g} 0 {HERO_VIEW[2] + 2 * EDGE_MARGIN:g} '
         f'{HERO_VIEW[3]:g}" preserveAspectRatio="xMidYMid slice" '
         f'role="img" aria-labelledby="atplate-t">'
         f'<title id="atplate-t">Europe, with the countries this atlas writes '
         f'about named on their own ground. Every country is listed under the '
         f'nine corners beside this drawing.</title>'
-        f'<g class="atpan">'
         f'{clip}{ground}'
         f'<g class="lyr lyr-land" clip-path="url(#{cut})">{land}</g>'
         f'<g class="lyr lyr-labels">{names}</g>'
-        f'</g></svg></figure>')
-
-    # WHERE EACH CORNER SITS ON THE DRAWING, DERIVED FROM THE DRAWING.
-    #
-    # `.atcue` promises *scroll to move through the continent* and for one
-    # commit the continent did not move: the lighting changed and the
-    # picture stood still, which is a caption claiming something the page
-    # does not do — the fault this repository records about a journey
-    # caption promising a note that had been removed.
-    #
-    # And it cost more than a promise. Measured in Chromium at 1440 with
-    # the eastern step lit: the panel's own wash begins at x=760 of a plate
-    # running 409 to 1296, so it covers the EASTERN HALF of the drawing at
-    # 90% paper, and the card itself sits over Ukraine's centre (989, 482)
-    # — `elementsFromPoint` returns `.atkick`. Four of the nine corners are
-    # eastern or south-eastern, so on nearly half the sequence the band lit
-    # ground a reader could not see. **A scrim that runs over the part of
-    # the drawing the band is about deletes the band's subject**, which is
-    # /plan's own finding one page over, where the answer was to stop the
-    # overlap rather than to tune the wash. Here the overlap is the
-    # composition, so what moves is the continent.
-    #
-    # THREE POSITIONS, NOT NINE OFFSETS. Nine translate values would be
-    # nine numbers typed into a stylesheet, wrong the day a country moves
-    # between corners — *a figure typed into prose is the figure that was
-    # true two hundred destinations ago*. So the build DERIVES which third
-    # of the drawn continent each corner's mass sits in and writes a
-    # classification; the stylesheet holds three rules. Authoring the
-    # vocabulary is allowed here and authoring the measurement is not.
-    #
-    # The span is the countries' own, rather than the canvas's: the frame
-    # is 1120 units and Europe does not fill it, so thirds of the CANVAS
-    # would put every corner in the middle one. And the mean is taken over
-    # the PATH the drawing actually emitted, so a corner cannot be placed
-    # by a geometry the reader is not looking at.
-    mid = {}
-    for mo in re.finditer(r'id="at-([a-z0-9-]+)"[^>]*\sd="([^"]+)"', land):
-        xs = [float(v) for v in re.findall(r"[ML](-?[\d.]+)", mo.group(2))]
-        if xs:
-            mid[mo.group(1)] = sum(xs) / len(xs)
-    corner_x = {}
-    for slug, mslug in macro_of.items():
-        if slug in mid:
-            corner_x.setdefault(mslug, []).append(mid[slug])
-    corner_x = {k: sum(v) / len(v) for k, v in corner_x.items() if v}
-    pan = {}
-    if corner_x:
-        lo, hi = min(corner_x.values()), max(corner_x.values())
-        third = (hi - lo) / 3.0 or 1.0
-        for k, v in corner_x.items():
-            pan[k] = "w" if v < lo + third else ("e" if v > hi - third else "c")
+        f'</svg></figure>')
 
     blocks = []
     for m in sorted(data.get("macros", []), key=lambda x: macro_order[x["slug"]]):
@@ -7905,7 +7957,6 @@ def atlas_register(data):
         # wrote.
         blocks.append(
             f'<section class="atcorner" data-corner="{esc(m["slug"])}" '
-            f'data-pan="{pan.get(m["slug"], "c")}" '
             f'aria-labelledby="atc-{esc(m["slug"])}">'
             f'<div class="atcard">'
             f'<p class="atkick"><span>{len(cs)}</span> countries</p>'
@@ -13061,8 +13112,8 @@ MAP_W, MAP_H = 1000, 780
 # 50°E outward, so neither is inside (0, 0)-(1120, 800) at any latitude, and
 # no fade has to hide anything. Widening past this would put one back.
 HERO_VIEW = (0.0, 0.0, 1120.0, 800.0)
-PAN_MARGIN = 170.0
-PAN_VIEW = (-PAN_MARGIN, 0.0, HERO_VIEW[2] + 2 * PAN_MARGIN, float(HERO_VIEW[3]))
+EDGE_MARGIN = 170.0
+WIDE_VIEW = (-EDGE_MARGIN, 0.0, HERO_VIEW[2] + 2 * EDGE_MARGIN, float(HERO_VIEW[3]))
 LON0, LON1, LAT0, LAT1 = -25.0, 45.0, 33.0, 71.5
 
 

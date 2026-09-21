@@ -2077,3 +2077,82 @@ out instead of removing it. `weight.home_kb` 174 → 179.
 
 Below 62rem the pan is undone with the stage: nothing is over the continent
 there, so a pan would only crop it.
+
+## Plate 05 — the corner lifts, and the continent holds still
+
+The pan above answered a measured fault with the wrong subject. The reader is
+being shown a **corner**; the corner is what may move. Everything else is
+where it was.
+
+### The direction is derived and the distance is one number
+
+`data-lift` is one of eight compass points, worked out at build time from the
+unit vector between two means: every liftable country's drawn centre, and that
+corner's own. Eight names are a vocabulary and may be authored here; which
+corner takes which is a measurement and may not — the same rule the pan was
+written under. One distance for all nine, 18 user units of a 1,460-unit frame,
+because a lift that varied with the corner would be nine typed numbers again.
+
+The mean of every liftable country is (591.4, 462.5). In document order,
+which is reach descending:
+
+| corner | reach from the mean | lift |
+|---|---:|---|
+| caucasus-bosphorus | 324 | e |
+| british-isles | 269 | w |
+| nordic | 259 | n |
+| mediterranean | 167 | sw |
+| western | 148 | w |
+| baltic | 145 | n |
+| eastern | 122 | e |
+| adriatic-balkans | 103 | se |
+| alpine-central | **35** | w |
+
+**The middle of Europe has the least defined direction of the nine**, and that
+is a fact about the continent rather than a defect: 35 units against 324. It
+still lifts, because a band that does nothing on one of its nine steps is a
+promise kept eight times.
+
+### SVG has no `z-index`, so the paint order had to carry it
+
+Probed in Chromium rather than assumed: two overlapping rects, the earlier one
+given `z-index: 5` and then `z-index: 5; position: relative`, and the later
+rect wins all three times. Document order is the only paint order there is.
+
+So the fifty are grouped by corner and **the groups are emitted
+most-peripheral-first**. A corner lifts outward, so everything it can slide
+onto is further out than it is, and the order is a construction rather than a
+lookup table. The two cases a document order in macro order gets wrong are
+what prove it: the Baltic states move north onto Russia, and central Europe
+moves west onto France.
+
+### The reorder costs hairlines, and they were counted
+
+Two adjacent countries each stroke their own ring, so on a shared frontier the
+later one wins — and the reorder changes which that is wherever the two sit in
+different corners. The plate shot at 1280 and 390 with every transition and
+every lift frozen, before and after:
+
+| | |
+|---|---|
+| differing pixels | 2,659 of 1,153,280 — **0.23%** |
+| worst delta | 89 of 255 |
+| where | hairlines on the Scandinavian, Alpine, Balkan and Caucasus frontiers |
+
+The first draft of the comment on that code said *byte-identical*. That is
+what the argument predicted and not what the instrument said.
+
+### What moved with it
+
+`.atdoor` carries the same attribute, because a country name here is placed ON
+the country it names. A **cut** country has a corner and no lift: its ring ends
+on our bbox, so it may not be moved and may not be lit, and its name un-dims
+with the rest of its corner exactly as before — Russia keeps its ground while
+Ukraine, Belarus and Moldova lift off it.
+
+`.atcue` said *scroll to move through the continent*, written for the pan and
+false in the commit that removed it. `PAN_MARGIN` and `PAN_VIEW` are
+`EDGE_MARGIN` and `WIDE_VIEW`: the frame is still wider than the window,
+because `landmass` clips to the view it is given and a margin generated over
+the narrow frame comes out empty, and nothing pans. `weight.home_kb` 179 → 180
+— nine `<g>` wrappers and sixteen attributes.
