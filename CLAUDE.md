@@ -7463,6 +7463,115 @@ space-separated list and `~=` reads it, so the stylesheet gets nine selectors
 rather than eighty-one and `atlas.js` copies one attribute across, computing
 no distance of its own.
 
+
+**THE MAP IS THE RIGHT TWO THIRDS AND THE FRAME IS EUROPE RATHER THAN THE
+DATASET, WHICH ARE THE OWNER'S TWO INSTRUCTIONS AND THEY PAY FOR EACH
+OTHER.** *The map should take only 2/3 and extend to the right, not more than
+that*, and *Russia is not supposed to be in Europe, but it covers a bigger
+place than Europe — the focus is Europe.* **The literal crop is refused,
+measured**: keeping `slice` and narrowing the box to two thirds crops
+whichever axis is long, so at 1280 the box becomes 853x900 against a frame of
+1460x800 and the drawing shows 760 of its 1460 units — Iceland, western
+Iberia and the whole Caucasus leave the picture. `meet` aligned to the top
+shows the whole drawing instead, on a frame `atlas_frame()` fits to the
+countries this atlas writes about with **the CUT countries left out of the
+fit**: this atlas holds a fragment of Russia, so its northern reach is a fact
+about where `data/geo/` stops rather than about Europe, and a frame sized
+around it makes the fragment the biggest thing in a picture of the other
+forty-nine. 1460x800 becomes 840.8x771 and five kilobytes of ground beyond
+come off with it.
+
+**AND THE RELIEF WAS REFUSED TWICE HERE AND THE OWNER OVERRULED IT.**
+`atlas_register`'s own paragraph says this band is the continent as a
+REGISTER — *no water, no relief, no rivers, no lakes, no photograph and no
+dusk* — and that refusal has stopped two good-looking changes, which is why
+*a recorded refusal is evidence* is in this file twice. **A band claims only
+HEIGHT, which is the one thing the elevation model measures**, so nothing is
+invented; that is exactly what separates it from the water, the rivers and
+the photograph the same paragraph refuses, and those stay refused. The
+settings were **rendered and looked at rather than picked**: four candidates
+injected into the real page and photographed at 1440 — three bands at 3.5
+units (15.7 KB), the same at 4.5 (10.8), two at 4.5 (4.4), three at 6.0
+(6.6) — and the two cheap ones are a layer that ships and cannot be seen,
+which is the measurement that removed the terrain's second strength. 13.0 KB
+shipped, `weight.home_kb` 184 to 192, itemised in `tools/invariants.py`.
+
+**EVERY PICTURE TAKEN OF THIS BAND WAS TAKEN FROM THE MIDDLE OF THE
+SEQUENCE, AND BOTH ENDS WERE BROKEN.** The stage is `100svh` sticky inside
+`.atlas`, so it is pinned while the section spans the viewport and for
+nothing either side of that; the nine steps are `40svh` each and started at
+the section's own top, and `atlas.js` marks a step when its middle crosses
+the middle of the viewport — **30svh before the stage pins** for step one
+and 40svh after it unpins for step nine. Measured at 1280, 1440 and 1920: on
+the FIRST corner the card rendered at y=420 and the headline at 345-636, so
+the panel sat **217 pixels inside the headline's own box**; on the LAST the
+headline had left the screen, top at -195, with 277 pixels of it behind the
+masthead. The inset is arithmetic — a step's middle must fall inside the
+pinned range, which needs at least 30svh at each end — so `.atread` takes
+`padding-block: 36svh`, that floor with six to spare. It costs 72svh of
+scroll and no pixel of page: the track is invisible and what it moves across
+is the stage. The headline now holds at 75-367 on every corner at every
+width. **And the inset had to be undone where its reason expires**: the
+narrow block resets `.atread`'s MARGIN and not its padding, so 72svh of empty
+page would have shipped on every phone — below 62rem the stage is not sticky,
+the cards are a column and the steps are `min-height: 0`, which is *a repair
+applied where its reason has expired*, made in the commit that added the
+padding.
+
+**LAND THAT ENDS ON A RULED LINE WITH NO FRAME ROUND IT IS A RENDERING
+FAULT.** This drawing has no visible edge — the band paints the map's own
+water, which is the repair that made it a room rather than an object — so
+`beyondmass(pad=0.0)`, which clips the ground exactly to the frame, is right
+on three edges and wrong on the fourth: the top sits at the stage's own top
+with the masthead on it, the left and right bleed past the viewport, and the
+SOUTH is in the middle of the stage. Measured at 1440 on the Mediterranean
+step, Tunisia and Anatolia ended as two straight-edged wedges on a horizontal
+730 pixels down with the band's water under them — **/plan's context-land
+slab, arrived at from below**. `ATLAS_FRAME_PAD_S` is 0.20 against 0.05 on
+the other three sides, which puts the southernmost named country 16% of the
+frame above the bottom, and `ATLAS_GROUND_FADE` is 0.10, smoothstep in five
+stops, handing what is left of the ground to the water. **Masked rather than
+clipped, and on the ground alone** — it is the only layer that reaches that
+edge, and *a masked group hit-tests as ONE region*, which is what the hero
+lost fifty country links to. It also shortens the dead band under the drawing
+from 235 pixels to 144 at 1280x900 without the continent losing a unit.
+
+**AND `ATLAS_TYPE_ZONES` IS GONE, BECAUSE THE COMPOSITION REPLACED IT.** That
+reserve was a union over 385 samples of where the headline and the card land
+in the projection's own units, seeded into the label placer's `taken` so a
+country name could not be set under either; it cost six of the seventeen
+names and it was the right trade while the type stood on the drawing. Re-run
+on the two-column composition, the same 385 samples report the headline's
+union ending at **x=140.7** and the card's at **x=174.5** against a frame
+that begins at **x=201** — neither touches the drawing at any width, height
+or scroll position the stage is sticky at. **A reserve over ground the frame
+does not contain is a cost with no subject**: 11 names to **17**, and the six
+it had been buying nothing with are RUSSIA, GERMANY, UNITED KINGDOM, ICELAND,
+IRELAND and LATVIA, which is the list this file already records as the wrong
+answer. The doors go 29 to 26 in the same move and every corner keeps at
+least one. **The two-rung mark placer went with it** — a soft rung whose list
+is always empty can never fire, and *a rung nothing reaches is dead code that
+looks like a decision*. And the guarantee is STRUCTURAL now rather than
+measured: `.atlead` is `min(29%, 25rem)` and `.atread` is `min(30%, 23rem)`
+against a `.atwin` that starts at 34%, so the column cannot reach the drawing
+at any width by construction, where a union is a fact about a sample.
+`browser-checks.js` asserts that against the page's own `viewBox` rather than
+against a declared number — **proved red by serving the stylesheet with both
+columns widened to 60%: 30 failures over eighteen samples, against 0 of 18 as
+shipped.**
+
+**AND A STALE PARAGRAPH IN THE STYLESHEET ARGUED FOR THE OPPOSITE OF THE RULE
+UNDER IT.** *THE BOX TAKES THE FRAME'S OWN PROPORTION INSTEAD* was written
+for a version that set an `aspect-ratio` on `.atwin` and was reversed in the
+same commit, one paragraph down, without the argument coming with it. *A
+comment claiming evidence is read as evidence*, and this one contradicted the
+declaration eight lines below it. Two more from the same run, each caught by
+a guard this file argues for: an eighth `line-height` — 1.05, four
+hundredths from the `1` the file already had, on a heading that sets on two
+lines — caught by `css.line_heights` in the run that introduced it; and the
+weight ceiling, which is the only instrument here that measures bytes.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

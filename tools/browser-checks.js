@@ -6592,100 +6592,93 @@ async function main() {
    * contrast fault — a name arrives faintly through a 76px serif rather
    * than being deleted by it, which is worse than either.
    *
-   * `pages.ATLAS_TYPE_ZONES` is the reserve, and it is a UNION over
-   * viewports rather than a box fitted to one. The drawing is `slice` on a
-   * 1460x800 frame inside a container whose aspect runs 1.1 to 5.4, so the
-   * scale between the page's pixels and the projection's units differs on
-   * every screen and the same headline lands in a different part of Europe
-   * on each. This end MEASURES, because arithmetic on a declared number
-   * proves nothing about a page — the palette register asserted a contrast
-   * for a colour the stylesheet no longer had, for exactly this reason.
+   * `ATLAS_TYPE_ZONES` WAS THE REPAIR AND THE COMPOSITION REPLACED IT.
+   * That reserve was a union over 385 samples of where the headline and the
+   * card land in the projection's own units, seeded into the label placer's
+   * `taken` so a country name could not be set under either. It cost six of
+   * the seventeen names and it was the right trade while the type stood on
+   * the drawing.
    *
-   * AND IT READS THE DECLARATION RATHER THAN CARRYING A COPY. Four typed
-   * dispatch caps cost this repository a whole sitting; the numbers are
-   * parsed out of `tools/lib/pages.py`, which is where the build reads
-   * them, so the two cannot disagree.
+   * THE MAP IS THE RIGHT TWO THIRDS NOW, so the promise is stronger and
+   * needs no declared number at all: the editorial column is WEST OF THE
+   * FRAME. `.atlead` is `min(29%, 25rem)` and `.atread` is `min(30%, 23rem)`
+   * against a `.atwin` that starts at 34%, so the column cannot reach the
+   * drawing at any width by construction — and the same 385 samples report
+   * the headline's union ending at x=140.7 and the card's at x=174.5 against
+   * a frame that begins at x=201.
    *
-   * The viewports are the ones the 385-sample sweep found BINDING — 1152
-   * x640 drives the headline's depth, 1024x1440 its width, 3440x1080 the
-   * card's left edge — plus the three a reader is most likely on. A check
-   * that sampled only the common widths would go green on a composition
-   * that is wrong on an ultrawide, which is the state this one was written
-   * from.
+   * THIS END MEASURES AND READS THE PAGE'S OWN viewBox. Arithmetic on a
+   * declared number proves nothing about a page — the palette register
+   * asserted a contrast for a colour the stylesheet no longer had, for
+   * exactly this reason — and a constant two files have to agree on is what
+   * four typed dispatch caps cost this repository a sitting. The frame's
+   * left edge comes off the `<svg>` in front of the browser.
    *
-   * PROVED RED by narrowing the declared headline box to 200x200 and
-   * running the whole suite: one failure of 13,160, naming the element,
-   * the viewport, the scroll position, the box measured and the box
-   * declared. A check is not proved by passing.
+   * The viewports are the ones the sweep found binding — 1152x640 drives the
+   * headline's depth, 1024x1440 its width, 3440x1080 the card's left edge —
+   * plus the three a reader is most likely on. A check that sampled only the
+   * common widths would go green on a composition that is wrong on an
+   * ultrawide, which is the state the reserve was written from.
+   *
+   * PROVED RED by serving the stylesheet with `.atlead` and `.atread`
+   * widened to 60%: **30 failures over the eighteen samples** — both
+   * elements at every one — each naming the element, the viewport, the
+   * scroll position, the right edge measured and the frame's left edge,
+   * against 0 of 18 as shipped. A check is not proved by passing.
    */
   {
-    const src = fs.readFileSync(
-      path.join(__dirname, "lib", "pages.py"), "utf8");
-    const dec = src.match(
-      /ATLAS_TYPE_ZONES = \(\s*\(([^)]*)\),[^(]*\(([^)]*)\),/);
-    ok(!!dec,
-       "tools/lib/pages.py no longer declares ATLAS_TYPE_ZONES in a shape "
-       + "this check can read, so the protected zone under the homepage's "
-       + "atlas register is being measured against nothing");
-    if (dec) {
-      const want = [1, 2].map(i => dec[i].split(",").slice(0, 4)
-                                   .map(s => parseFloat(s)));
-      const VPS = [[1152, 640], [1024, 1440], [3440, 1080],
-                   [1280, 900], [1920, 1080], [2560, 900]];
-      let seen = 0, outside = [];
-      for (const [w, h] of VPS) {
-        const bp = await browser.newPage({ viewport: { width: w, height: h } });
-        await bp.goto(base + "/", { waitUntil: "load" });
-        for (const step of [0, 0.4, 0.85]) {
-          const got = await bp.evaluate((s) => {
-            const at = document.querySelector(".atlas");
-            window.scrollTo(0, at.offsetTop + s * (at.offsetHeight - innerHeight));
-            if (getComputedStyle(document.querySelector(".atstage")).position
-                !== "sticky") return null;
-            const svg = document.querySelector("#act5 svg.instrmap");
-            const m = svg.getScreenCTM().inverse();
-            const P = (x, y) => { const p = svg.createSVGPoint();
-              p.x = x; p.y = y; const q = p.matrixTransform(m);
-              return [q.x, q.y]; };
-            const U = (u, r) => u ? [Math.min(u[0], r[0]), Math.min(u[1], r[1]),
-                                     Math.max(u[2], r[2]), Math.max(u[3], r[3])]
-                                  : r;
-            const box = (e) => { if (!e) return null;
-              const b = e.getBoundingClientRect(); if (!b.width) return null;
-              const a = P(b.x, b.y), c = P(b.right, b.bottom);
-              return [a[0], a[1], c[0], c[1]]; };
-            let card = null;
-            for (const c of document.querySelectorAll(".atcard")) {
-              if (+getComputedStyle(c).opacity <= 0.5) continue;
-              const r = box(c); if (r) card = U(card, r);
-            }
-            return { mega: box(document.querySelector("#act5 .mega")), card };
-          }, step);
-          if (!got) break;
-          seen++;
-          for (const [k, i] of [["headline", 0], ["card", 1]]) {
-            const r = got[k === "headline" ? "mega" : "card"];
-            if (!r) continue;
-            const z = want[i];
-            if (r[0] < z[0] - 1 || r[1] < z[1] - 1
-                || r[2] > z[2] + 1 || r[3] > z[3] + 1)
-              outside.push(`${k} at ${w}x${h}+${step} measures [`
-                + r.map(v => v.toFixed(1)).join(", ") + "] against a declared ["
-                + z.join(", ") + "]");
+    const VPS = [[1152, 640], [1024, 1440], [3440, 1080],
+                 [1280, 900], [1920, 1080], [2560, 900]];
+    let seen = 0;
+    const onDrawing = [];
+    for (const [w, h] of VPS) {
+      const bp = await browser.newPage({ viewport: { width: w, height: h } });
+      await bp.goto(base + "/", { waitUntil: "load" });
+      for (const step of [0, 0.4, 0.85]) {
+        const got = await bp.evaluate((s) => {
+          const at = document.querySelector(".atlas");
+          window.scrollTo(0, at.offsetTop + s * (at.offsetHeight - innerHeight));
+          if (getComputedStyle(document.querySelector(".atstage")).position
+              !== "sticky") return null;
+          const svg = document.querySelector("#act5 svg.instrmap");
+          const m = svg.getScreenCTM().inverse();
+          const P = (x, y) => { const p = svg.createSVGPoint();
+            p.x = x; p.y = y; const q = p.matrixTransform(m);
+            return [q.x, q.y]; };
+          const right = (e) => { if (!e) return null;
+            const b = e.getBoundingClientRect(); if (!b.width) return null;
+            return P(b.right, b.bottom)[0]; };
+          let card = null;
+          for (const c of document.querySelectorAll(".atcard")) {
+            if (+getComputedStyle(c).opacity <= 0.5) continue;
+            const r = right(c);
+            if (r !== null) card = card === null ? r : Math.max(card, r);
           }
+          return { mega: right(document.querySelector("#act5 .mega")), card,
+                   frame: parseFloat(svg.getAttribute("viewBox").split(/\s+/)[0]) };
+        }, step);
+        if (!got) break;
+        seen++;
+        for (const k of ["mega", "card"]) {
+          if (got[k] === null || got[k] === undefined) continue;
+          if (got[k] > got.frame - 1)
+            onDrawing.push(`${k === "mega" ? "headline" : "card"} at `
+              + `${w}x${h}+${step} reaches x=${got[k].toFixed(1)} against a `
+              + `frame beginning at x=${got.frame}`);
         }
-        await bp.close();
       }
-      ok(seen >= 12,
-         `the atlas register's type zones were measured at only ${seen} `
-         + `samples of ${VPS.length * 3}. The two-column composition has `
-         + `stopped being sticky at widths this check assumes it is, so the `
-         + `reserve under the country names is being asserted about nothing`);
-      ok(outside.length === 0,
-         "the page's own type has left the box the label placer reserves "
-         + "for it, so a country name may now be set under it: "
-         + outside.slice(0, 4).join("; "));
+      await bp.close();
     }
+    ok(seen >= 12,
+       `the atlas register's editorial column was measured at only ${seen} `
+       + `samples of ${VPS.length * 3}. The two-column composition has `
+       + `stopped being sticky at widths this check assumes it is, so the `
+       + `promise that the type never stands on the drawing is being `
+       + `asserted about nothing`);
+    ok(onDrawing.length === 0,
+       "the page's own type has reached the atlas register's drawing, where "
+       + "a country name may be set under it and the label placer has no "
+       + "reserve any more: " + onDrawing.slice(0, 4).join("; "));
   }
 
   /* A PAGE'S BAND NUMBERS RUN 01, 02, 03 — AND ON 753 PAGES TWO OF THEM WERE

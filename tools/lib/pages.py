@@ -250,8 +250,17 @@ def cut_band(lat0, lat1, lon, before, after):
             mx - nx * after, my - ny * after)
 
 
-def dusk_stops(lo=0.0, hi=1.0, top=1.0):
+def dusk_stops(lo=0.0, hi=1.0, top=1.0, color=None):
     """Smoothstep in five stops, as opacity only — the colour is the caller's.
+
+    COLOR IS FOR A MASK RATHER THAN FOR A WASH. Every painted fade here
+    leaves `stop-color` alone, because the rule that colours the stops is a
+    class selector on the group and a hard-coded colour would be a second
+    implementation of a token. A MASK has no such rule and no token: its
+    stops are read as luminance, so an uncoloured stop is black and a mask
+    of black hides everything it covers. The one caller that passes this is
+    the register's ground, which fades into the band's own water rather
+    than being cut by the frame.
 
     `top` CAPS HOW DEEP THE FADE GOES, which is a different lever from how
     WIDE it is. Narrowing /map's fade was tried and refused — it makes the
@@ -279,7 +288,8 @@ def dusk_stops(lo=0.0, hi=1.0, top=1.0):
         t = i / 4.0
         v = t * t * (3.0 - 2.0 * t) * top
         out.append(f'<stop offset="{lo + (hi - lo) * t:.4f}" '
-                   f'stop-opacity="{v:.3f}"/>')
+                   + (f'stop-color="{color}" ' if color else "")
+                   + f'stop-opacity="{v:.3f}"/>')
     return "".join(out)
 
 
@@ -7667,70 +7677,202 @@ DOOR_BAND_KB = 90
 # this repository a sitting.
 
 
-# THE PAGE'S OWN TYPE STANDS OVER THIS DRAWING AND THE DRAWING DID NOT KNOW.
+# THE PAGE'S OWN TYPE STOOD OVER THIS DRAWING AND THE RESERVE THAT ANSWERED
+# IT IS GONE, BECAUSE THE COMPOSITION ANSWERED IT BETTER.
 #
 # Every label on this site goes through one machine: `place_label_box`
 # measures it, tests it against the frame, against its own country's ground
 # and against every box already `taken`, and tries its other anchors before
 # it drops it. What has always been in `taken` is the labels this drawing
-# placed itself. On the register that is half the picture — the headline
-# and the region card are set ON the continent, in the page's own grid, and
-# the name layer had never heard of either. Measured at 1280: ICELAND ran
-# 109 pixels through the headline and SPAIN 43 through the figures; at
-# 1920 six names collided; at 2560 UNITED KINGDOM ran 256 pixels through
-# `One continent. Fifty doors.` The wash under the column is why nobody
-# called it a contrast fault — the names are dimmed rather than deleted, so
-# what a reader gets is a place name arriving faintly through a 76px serif,
-# which is worse than either.
+# placed itself. While the register was FULL BLEED that was half the
+# picture — the headline and the region card were set ON the continent, in
+# the page's own grid, and the name layer had never heard of either.
+# Measured at 1280: ICELAND ran 109 pixels through the headline and SPAIN
+# 43 through the figures; at 1920 six names collided; at 2560 UNITED
+# KINGDOM ran 256 pixels through `One continent. Fifty doors.` The wash
+# under the column was why nobody called it a contrast fault — the names
+# were dimmed rather than deleted, so what a reader got was a place name
+# arriving faintly through a 76px serif, which is worse than either.
 #
-# THE RESERVE IS A UNION OVER VIEWPORTS, BECAUSE A NAME IS PLACED ONCE AND
-# READ AT EVERY WIDTH. The drawing is `xMidYMid slice` on a 1460x800 frame
-# inside a box whose aspect runs from 1.1 to 5.4, so the SCALE between the
-# page's pixels and the projection's units is different on every screen and
-# the same headline lands in a different part of Europe on each. `.mega`
-# measured [48, 67, 345, 326] at 1280x900 and [232, 186, 422, 353] at
-# 2560x900, in these units. A reserve fitted to one viewport is a fact
-# about that viewport; the union is the only box that is true of all of
-# them, which is the same reasoning that makes `phone_declutter` re-test
-# every label at the phone's scale rather than trusting the desk's.
+# `ATLAS_TYPE_ZONES` was that repair: a union over 385 samples of where the
+# headline and the card land in the projection's own units, seeded into
+# `taken` so a country name could not be placed under either. It cost six
+# of the seventeen names and it was the right trade while the type stood on
+# the drawing.
 #
-# 385 samples: twelve widths from 992 to 3440 crossed with seven heights
-# from 640 to 1440, at five scroll positions each, taking the SVG's own
-# `getScreenCTM().inverse()` so the numbers are the drawing's rather than
-# the screen's. Below 62rem the stage is not sticky, the column is under
-# the map and nothing stands over it, so those viewports are outside the
-# sweep and outside the claim.
-#
-# AND THE UNION OF THE WHOLE COLUMN IS REFUSED, MEASURED. Adding the intro,
-# the action and the figures takes the left zone to y=846 and the right to
-# x=652: eleven of the seventeen names go, among them UNITED KINGDOM,
-# FRANCE, SPAIN, RUSSIA and TÜRKIYE — which is the exact list this
+# THE MAP IS THE RIGHT TWO THIRDS NOW, AND THE TYPE IS IN THE LEFT COLUMN.
+# Re-run on the two-column composition, the same 385 samples report the
+# headline's union ending at x=140.7 and the card's at x=174.5, against a
+# frame that BEGINS at x=201 — so neither zone touches the drawing at any
+# width, height or scroll position the stage is sticky at. A reserve over
+# ground the frame does not contain is a cost with no subject: 11 names to
+# **17**, and the six it had been buying nothing with are RUSSIA, GERMANY,
+# UNITED KINGDOM, ICELAND, IRELAND and LATVIA — which is the list this
 # repository already records as the wrong answer, the countries a reader
-# orients by. What is reserved is the HEADLINE and the CARD, the two pieces
-# of type that are display-size and opaque; the figures are answered by
-# moving them off the drawing, which is the next commit.
+# orients by. The doors go 29 to 26 in the same move and every corner keeps
+# at least one, because six more name boxes are in `taken` when the marks
+# are placed and a name is worth more than a mark on the same ground.
 #
-# AND IT IS THE HULL OF TWO READINGS, BECAUSE THIS HEADLINE FILLS ITS OWN
-# MEASURE. An h1's box is wider than its glyphs — this repository already
-# records a contrast sweep that read 2.15:1 against a real 9.58 for exactly
-# that reason — so the sweep was run a second time over the headline's own
-# line boxes, expecting the reserve to shrink. It did not: the glyph union
-# is [-130.0, 59.3, 439.1, 442.1] against the box union's [-130.0, 62.7,
-# 457.3, 435.8], NARROWER by 18 units and DEEPER by 6. Neither contains the
-# other, and 76px display type set on three short lines is the one case
-# where the trap does not apply. What is reserved is the hull, so the claim
-# is true however the headline is measured, and it costs no name that the
-# box union did not already cost.
+# AND THE GUARANTEE IS STRUCTURAL RATHER THAN MEASURED. `.atlead` is
+# `min(29%, 25rem)` and `.atread` is `min(30%, 23rem)`, against a `.atwin`
+# that starts at 34% — so the column cannot reach the drawing at any width
+# by construction, where a union is a fact about the sample. What
+# `browser-checks.js` asserts is that promise, read off the page's own
+# `viewBox` rather than off a declared number: the type's right edge is
+# west of the frame's left edge. A declaration nothing can drift from is
+# better than one two files have to agree on, which is what four typed
+# dispatch caps cost this repository a sitting.
+
+
+# HOW MUCH AIR THE REGISTER'S FRAME KEEPS ROUND THE ATLAS, as a share of the
+# drawn extent. It is a picture rather than a diagram, so the continent does
+# not touch the edges.
 #
-# `browser-checks.js` re-measures the two boxes at the viewports the sweep
-# found binding and fails when either leaves what is declared here, reading
-# these numbers out of this file rather than carrying a copy — because this
-# is a constant with a measurement behind it, and the measurement is the
-# only thing that keeps it true.
-ATLAS_TYPE_ZONES = (
-    (-130.0, 59.3, 457.3, 442.1),   # `One continent. Fifty doors.`
-    (652.9, 0.0, 1250.0, 371.2),    # the corner card
-)
+# AND THE SOUTH IS NOT THE OTHER THREE, WHICH IS A MEASUREMENT RATHER THAN A
+# PREFERENCE. This frame has no visible edge: the band paints the map's own
+# water, so where the drawing stops is exactly where nothing says it stops —
+# and land that ends on a ruled line with no frame round it is the /plan
+# context-land slab, arrived at from below. Measured at 1440 on the
+# Mediterranean step, the bottom edge cut Tunisia on the left and Anatolia
+# on the right into two straight-edged wedges 730 pixels down the stage,
+# with the band's water under them. The other three edges are already
+# answered: the top sits at the stage's own top and the masthead stands on
+# it, and the left and right bleed past the viewport. So the south gets the
+# air, and `ATLAS_GROUND_FADE` hands what is left of the ground to the water
+# rather than cutting it.
+#
+# IT ALSO SHORTENS THE DEAD BAND, WHICH IS THE SAME NUMBER SEEN FROM THE
+# OTHER END. `meet` fits the frame inside the box and puts the spare room at
+# the bottom: a taller frame is a taller drawing at the same width, so the
+# room under it falls from 235 pixels to 144 at 1280x900 without the
+# continent losing a unit.
+ATLAS_FRAME_PAD = 0.05
+ATLAS_FRAME_PAD_S = 0.20
+
+# AND THE GROUND ENDS IN WATER RATHER THAN ON A LINE, as a share of the
+# frame's own height. Masked rather than clipped, and the mask is on the
+# GROUND alone: `lyr-beyond` is the only layer that reaches this edge, it
+# carries no name, no link and no frontier, and **a masked group hit-tests
+# as ONE region** — the hero lost every country link to exactly that, so
+# nothing with an `<a>` in it may go inside one.
+#
+# The ramp is smoothstep in five stops, because a two-stop gradient has a
+# crease at each end and the eye draws a line along it — this stylesheet
+# records that as a Mach band reported three times as a hard edge while
+# "soften the gradient" never fixed it. The southern pad above is what keeps
+# a named country out of the ramp: 0.20 of the drawn extent puts the
+# southernmost country 16% of the frame above the bottom, against a fade
+# that reaches 10%.
+ATLAS_GROUND_FADE = 0.10
+
+
+def atlas_frame(land, cut):
+    """The window fitted to the countries this atlas writes about.
+
+    Takes the land markup a first pass emitted and returns the view the
+    second pass should be generated at. The CUT countries are left out of
+    the fit: this atlas holds a fragment of Russia, so its northern reach
+    is a fact about where the data stops rather than about Europe, and a
+    frame sized around it makes the fragment the biggest thing in a picture
+    of the other forty-nine.
+    """
+    lo_x = lo_y = float("inf")
+    hi_x = hi_y = float("-inf")
+    for m in re.finditer(r'<path[^>]*id="at-([a-z0-9-]+)"[^>]*\sd="([^"]+)"',
+                         land):
+        if m.group(1) in cut:
+            continue
+        n = [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", m.group(2))]
+        if not n:
+            continue
+        lo_x = min(lo_x, min(n[0::2])); hi_x = max(hi_x, max(n[0::2]))
+        lo_y = min(lo_y, min(n[1::2])); hi_y = max(hi_y, max(n[1::2]))
+    assert hi_x > lo_x and hi_y > lo_y, (
+        "the register's frame was fitted to no country at all. Either the "
+        "first pass emitted no `id=\"at-\"` path or every country it emitted "
+        "is in the cut set — and a frame fitted to nothing silently becomes "
+        "whatever the fallback is, which is how a drawing ends up showing "
+        "geography nobody chose")
+    w, h = hi_x - lo_x, hi_y - lo_y
+    px, py = w * ATLAS_FRAME_PAD, h * ATLAS_FRAME_PAD
+    ps = h * ATLAS_FRAME_PAD_S
+    return (round(lo_x - px, 1), round(lo_y - py, 1),
+            round(w + 2 * px, 1), round(h + py + ps, 1))
+
+
+# THE RELIEF ON THE REGISTER, WHICH THIS BAND'S OWN COMMENT USED TO REFUSE.
+#
+# `atlas_register` was written with a paragraph saying the drawing is the
+# continent as a REGISTER — *no water, no relief, no rivers, no lakes, no
+# photograph and no dusk* — and that refusal held twice in this repository,
+# once against four upgrades proposed in one session. It is the owner's to
+# overrule and he has: the band reads as a flat silhouette with names on it,
+# and the one thing that gives a stone continent depth without adding a
+# single claim is the ground's own height. **A band claims only height,
+# which is the one thing the elevation model measures**, so nothing here is
+# invented — which is what separates this from the water, the rivers and the
+# photograph the same paragraph refuses and that stay refused.
+#
+# THE SETTINGS WERE RENDERED AND LOOKED AT, NOT PICKED. Four were built,
+# injected into the real page and photographed at 1440: three bands at 3.5
+# units (15.7 KB), the same at 4.5 (10.8), two bands at 4.5 (4.4) and three
+# at 6.0 (6.6). The two cheap ones are too quiet to be worth their bytes —
+# at two bands the Scandinavian spine barely survives and the Carpathians
+# are gone, which is a layer that ships and cannot be seen, the exact
+# measurement that removed the terrain's second strength. 3.5 reads as
+# relief and still answers the brief's own test: you notice it after
+# looking.
+#
+# AND THE RINGS THAT ARE NOT ON THIS ATLAS ARE DROPPED, GEOGRAPHICALLY.
+# The elevation model covers the frame and this drawing covers fifty
+# countries, so the first render put the east coast of Greenland and two
+# unnamed highlands in the sea north-west of Iceland — ground the register
+# does not draw, at 34% over water. The plates get away with the same
+# mismatch because a plate is 590 km wide and this is a continent. The test
+# is `NameGround`'s own: sample the ring and keep it if any sample is on a
+# country this drawing actually emitted. 14 rings of 58 go, and 2.7 KB with
+# them.
+ATLAS_RELIEF_THIN = 3.5
+ATLAS_RELIEF_MIN = 80.0
+ATLAS_RELIEF_BANDS = (600, 1200, 2000)
+
+
+def atlas_relief(land, view):
+    """The hypsometric bands, kept only where this drawing draws ground."""
+    wash = cartography.relief_wash(MAPPROJ, view,
+                                   thin_units=ATLAS_RELIEF_THIN,
+                                   min_units=ATLAS_RELIEF_MIN,
+                                   bands=ATLAS_RELIEF_BANDS)
+    if not wash:
+        return ""
+    ds = [m.group(1) for m in LAND_PATH.finditer(land)]
+    if not ds:
+        return ""
+    ground = NameGround(ds)
+    out, kept, seen = [], 0, 0
+    for pm in re.finditer(r'<path class="tband (t\d+)" d="([^"]+)"/>', wash):
+        band, d = pm.group(1), pm.group(2)
+        subs = []
+        for sub in d.split("Z"):
+            pts = [(float(a), float(b)) for a, b in
+                   re.findall(r"[ML](-?[\d.]+) (-?[\d.]+)", sub)]
+            if len(pts) < 3:
+                continue
+            seen += 1
+            step = max(1, len(pts) // 12)
+            if any(any(ground.own(k, x, y) for k in range(len(ds)))
+                   for x, y in pts[::step]):
+                subs.append(sub)
+                kept += 1
+        if subs:
+            out.append(f'<path class="tband {band}" '
+                       f'd="{"Z".join(subs)}Z"/>')
+    assert seen and kept, (
+        "the register's relief kept no ring at all. Either the wash has "
+        "stopped producing geometry or the land markup it is tested against "
+        "has stopped matching LAND_PATH — and a terrain layer that silently "
+        "empties looks exactly like one that was never drawn")
+    return "".join(out)
 
 
 # THE MARK IS ON WHAT IS OPEN, AND FIFTY OF THEM WERE BUILT AND MEASURED OUT.
@@ -7780,7 +7922,7 @@ ATLAS_MARK_H = 22.0
 ATLAS_MARK_RISE = ATLAS_MARK_W / 2.0
 
 
-def atlas_door_marks(land, slugs, names, zones):
+def atlas_door_marks(land, slugs, names):
     """An arch on each of `slugs`, on its own ground, clear of `names`.
 
     Returns {slug: markup}. A country that cannot hold the mark anywhere
@@ -7788,20 +7930,18 @@ def atlas_door_marks(land, slugs, names, zones):
     nowhere gets, and for the same reason: the country keeps its shape, its
     frontier, its link and its row in the register column below.
 
-    TWO RUNGS, AND THE FIRST RUN HAD ONE AND LEFT A CORNER EMPTY. The type
-    zones are a UNION over viewports — the headline covers x 48 to 345 at
-    1280 and x 232 to 422 at 2560, and the reserve is the box that contains
-    both — which is right for a NAME, a bar of type with nine anchors and an
-    alternative, and far too blunt for a 20-unit glyph. Treating them as
-    hard left the British Isles with **no mark at all**: both its countries
-    sit inside the union, so the one step of the nine whose corner is two
-    islands said nothing, which is the promise kept eight times the lift
-    already records about `alpine-central`. So a mark avoids the zones where
-    it can and takes the ground under them where that is all there is — the
-    wash over the column dims it rather than letting it fight the headline,
-    and a corner that draws no door is worse than a door in shadow. It is
-    `NameGround`'s own shape, which tries zero crossings first and two only
-    if nothing fits.
+    IT HAD A SECOND RUNG AND THE COMPOSITION REMOVED ITS SUBJECT. While the
+    headline stood on the drawing, `ATLAS_TYPE_ZONES` was seeded here as a
+    SOFT constraint: a mark avoided the reserve where it could and took the
+    ground under it where that was all there was, because treating a union
+    over viewports as hard left the British Isles with no mark at all — both
+    its countries sit inside it, so the one step of the nine whose corner is
+    two islands said nothing. The map is the right two thirds now and the
+    type is west of the frame at all 385 samples, so the soft list was
+    always empty and the rung could never fire. **A rung nothing reaches is
+    dead code that looks like a decision**, which is this repository's own
+    sentence about a motif, so it is gone rather than kept for a layout
+    nobody is proposing.
     """
     ds, idx_of = [], {}
     for i, m in enumerate(LAND_PATH.finditer(land)):
@@ -7813,7 +7953,6 @@ def atlas_door_marks(land, slugs, names, zones):
     hw, hh = ATLAS_MARK_W / 2.0, ATLAS_MARK_H / 2.0
     _arch = arch_path(ATLAS_MARK_W, ATLAS_MARK_H, ATLAS_MARK_RISE)
     taken = [tuple(b) for b in names]
-    soft = [tuple(b) for b in zones]
     out = {}
     # Largest first, exactly as the names are placed: the order decides who
     # gets the clean position when two marks want the same ground.
@@ -7858,9 +7997,6 @@ def atlas_door_marks(land, slugs, names, zones):
             box = (x - hw - LABEL_CLEAR, y - hh - LABEL_CLEAR,
                    x + hw + LABEL_CLEAR, y + hh + LABEL_CLEAR)
             if _hits(box, taken):
-                continue
-            if _hits(box, soft):
-                fits.append((x, y, box))   # possible, and under the type
                 continue
             fits = [(x, y, box)]
             break
@@ -7941,12 +8077,37 @@ def atlas_register(data):
                  if e.get("slug") and any(
                      r[i] >= cut_east - 0.05
                      for r in (e.get("rings") or []) for i in range(0, len(r), 2))}
+    _bands = {c["slug"]: "atc-" + macro_of[c["slug"]]
+              for c in data["countries"].values()
+              if macro_of.get(c["slug"]) and c["slug"] not in cut_slugs}
+    _pid = lambda ent: ("at-" + ent["slug"]) if ent.get("slug") else ""
+    # THE FRAME IS THE ATLAS'S OWN EXTENT, AND IT IS MEASURED IN TWO PASSES.
+    #
+    # `WIDE_VIEW` is the HERO's window with a margin either side, and the
+    # register inherited it. Measured on the built page at 1280, the drawn
+    # land occupied 432 of the plate's 824 pixels: **more than half the
+    # frame was open sea and empty margin**, so Europe was a small figure in
+    # a large rectangle and the only thing filling the corner was the one
+    # country this atlas holds a FRAGMENT of. Russia measured **35.6% of the
+    # drawn extent** on a band whose subject is the other forty-nine.
+    #
+    # The first pass generates at the inherited window and is thrown away;
+    # what it is for is the extent of the paths that were actually EMITTED,
+    # which is the only honest source for it — a frame fitted to the
+    # dataset's bbox would be fitted to geography this drawing thins away,
+    # and one fitted to a typed number would be the figure that was true two
+    # hundred destinations ago. The CUT countries are excluded from the fit
+    # for the reason the band already states in prose: this atlas holds a
+    # fragment of Russia, cut at 52 degrees east, so its northern reach is a
+    # fact about where our data stops rather than about Europe. It keeps its
+    # shape, its frontier, its name and its link, and the frame stops
+    # sizing itself around it.
+    _probe = geo.landmass(MAPPROJ, WIDE_VIEW, doc=doc, thin_units=3.0,
+                          min_units=6.0, bands=_bands, path_id=_pid)[1]
+    _view = atlas_frame(_probe, cut_slugs)
     _ctx, land = geo.landmass(
-        MAPPROJ, WIDE_VIEW, doc=doc, thin_units=3.0, min_units=6.0,
-        bands={c["slug"]: "atc-" + macro_of[c["slug"]]
-               for c in data["countries"].values()
-               if macro_of.get(c["slug"]) and c["slug"] not in cut_slugs},
-        path_id=lambda ent: ("at-" + ent["slug"]) if ent.get("slug") else "")
+        MAPPROJ, _view, doc=doc, thin_units=3.0, min_units=6.0,
+        bands=_bands, path_id=_pid)
     cut_names = sorted(c["name"] for c in data["countries"].values()
                        if c["slug"] in cut_slugs)
 
@@ -8044,18 +8205,18 @@ def atlas_register(data):
                 f'href="{urls.country(c)}">{text}</a>')
 
     nameboxes = []
-    names = name_countries(land, HERO_VIEW, max_names=99,
-                           reserved=ATLAS_TYPE_ZONES, boxes=nameboxes,
+    names = name_countries(land, _view, max_names=99,
+                           boxes=nameboxes,
                            metric="atname", metric2="atname2",
                            decorate=_door)
     drawn = names.count("<text")
     # THE NAMES GO DOWN FIRST AND THE MARKS AVOID THEM, because a name says
     # which country and a mark says only that it is a door: where the two
-    # want one piece of ground the name is worth more. `nameboxes` already
-    # carries the two type zones, so a mark cannot land under the headline
-    # either.
-    marks = atlas_door_marks(land, liftable, nameboxes,
-                             ATLAS_TYPE_ZONES)
+    # want one piece of ground the name is worth more. `nameboxes` is what
+    # the name pass PLACED rather than what it was given — the first version
+    # handed back its whole `taken` list, which on a pass seeded with the
+    # type reserve told the mark placer that the reserve was a name.
+    marks = atlas_door_marks(land, liftable, nameboxes)
 
     # A LIT CORNER MUST PAINT ABOVE WHATEVER IT MOVES ONTO, AND SVG HAS NO
     # `z-index` TO DO IT WITH — probed in Chromium, on the element and with
@@ -8186,9 +8347,37 @@ def atlas_register(data):
     # `#heroland` is: two datasets simplified independently do not share an
     # edge, and along a 700-unit cut a tenth of a unit of paper is a bright
     # hairline exactly where the picture must not have one.
-    beyond = [b for b in geo.beyondmass(MAPPROJ, WIDE_VIEW, thin_units=6.0,
+    beyond = [b for b in geo.beyondmass(MAPPROJ, _view, thin_units=6.0,
                                         min_units=200.0, pad=0.0) if b]
-    ground = ('<g class="lyr lyr-beyond" aria-hidden="true">'
+    # AND IT ENDS IN WATER RATHER THAN ON A LINE.
+    #
+    # `pad=0.0` clips this layer to the frame exactly, which is right on
+    # three edges and wrong on the fourth: the top sits under the masthead
+    # and the left and right bleed past the viewport, but the SOUTH is in
+    # the middle of the stage with the band's own water under it. Measured
+    # at 1440 on the Mediterranean step, Tunisia and Anatolia ended as two
+    # straight-edged wedges on a ruled horizontal 730 pixels down — a
+    # rendering fault on the one drawing whose ground is meant to be
+    # continuous, and the /plan context-land slab arrived at from below.
+    #
+    # Masked rather than clipped, and the mask is on THIS layer alone: it is
+    # the only one that reaches the edge, and **a masked group hit-tests as
+    # one region**, so nothing carrying an `<a>` may go inside one. The
+    # southern pad above keeps every named country out of the ramp.
+    gfade = f"atg{next(_CUT_N)}"
+    fy0 = _view[1] + _view[3]
+    fy1 = fy0 - _view[3] * ATLAS_GROUND_FADE
+    ground = ('<g class="lyr lyr-beyond" aria-hidden="true" '
+              f'mask="url(#{gfade}m)"><defs>'
+              f'<linearGradient id="{gfade}" gradientUnits="userSpaceOnUse" '
+              f'x1="0" y1="{fy0:.1f}" x2="0" y2="{fy1:.1f}">'
+              + dusk_stops(color="#fff") + '</linearGradient>'
+              f'<mask id="{gfade}m" maskUnits="userSpaceOnUse" '
+              f'x="{_view[0]:g}" y="{_view[1]:g}" '
+              f'width="{_view[2]:g}" height="{_view[3]:g}">'
+              f'<rect x="{_view[0]:g}" y="{_view[1]:g}" '
+              f'width="{_view[2]:g}" height="{_view[3]:g}" '
+              f'fill="url(#{gfade})"/></mask></defs>'
               + "".join(f'<path d="{d}"/>' for d in beyond) + "</g>") if beyond else ""
 
     # THE FRONTIER INK STOPS WHERE THE DATASET STOPS, AND THE GROUND DOES NOT.
@@ -8241,6 +8430,7 @@ def atlas_register(data):
             + "L".join(f"{px:.1f} {py:.1f}" for px, py in keep)
             + 'Z"/></clipPath></defs>')
 
+    relief = atlas_relief(land, _view)
     fig = (
         # THE ROLE GOES ON THE `<svg>`, WHICH IS WHERE THE CHECK READS IT —
         # `c_map_roles` matches the element carrying the map class, and this
@@ -8261,16 +8451,36 @@ def atlas_register(data):
         # corner lifting toward the frame's edge moves through drawn land.
         f'<figure class="atplate">'
         f'<svg class="instrmap atlas" data-role="illustration" '
-        f'viewBox="{-EDGE_MARGIN:g} 0 {HERO_VIEW[2] + 2 * EDGE_MARGIN:g} '
-        f'{HERO_VIEW[3]:g}" preserveAspectRatio="xMidYMid slice" '
+        # AND IT IS `meet` ALIGNED TO THE TOP, WHICH IS TWO DECISIONS IN ONE
+        # ATTRIBUTE. `slice` crops whichever axis is long, which is what a
+        # full-bleed band needs and what a framed one must not do: at 1920
+        # the fitted frame is 923 pixels tall in a 900-pixel stage and the
+        # top and bottom of Europe left the picture. `meet` fits the whole
+        # drawing and letterboxes — and the letterbox here is INVISIBLE,
+        # because this drawing paints no ocean of its own and the band's
+        # paper IS `--map-water`, which is the same repair that removed the
+        # plate's seam when it became the room. `YMin` puts the spare room
+        # at the BOTTOM: the drawing sits at the top of the stage, where the
+        # headline beside it starts, rather than centred in a box whose
+        # lower half is the scroll cue's.
+        f'viewBox="{_view[0]:g} {_view[1]:g} {_view[2]:g} {_view[3]:g}" '
+        f'preserveAspectRatio="xMidYMin meet" '
         f'role="img" aria-labelledby="atplate-t">'
         f'<title id="atplate-t">Europe, with the countries this atlas writes '
         f'about named on their own ground. Every country is listed under the '
         f'nine corners beside this drawing.</title>'
         f'{clip}{ground}'
         f'<g class="lyr lyr-land" clip-path="url(#{cut})">{land}</g>'
-        f'<g class="lyr lyr-labels">{names}</g>'
-        f'</svg></figure>')
+        # THE RELIEF SITS WHERE `cartography.ORDER` PUTS IT — above the land
+        # and under everything that describes it, so a lit corner keeps its
+        # names and its doors over its own ground. A layer with no content
+        # emits NOTHING rather than an empty group, which is that module's
+        # own rule: an empty `lyr-terrain` is a claim that this map has
+        # relief and simply had none here.
+        + (f'<g class="lyr lyr-terrain" aria-hidden="true">{relief}</g>'
+           if relief else "")
+        + f'<g class="lyr lyr-labels">{names}</g>'
+        + f'</svg></figure>')
 
     blocks = []
     for m in sorted(data.get("macros", []), key=lambda x: macro_order[x["slug"]]):
