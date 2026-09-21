@@ -2940,6 +2940,17 @@ main h2 { margin-top: var(--s6); margin-bottom: var(--s4); }
 @media (max-width: 60rem) { .navutil::before { display: none; } }
 .navutil a { text-decoration: none; color: var(--ink-2); border-bottom: 1.5px solid transparent; padding-bottom: 2px; }
 .navutil a:hover { color: var(--door); border-bottom-color: var(--door); }
+/* AND THE TWO UTILITIES COULD BE MARKED CURRENT AND NOT LOOK IT. The room
+   links have carried `[aria-current="page"]` styling since the bar was
+   written; `.navutil a` had the transparent border and the hover colour and
+   no rule for the marked state at all — so standing on /search or
+   /my-europe the markup said "page" and the bar said nothing. Present,
+   correct, announced to a screen reader and invisible to everybody else,
+   which is this repository's most repeated shape. Same two declarations the
+   rooms use, because a marker that differs between two halves of one bar is
+   two markers. */
+.navutil a[aria-current="page"] { color: var(--ink);
+  border-bottom-color: var(--door); }
 .navsearch { color: var(--door); }
 .navsearch span { font-size: 1.1em; line-height: 1; }
 /* A MASTHEAD WORSE IN THE MIDDLE OF ITS RANGE THAN AT EITHER END. Below

@@ -6871,6 +6871,33 @@ composition* is written here about a CSS class and is the same rule about a
 module-level function — loud this time only by luck, because the two
 signatures differ.
 
+
+**NINETEEN OF FORTY-SEVEN FAMILIES LIT NO ROOM IN THE MASTHEAD, INCLUDING A
+ROOM'S OWN PAGE.** `aria-current` was decided by the AREA string a page
+builder passes, and the table's area sets cover the indexes rather than the
+pages the FIELDS point at — so /about, /how-it-works, /method, /sources,
+/beyond-the-obvious and **/manifesto, which is the EUROPE room's own href**,
+were every one of them unmarked. A reader standing on the page a word in the
+bar links to was told nothing by that word. **The field already declares the
+answer**: a room is current when the reader is on its own page or on any page
+its directory names, both of which are in the same table, so the test is
+derived from the row rather than from a second hand-listed set somebody has
+to extend. It is `bottom_nav`'s own prefix rule, which the masthead never
+got. 28 lit one → 34, 19 lit none → 13, and the thirteen are the homepage,
+the 404, the two utilities and nine institutional pages that are in no room.
+
+**AND THE AREA WINS WHERE IT SPEAKS, WHICH THE FIRST VERSION DID NOT SAY AND
+ONE PAGE PROVED.** `/discover/<macro>` passes `area="countries"`, which is
+ATLAS, and its path sits under DISCOVER — so adding the path test lit both,
+on a bar whose whole job is to say where you are. The area is the builder's
+own statement of what the page IS and the path is the fallback for the pages
+whose builder says nothing.
+
+**AND A MARKED LINK COULD BE MARKED AND NOT LOOK IT.** `.navutil a` had the
+transparent border and the hover colour and no rule for `[aria-current]`, so
+/search and /my-europe announced a current page to a screen reader and showed
+nothing to anybody else. Present, correct, announced and invisible.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

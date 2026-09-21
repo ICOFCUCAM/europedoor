@@ -1830,3 +1830,50 @@ resolves the **later** definition, so the build called that one and stopped on
 its signature. *Grep the stylesheet before naming a composition* is written
 here about a CSS class; it is the same rule about a module-level function, and
 this time it was loud only by luck — the two signatures differ.
+
+## Menu 03 — nineteen of forty-seven families lit no room, including a room's own page
+
+`aria-current` in the masthead was decided by the **area** string a page
+builder passes, and the table's area sets cover the indexes rather than the
+pages the fields point at. Measured across every rendered family:
+
+| | before | after |
+|---|---|---|
+| lit exactly one room | 28 | 34 |
+| lit two rooms | 0 | 0 |
+| lit none | 19 | 13 |
+
+Among the nineteen: /about, /how-it-works, /method, /sources,
+/beyond-the-obvious, /search, /my-europe — and, most plainly, **/manifesto,
+which is the EUROPE room's own href.** A reader standing on the page a word in
+the bar links to was told nothing by that word.
+
+**The field already declares the answer.** A room is current when the reader
+is on its own page or on any page its directory names, and both are in the
+same table — so the test is derived from the row rather than from a second
+hand-listed set somebody has to remember to extend. It is `bottom_nav`'s own
+rule, which has marked by PREFIX rather than by equality since it was written
+so that a city page lights Explore; the masthead never got it. One mechanism,
+two bars.
+
+**And the area wins where it speaks, which the first version did not say and
+one page proved.** `/discover/adriatic-balkans` is a macro region: it passes
+`area="countries"`, which is ATLAS, and its path sits under DISCOVER — so
+adding the path test lit both, on a bar whose whole job is to say where one
+is. The area is the page builder's own statement of what the page IS; the path
+is the fallback for pages whose builder says nothing.
+
+The thirteen still unlit are the homepage and the 404, which are correctly
+none, the two utilities, which are marked in their own half of the bar, and
+nine institutional and legal pages that are in no room and live in the footer.
+
+**And a marked link could be marked and not look it.** `.navutil a` had the
+transparent border and the hover colour and no rule for the marked state at
+all, so /search and /my-europe announced a current page to a screen reader and
+showed nothing to anybody else — present, correct, announced and invisible,
+which is this repository's most repeated shape. Same two declarations the
+rooms use, because a marker that differs between two halves of one bar is two
+markers.
+
+Both halves proved red: seven failures with the area-only test (naming
+/manifesto and /sources by name), one with the utility rule emptied.

@@ -1808,10 +1808,49 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     # in the footer of the same document — which is exactly where /themes,
     # /interests, /map and /europe-in have always been, because none of
     # them was ever in this bar at all.
+    # AND NINETEEN OF FORTY-SEVEN FAMILIES LIT NO ROOM AT ALL, INCLUDING A
+    # ROOM'S OWN HREF.
+    #
+    # `aria-current` was decided by the AREA string a page builder passes,
+    # and the table's area sets cover the indexes rather than the pages the
+    # fields point at. Measured across every rendered family: 28 lit exactly
+    # one room, 0 lit two, and 19 lit none — /about, /how-it-works, /method,
+    # /sources, /beyond-the-obvious, /search, /my-europe and, most plainly,
+    # **/manifesto, which is the EUROPE room's own href**. A reader standing
+    # on the page a word in the bar links to was told nothing by that word.
+    #
+    # THE FIELD ALREADY DECLARES THE ANSWER. A room is current when the
+    # reader is on its own page or on any page its directory names, and both
+    # are in this table — so the test is derived from the row rather than
+    # from a second hand-listed set somebody has to remember to extend. It
+    # is `bottom_nav`'s own rule, which has marked by PREFIX rather than by
+    # equality since it was written, so a city page lights Explore; the
+    # masthead never got it. One mechanism, two bars.
+    #
+    # The area sets stay, because they answer the half a path cannot: an
+    # arrival page at /europe/<c>/<r>/<city> is in no field and belongs to
+    # DISCOVER. A page matching both lights one room, because it is the same
+    # room — nothing is in two fields, which is the rule the table is built
+    # on and which this measurement confirms at zero.
+    def _here(href):
+        return path == href or path.startswith(href.rstrip("/") + "/")
+
+    # AND THE AREA WINS WHERE IT SPEAKS, WHICH THE FIRST VERSION DID NOT SAY
+    # AND ONE PAGE PROVED. `/discover/adriatic-balkans` is a macro region: it
+    # passes `area="countries"`, which is ATLAS, and its PATH sits under
+    # DISCOVER — so adding the path test lit both, on a bar whose whole job
+    # is to say where one is. The area is the page builder's own statement
+    # of what the page IS and the path is the fallback for the pages whose
+    # builder says nothing, so an area match settles it and no path match
+    # may add a second room. Measured: 0 pages light two.
+    _byarea = any(area in a for _h, _l, a, _b, _fh, _f in NAV)
+
     nav = []
     thumbed = {href for href, _l, _d in BOTTOM_NAV}
     for href, label, areas, _blurb, fhead, field in NAV:
-        mark = ' aria-current="page"' if area in areas else ''
+        at = (area in areas) if _byarea else (
+            _here(href) or any(_here(fh) for fh, _fl in field))
+        mark = ' aria-current="page"' if at else ''
         dup = " inthumb" if href in thumbed else ''
         if not field:
             nav.append(f'<a class="navtop{dup}" href="{href}"{mark}>{esc(label)}</a>')
@@ -1913,8 +1952,8 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     </a>
     <nav class="nav" aria-label="{esc(T("nav.aria.primary"))}">{"".join(nav)}</nav>
     <div class="navutil">
-      <a class="navsearch" href="/search"><span aria-hidden="true">⌕</span> {esc(T("nav.search"))}</a>
-      <a class="navmine inthumb" href="/my-europe">{esc(T("nav.myeurope"))}</a>
+      <a class="navsearch" href="/search"{' aria-current="page"' if _here("/search") else ''}><span aria-hidden="true">⌕</span> {esc(T("nav.search"))}</a>
+      <a class="navmine inthumb" href="/my-europe"{' aria-current="page"' if _here("/my-europe") else ''}>{esc(T("nav.myeurope"))}</a>
     </div>
   </div>
 </header>

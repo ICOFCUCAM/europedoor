@@ -4736,6 +4736,85 @@ async function main() {
     await cp.close();
   }
 
+  /* ── AND THE BAR HAS TO SAY WHERE YOU ARE, ON EVERY PAGE THAT IS IN IT ──
+   * `aria-current` was decided by the AREA string a page builder passes,
+   * and the table's area sets cover the indexes rather than the pages the
+   * fields point at. Measured across every rendered family before the
+   * repair: 28 lit exactly one room, 0 lit two, and 19 lit NONE — among
+   * them /about, /how-it-works, /method, /sources, /beyond-the-obvious and,
+   * most plainly, /manifesto, which is the EUROPE room's own href. A reader
+   * standing on the page a word in the bar links to was told nothing by
+   * that word.
+   *
+   * THE TWO HALVES OF THE ASSERTION ARE DIFFERENT PROMISES. At most one
+   * room may be lit, because a bar that lights two has stopped saying where
+   * you are — and the first repair lit two on /discover/<macro>, whose area
+   * is ATLAS and whose path is under DISCOVER. And a page that IS a room's
+   * href, or one of the entries in its field, must light that room: that is
+   * the half no count could report, because a hand-listed area set is
+   * always internally consistent.
+   *
+   * The utilities are in it too. They carried the marker in the markup and
+   * had no rule for the marked state, so /search and /my-europe announced a
+   * current page to a screen reader and showed nothing to anybody else. */
+  {
+    const ap = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    let lit = 0, none = 0;
+    for (const [fam, url] of require("./lib/families.js").ALL) {
+      const r = await ap.goto(base + url, { waitUntil: "load" });
+      if (!r || r.status() !== 200) continue;
+      const m = await ap.evaluate(() => ({
+        rooms: [...document.querySelectorAll('.nav [aria-current="page"]')]
+          .map((a) => a.textContent.trim()),
+        util: [...document.querySelectorAll('.navutil [aria-current="page"]')]
+          .map((a) => a.textContent.trim()),
+        // the room this page SHOULD light, read off the bar's own hrefs
+        owed: [...document.querySelectorAll(".nav .navtop, .nav .navfield a")]
+          .filter((a) => {
+            const h = a.getAttribute("href");
+            return h === location.pathname ||
+                   location.pathname.startsWith(h.replace(/\/$/, "") + "/");
+          })
+          .map((a) => (a.closest(".navroom") || a).querySelector(".navtop")
+                        ? (a.closest(".navroom") || a.parentElement).querySelector(".navtop").textContent.trim()
+                        : a.textContent.trim()),
+      }));
+      checked++;
+      ok(m.rooms.length <= 1,
+         `${fam} (${url}) lights ${m.rooms.length} rooms — ${m.rooms.join(", ")}. ` +
+         `A bar that lights two has stopped saying where you are`);
+      if (m.owed.length) {
+        checked++;
+        ok(m.rooms.length === 1,
+           `${fam} (${url}) is the page ${m.owed[0]} links to and the bar ` +
+           `lights no room at all`);
+      }
+      if (m.rooms.length === 1) lit++; else none++;
+    }
+    checked++;
+    ok(lit >= 30,
+       `only ${lit} of ${lit + none} families light a room in the masthead, ` +
+       `which is below what this check was written at — the bar has stopped ` +
+       `saying where a reader is on most of the site`);
+    // AND A MARKED LINK HAS TO LOOK MARKED, which is the half the markup
+    // cannot answer: the utilities carried the attribute and no rule.
+    await ap.goto(base + "/search", { waitUntil: "load" });
+    const seen = await ap.evaluate(() => {
+      const a = document.querySelector('.navutil [aria-current="page"]');
+      if (!a) return null;
+      const plain = document.querySelector('.navutil a:not([aria-current])');
+      const cs = getComputedStyle(a), ps = getComputedStyle(plain);
+      return { border: cs.borderBottomColor, other: ps.borderBottomColor,
+               colour: cs.color, othercolour: ps.color };
+    });
+    checked++;
+    ok(seen && (seen.border !== seen.other || seen.colour !== seen.othercolour),
+       `/search marks its own utility link current and paints it exactly ` +
+       `like the one beside it (${seen && seen.border} against ` +
+       `${seen && seen.other}) — present, announced, and invisible`);
+    await ap.close();
+  }
+
   // ONE PROJECTION, TWO IMPLEMENTATIONS, AND A CHECK THAT THEY AGREE.
   //
   // The map used to be equirectangular, so the build could hand the browser
