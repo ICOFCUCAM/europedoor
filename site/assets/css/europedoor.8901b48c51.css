@@ -5375,7 +5375,24 @@ body[data-hero] .masthead { position: sticky; }
  * sitting at the top as a decorative box. The caption says which of the two
  * it is; a generated horizon shown silently next to real geography invites
  * a reader to take it for a photograph. */
-.placeband { margin: var(--s8) 0 0; display: grid; gap: var(--s4); }
+/* `.placeband` ITSELF IS EMITTED NOWHERE, AND ITS GRID IS WHY THE
+   DESTINATION PHOTOGRAPH HAD NO DECLARED CROP ON 319 PAGES.
+   `grep -rho 'class="[^"]*placeband[^"]*"' site --include=index.html | sort -u`
+   returns `class="placeband-art"` and `class="placeband-map"` and nothing
+   else: the band became `.ed-arrival-media` when the destination page moved
+   to the 2036 arrival family, and the photograph and the map stopped sitting
+   side by side and became two full-width rows. Four rules for the wrapper
+   went on describing the old grid — the 5fr/7fr columns, `align-items:
+   stretch`, the spanning figcaption and `.maponly` (twice, identically, 218
+   lines apart) — and `data/image-purposes.json` cited that grid as the reason
+   `destination-hero` could not be measured at all: "its container is exactly
+   as tall as the MAP BESIDE IT". There is no map beside it. A refusal whose
+   reason has expired switched the crop guard off on the largest family on the
+   site, which is this stylesheet's own most repeated shape.
+   The wrapper's own `margin`/`display`/`gap` go with it rather than moving
+   to `.placeband-map`: the rows are spaced by `.ed-arrival-media` already,
+   and re-homing a dead declaration would be adding a gap on the evidence of
+   a rule that has not applied to anything. */
 /* NO `display` HERE, AND NO `.plate` EITHER — the sixth dead `display` on a
    photograph container, and the first found in a rule that a LATER one had
    quietly taken over. `.ed-arrival-media :is(picture, img)` sets the same
@@ -5396,17 +5413,28 @@ body[data-hero] .masthead { position: sticky; }
    image all unmoved. */
 .placeband-art picture { width: 100%;
   height: 100%; object-fit: cover; border-radius: var(--radius); }
-.placeband-art { aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius); }
+/* AND THE ASPECT IS DECLARED AT EVERY WIDTH, WHICH IS WHAT THE SLOT'S OWN
+   TRIGGER ASKED FOR. With the grid gone, nothing above 62rem gave this box a
+   ratio, and `.placeband-art picture { height: 100% }` against an auto-height
+   parent resolves to `auto` — so the container took THE PHOTOGRAPH'S OWN
+   SHAPE and the opening band's height was decided by whatever was licensed.
+   Measured in Chromium over 16 widths x 3 heights: Salzburg (a 3:2 source)
+   1.500-1.778, Porto (16:9) flat at 1.778, Berchtesgaden 1.778-2.044, Cesky
+   Krumlov 1.778-2.126 — a container range of 1.500-2.126 across the family,
+   where a first sample of twelve destinations had reported 1.500-1.778
+   because it happened to catch only 3:2 sources. 259 of the 319 are 3:2, 26
+   are 16:9 and one is 2.125, so 27 pages opened on a shape the other 292 did
+   not and nothing anywhere said so.
+   3/2 rather than 16/9 because the slot's note asks for the vertical
+   relationship — "the valley floor against the wall above it, the water the
+   town turns towards" — so HEIGHT is what has to survive the crop: against
+   the declared source range 1.5-2.4 this keeps 100% of the height of every
+   source and crops only the width of a panoramic one. Both give the same
+   62.5% guaranteed frame, so the arithmetic does not choose between them and
+   the note does. */
+.placeband-art { aspect-ratio: 3 / 2; overflow: hidden; border-radius: var(--radius); }
 .placeband-map .minimap { margin: 0; }
-.placeband figcaption { grid-column: 1 / -1; font-size: var(--t-xs); color: var(--ink-3);
-                        line-height: 1.5; }
-@media (min-width: 62rem) {
-  .placeband { grid-template-columns: 5fr 7fr; align-items: stretch; }
-  .placeband-art { aspect-ratio: auto; }
-  /* No photograph, no illustration: the map takes the full width and its
-   * labels become legible, which is the whole reason the plate went. */
-  .placeband.maponly { grid-template-columns: 1fr; }
-}
+
 
 
 /* ── EXPERIENCE: the second family to get a composition ───────────────
@@ -5619,8 +5647,7 @@ body[data-hero] .masthead { position: sticky; }
   max-width: 60ch;
 }
 
-.placeband.maponly { grid-template-columns: 1fr; }
-@media (min-width: 62rem) { .placeband.maponly { grid-template-columns: 1fr; } }
+
 
 
 /* ── THE ARCH: EuropeDoor's signature aperture ────────────────────────
@@ -8744,15 +8771,37 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
 .ed-split-copy p { font-size: var(--t-md); line-height: 1.55; color: var(--ink-2); }
 
 /* ── ARRIVAL: the destination feature ────────────────────── */
+/* THE COPY COLUMN COULD NOT HOLD THE DESTINATION'S OWN NAME, AND 129 OF THE
+   319 PAGES BROKE IT MID-WORD. Measured in Chromium: the h1's content box is
+   177px at 834, 211 at 1280 and 223 from 1520 up — it never passes 239 at any
+   width — against names that want 83 to 579px, so "Cesky Krumlov" set as
+   "Cesky / Krumlo / v" and Copenhagen, Salzburg, Dubrovnik, Sarajevo and 125
+   others were cut in half. Three separate causes, each of which alone would
+   have been survivable:
+     1 the track is .55fr of 1.45/.55, so 27.5% of the band;
+     2 `padding: clamp(2.25rem, 5vw, 5rem)` was written for the BLOCK axis —
+       air above and below a 620px band — and applied to all four sides, so a
+       padding sized to the VIEWPORT sat inside a column that is a quarter of
+       the viewport: 128px of a 339px column at 1280, 160 of 383 at 1920, 42%;
+     3 `--ed-display-2` is `clamp(38px, 5vw, 76px)` and keeps growing to 76
+       while the band caps at 1392 and the column caps at 383 — so the ratio of
+       word to column gets WORSE as the window grows, 1.40x over at 834 and
+       2.02x at 1920. A viewport-scaled font inside a max-width column.
+   The track is .75fr, the inline padding stops being viewport-scaled, and the
+   h1 caps where the band stops growing. Media:copy is 1.93:1 at 1280 where it
+   was 2.64:1, which is the feature scale this repository already argues for
+   (1.35/.65 is 2.08:1) rather than a new proportion. Solved for the worst name
+   that CANNOT break — Belovezhskaya, 379px at 64px — because the four longer
+   than it all carry a hyphen and may legitimately break there. */
 .ed-arrival {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(16.25rem, .55fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .75fr);
   min-height: 38.75rem;
   background: var(--ed-pine-deep); color: var(--ed-paper);
 }
 .ed-arrival-media { min-height: 38.75rem; }
 .ed-arrival-copy {
-  padding: clamp(2.25rem, 5vw, 5rem);
+  padding: clamp(2.25rem, 5vw, 5rem) clamp(1.5rem, 2vw, 2.25rem);
   display: flex; flex-direction: column; justify-content: flex-end;
 }
 /* AND THE SIDE INSET COMES OFF ON A PHONE, THE SAME WAY THE MAP'S PAD DID.
@@ -9094,7 +9143,14 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    other accent has with the dark world and the reason those lifts exist. */
 .ed-arrival-copy h1 {
   font-family: var(--ed-serif); font-weight: 400;
-  font-size: var(--ed-display-2); line-height: .96; margin: 0; max-width: none;
+  /* NOT `--ed-display-2`: that token is `clamp(38px, 5vw, 76px)` and it is
+     right everywhere it sets type across a whole band. This one sets a single
+     word inside a column that stops growing at 1440, so it caps there too —
+     the same move /journeys made when a 76px headline stranded its last word
+     in a 461px column, and for the same reason: a feature's type column is
+     narrow BY DESIGN, so the name takes the step that fits it. */
+  font-size: clamp(var(--t-2xl), 4vw, var(--t-5xl));
+  line-height: .96; margin: 0; max-width: none;
 }
 /* AND THE ARRIVAL BAND IS DARK IN BOTH PREFERENCES, so its eyebrow states
    its own colour and has to out-specify the family rule to do it — the

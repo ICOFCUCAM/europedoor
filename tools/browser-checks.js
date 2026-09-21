@@ -6461,14 +6461,49 @@ async function main() {
    * REACH, so a selector that matches nothing on any of its pages fails and
    * names them instead of satisfying both bounds by having no value. */
   {
-    const purposes = JSON.parse(fs.readFileSync(
-      path.join(__dirname, "..", "data", "image-purposes.json"), "utf8")).purposes;
+    /* AND THE TEN TEMPLATED SLOTS WERE IN NOBODY'S SET AT THIS END.
+     * `checks.py`'s own `c_photo_safe_area` merges `slots` into `purposes`
+     * with the reason written on it — "a slot's crop rule is the same claim
+     * as a purpose's, and a template that escaped this check would be 319
+     * pages of unchecked crop" — and this end, whose comment says the two
+     * exist so that "neither can drift without the other noticing", read
+     * `.purposes` alone. So the arithmetic covered seventeen entries and the
+     * measurement covered seven, and the ten it never looked at are every
+     * templated family on the site: 319 destinations, 255 places, 130
+     * regions, 50 countries. A rule stated once and applied to one of its
+     * call sites, in the pair of checks written to keep each other honest. */
+    const spec = JSON.parse(fs.readFileSync(
+      path.join(__dirname, "..", "data", "image-purposes.json"), "utf8"));
+    const purposes = { ...spec.purposes, ...spec.slots };
     /* the registry is where a surface's PATH is declared, and it is
      * generated and stale-checked; a second copy typed here is the fault
      * above in a different field. */
     const regrows = JSON.parse(fs.readFileSync(
       path.join(__dirname, "..", "desk", "registry.json"), "utf8")).purposes;
     const pathOf = new Map(regrows.map((r) => [r.purpose, r.path]));
+    /* A SLOT HAS NO PATH OF ITS OWN — the registry keys its INSTANCES
+     * (`destination-hero@albania/.../theth`) and carries the slot name
+     * beside each. So a slot's pages are a sample of its instances, spread
+     * across the list rather than taken from the front: this session's first
+     * reading of `.placeband-art` sampled twelve destinations, reported the
+     * container as 1.500-1.778 and was wrong, because all twelve happened to
+     * be 3:2 sources and the 26 at 16:9 and the one at 2.125 were further
+     * down the alphabet. A sample that is not spread is a fact about its own
+     * first entries. */
+    const slotPaths = new Map();
+    for (const r of regrows) {
+      if (!r.slot || !r.path) continue;
+      if (!slotPaths.has(r.slot)) slotPaths.set(r.slot, []);
+      slotPaths.get(r.slot).push(r.path);
+    }
+    const SAMPLE = 6;
+    const sampleOf = (slot) => {
+      const all = slotPaths.get(slot) || [];
+      if (all.length <= SAMPLE) return all;
+      const step = (all.length - 1) / (SAMPLE - 1);
+      return [...new Set(Array.from({ length: SAMPLE },
+        (_, i) => all[Math.round(i * step)]))];
+    };
     const groups = new Map();
     for (const [of_, v] of Object.entries(purposes)) {
       const con = v.container;
@@ -6477,8 +6512,8 @@ async function main() {
       if (!groups.has(sel)) groups.set(sel, { sel, want: con, of: [], urls: [] });
       const g = groups.get(sel);
       g.of.push(of_);
-      const u = pathOf.get(of_);
-      if (u && !g.urls.includes(u)) g.urls.push(u);
+      const us = pathOf.has(of_) ? [pathOf.get(of_)] : sampleOf(of_);
+      for (const u of us) if (u && !g.urls.includes(u)) g.urls.push(u);
       /* AND THE EQUALITY ASSERTION THAT USED TO SIT HERE WAS TRUE TODAY AND
        * UNSOUND IN GENERAL. It said two purposes naming one component may
        * not declare two boxes, "because a crop box is a property of the

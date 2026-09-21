@@ -655,8 +655,16 @@
       "note": "A destination portrait has to say what it is like to BE there — the valley floor against the wall above it, the water the town turns towards. Never a monument alone and never an aerial: the page already draws where the place is, four hundred pixels above this, so a photograph that answers 'where' duplicates the map.",
       "container": {
         "selector": ".placeband-art",
-        "unmeasurable": "NOT MEASURABLE, AND THAT IS THE DEFECT. `.placeband-art` is aspect-ratio 16/9 below 62rem and `aspect-ratio: auto` above it, inside a 5fr/7fr grid with align-items: stretch — so above 62rem the photograph's container is exactly as tall as the MAP BESIDE IT, and the map's height depends on the destination. A slot whose crop is decided by a neighbour cannot be art-directed and cannot be checked. It renders only when a photograph exists, so changing it today would be changing a code path nothing exercises — the failure this repository already made with the focal point, which shipped as a style attribute the CSP forbids because nothing ever ran it.",
-        "trigger": "Give it a declared aspect at every width in the same commit as the first destination photograph, and measure it then."
+        "min_aspect": 1.5,
+        "min_at": "320x640",
+        "max_aspect": 1.5,
+        "max_at": "360x640",
+        "declared": "`.placeband-art` is aspect-ratio 3/2 at every width. It was `unmeasurable` until the trigger on that flag fired: the flag's reason was that above 62rem the box is as tall as the MAP BESIDE IT, and the map has not been beside it since the destination page moved to the 2036 arrival family — `.placeband` is emitted on no page at all, and the photograph and the map are two full-width rows of `.ed-arrival-media`. With that grid gone nothing gave the box a ratio above 62rem and `picture { height: 100% }` against an auto-height parent resolves to `auto`, so the container took the PHOTOGRAPH'S OWN shape: measured 1.500-1.778 on a 3:2 source, flat 1.778 on a 16:9 one and 1.778-2.126 on the single 2.125 source, a family range of 1.500-2.126 and a real guaranteed frame of 44%. Now 1.500 at every width on every destination, 240 of 240 samples."
+      },
+      "safe_area": {
+        "width": 0.625,
+        "height": 1.0,
+        "frame": 0.625
       }
     },
     "place-hero": {
@@ -671,15 +679,16 @@
       "note": "A place is one thing inside a destination — a bridge, a cellar, a cable car — so this is the closest frame the site has. It must be that thing and not the town around it: the destination page one level up already carries the wider picture, and a page that shows the same view as its parent has said nothing. Without a photograph this container draws a minimap, so a picture here REPLACES geography and has to earn it.",
       "container": {
         "selector": ".card-art.frame",
-        "min_aspect": 1.778,
-        "min_at": "declared",
-        "max_aspect": 1.778,
-        "max_at": "declared"
+        "min_aspect": 2.333,
+        "min_at": "480x640",
+        "max_aspect": 2.333,
+        "max_at": "320x640",
+        "declared": "`.card-art.frame` is 21/9 at every width, measured over 10 widths x 2 heights on 6 place pages: 2.333 in all 120 samples. It was declared 1.778 with min_at and max_at reading the literal string \"declared\" — read off `.card-art`, whose own rule is 16/9, and missing the `.frame` modifier that overrides it. Reading a base class and rendering a modifier is the same fault as measuring a container the page does not emit, one selector in."
       },
       "safe_area": {
-        "width": 0.936,
-        "height": 0.844,
-        "frame": 0.789
+        "width": 1.0,
+        "height": 0.643,
+        "frame": 0.643
       }
     },
     "story-hero": {
@@ -728,15 +737,16 @@
       "note": "What a whole country feels like, above its name. Never a single famous landmark and never a city skyline: a landmark is a place INSIDE the country and the capital has its own role. Fifty of these are seen one after another by a reader moving through /countries, so the SET is part of the brief exactly as it is for the four doors — different light, different season and different palette between neighbours. THE BAND IS AN ADDITION AND NOT A REPLACEMENT: the country portrait stays exactly where it is, because it is this family's signature moment and it is the thing that says which country the page is about. With no photograph there is no band at all, which is today's page unchanged — a slot waiting for a picture is honest and three hundred pixels of it is a hole.",
       "container": {
         "selector": ".headshot",
-        "min_aspect": 0.941,
+        "min_aspect": 0.692,
         "min_at": "320x640",
-        "max_aspect": 1.129,
-        "max_at": "980x640"
+        "max_aspect": 1.333,
+        "max_at": "760x640",
+        "declared": "`.headshot` is 0.692-1.333, measured on both families that use it: a country page and a theme page give the identical range at the identical viewports. It was declared 0.941-1.129 here and 0.692-1.333 on theme-hero, and that difference was recorded as one class with two real boxes because the two families put it in different grids. Re-measured, they do not: theme-hero's number was right and this one had gone stale, so the remedy is one correct number rather than two selectors."
       },
       "safe_area": {
-        "width": 0.428,
+        "width": 0.315,
         "height": 1.0,
-        "frame": 0.428
+        "frame": 0.315
       }
     },
     "region-hero": {
@@ -752,10 +762,10 @@
       "container": {
         "selector": ".pageband",
         "min_aspect": 1.778,
-        "min_at": "declared",
+        "min_at": "320x640",
         "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "max_at": "1440x640",
+        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, measured 1.778-2.333 over 10 widths x 2 heights on 30 pages across all five families that use it (540 samples), where min_at and max_at had read the literal string \"declared\", with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
       },
       "safe_area": {
         "width": 0.808,
@@ -776,10 +786,10 @@
       "container": {
         "selector": ".pageband",
         "min_aspect": 1.778,
-        "min_at": "declared",
+        "min_at": "320x640",
         "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "max_at": "1440x640",
+        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, measured 1.778-2.333 over 10 widths x 2 heights on 30 pages across all five families that use it (540 samples), where min_at and max_at had read the literal string \"declared\", with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
       },
       "safe_area": {
         "width": 0.847,
@@ -811,10 +821,10 @@
       "container": {
         "selector": ".pageband",
         "min_aspect": 1.778,
-        "min_at": "declared",
+        "min_at": "320x640",
         "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "max_at": "1440x640",
+        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, measured 1.778-2.333 over 10 widths x 2 heights on 30 pages across all five families that use it (540 samples), where min_at and max_at had read the literal string \"declared\", with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
       },
       "safe_area": {
         "width": 0.847,
@@ -844,10 +854,10 @@
       "container": {
         "selector": ".pageband",
         "min_aspect": 1.778,
-        "min_at": "declared",
+        "min_at": "320x640",
         "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "max_at": "1440x640",
+        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, measured 1.778-2.333 over 10 widths x 2 heights on 30 pages across all five families that use it (540 samples), where min_at and max_at had read the literal string \"declared\", with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
       },
       "safe_area": {
         "width": 0.847,
@@ -909,10 +919,10 @@
       "container": {
         "selector": ".pageband",
         "min_aspect": 1.778,
-        "min_at": "declared",
+        "min_at": "320x640",
         "max_aspect": 2.333,
-        "max_at": "declared",
-        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, at every width, with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
+        "max_at": "1440x640",
+        "declared": "`.pageband` is aspect-ratio 16/9 below 62rem and 21/9 above it, measured 1.778-2.333 over 10 widths x 2 heights on 30 pages across all five families that use it (540 samples), where min_at and max_at had read the literal string \"declared\", with nothing beside it deciding its height. ONE CLASS SERVES EVERY FAMILY that opens on a photograph, so the crop rule is written once and every container that uses it is measurable by the same arithmetic — which `.placeband-art` is not, because its height is the height of the map next to it."
       },
       "safe_area": {
         "width": 0.847,

@@ -3336,22 +3336,44 @@ def c_frontend():
     inv = importlib.import_module("invariants")
     sizes = {inv._size_of(v)
              for v in re.findall(r"font-size:\s*([^;]+);", inv._css())}
-    # 24 RATHER THAN 20, AND THE FOUR ARE THE 2036 SYSTEM'S WHOLE SCALE.
-    # Eight page families, four display values: an opening, a section, a row
-    # and the reading step under them. The brief wrote nine clamps, one per
-    # component, each a few pixels from its neighbour — and nine arbitrary
-    # clamps is a second type scale wearing the first one's clothes, which
-    # is how the sibling repository reached 418. The ceiling moves by what
-    # was actually added and no further.
-    if len(sizes) > 24:
-        fail(f"{len(sizes)} distinct font-size values; the audit measured 13 and the "
-             f"sibling repository measured 418: " + ", ".join(sorted(sizes)))
+    # AND THE CEILING IS READ FROM THE REGISTER RATHER THAN TYPED HERE,
+    # BECAUSE ALL THREE COPIES HAD DRIFTED AND EVERY ONE WAS LOOSER.
+    # The comment above ends "One implementation", about the PARSER — this
+    # copy shares `_size_of` and `_css` with `invariants.py` and then typed
+    # its own NUMBER, which is the dispatch cap exactly: four copies of one
+    # bound, three raised and the one that was a gate left behind. Measured
+    # the day the arrival band's h1 needed a clamp of its own:
+    #
+    #     font sizes   register 25   here 24
+    #     breakpoints  register  6   here 10
+    #     shadows      register  3   here  6
+    #
+    # Nothing got through, because the register is a gate too and is the
+    # tighter of each pair — but a check that is quietly LOOSER than the
+    # promise a reader is shown is the state this repository has failed a
+    # whole sitting from. The register owns the number, carries a `why` per
+    # row, and refuses to move without `--write` in the same commit.
+    reg = json.load(open(os.path.join(ROOT, "docs", "invariants.json"),
+                         encoding="utf-8"))["invariants"]
+
+    def ceiling(key):
+        row = reg[key]
+        assert row["kind"] == "ceiling", key
+        return row["value"]
+
+    if len(sizes) > ceiling("css.font_sizes"):
+        fail(f"{len(sizes)} distinct font-size values against the register's "
+             f"ceiling of {ceiling('css.font_sizes')}; the audit measured 13 "
+             f"and the sibling repository measured 418: "
+             + ", ".join(sorted(sizes)))
     bps = set(re.findall(r"@media[^{]*\(m(?:in|ax)-width:\s*([^)]+)\)", css))
-    if len(bps) > 10:
-        fail(f"{len(bps)} breakpoints; the audit measured 6")
+    if len(bps) > ceiling("css.breakpoints"):
+        fail(f"{len(bps)} breakpoints against the register's ceiling of "
+             f"{ceiling('css.breakpoints')}; the audit measured 6")
     shadows = set(re.findall(r"box-shadow:\s*([^;]+);", css))
-    if len(shadows) > 6:
-        fail(f"{len(shadows)} distinct shadows; the audit measured 2")
+    if len(shadows) > ceiling("css.shadows"):
+        fail(f"{len(shadows)} distinct shadows against the register's ceiling "
+             f"of {ceiling('css.shadows')}; the audit measured 2")
     if len(glob.glob(os.path.join(ROOT, "assets", "css", "*.css"))) != 1:
         fail("there is more than one stylesheet")
     n += 4

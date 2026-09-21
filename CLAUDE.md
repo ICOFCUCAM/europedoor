@@ -7633,6 +7633,76 @@ allowance that had **4.1 MB** left. Deleting the regenerable build artifact
 first is what made the restore possible at all.
 
 
+**A REFUSAL'S TRIGGER FIRED AND NOBODY PULLED IT, SO THE LARGEST SLOT ON THE
+SITE HAD AN UNMEASURED CROP ON EVERY DESTINATION.** `destination-hero` declared its
+container `unmeasurable` with the reason written out — above 62rem
+`.placeband-art` is *"exactly as tall as the MAP BESIDE IT"* — and a trigger
+saying **give it a declared aspect at every width in the same commit as the
+first destination photograph**. All 319 destinations carry one now, and the
+reason had expired with the layout: the parent is `.ed-arrival-media`,
+`display: block`, the photograph and the map are two full-width rows, and
+`grep -rho 'class="[^"]*placeband[^"]*"' site --include=index.html | sort -u`
+returns `placeband-art` and `placeband-map` and **never `placeband`** — four
+rules, including the 5fr/7fr grid the flag cited, described a wrapper the site
+emits nowhere. With that grid gone nothing gave the box a ratio and
+`picture { height: 100% }` against an auto-height parent resolves to `auto`,
+so **the container took the PHOTOGRAPH'S OWN shape**: 1.500–1.778 on a 3:2
+source, flat 1.778 on a 16:9 one, 1.778–**2.126** on the single 2.125 source.
+The opening band's height was decided by whatever was licensed — 27 of 319
+pages opened on a shape the other 292 did not. `aspect-ratio: 3/2` at every
+width, chosen because the slot's note asks for the vertical relationship and
+both candidates give the same 62.5% frame, so the arithmetic does not choose
+and the note does. Safe area 44.1% → 62.5%. **And a first sample of twelve
+destinations read 1.500–1.778 and was wrong** because all twelve were 3:2: *a
+sample that is not spread is a fact about its own first entries.*
+
+**AND THE MEASUREMENT END HAD NEVER LOOKED AT A TEMPLATED SLOT.**
+`c_photo_safe_area` merges `slots` into `purposes` with its reason on it — *a
+slot's crop rule is the same claim as a purpose's, and a template that escaped
+this check would be a whole templated family of unchecked crop* — while
+`browser-checks.js`,
+whose comment says the two exist so *"neither can drift without the other
+noticing"*, read `.purposes` alone. **Seventeen entries of arithmetic against
+seven of measurement**, and the ten never looked at are every templated family
+on the site. Wired in, ten of twelve groups held and two were real:
+`.card-art.frame` is **2.333** on all 120 samples against a declared 1.778 —
+read off `.card-art`, whose own rule is 16/9, missing the `.frame` modifier
+that overrides it — and `.headshot` measures **0.692–1.333 on both** families
+that use it, so the recorded finding that one class had two real boxes has
+stopped being true and the remedy was one correct number rather than two
+selectors. The literal string `"declared"` is gone from all ten `min_at`s.
+
+**AND 129 OF THE 319 DESTINATIONS BROKE THEIR OWN NAME MID-WORD.** Found by
+rendering Český Krumlov to check the crop and reading `Český / Krumlo / v`.
+**The first instrument reported zero and was measuring the symptom**: a Range
+over a word that is already wrapped returns the union of its line fragments,
+which is narrower than the word. Measured unbroken, the h1's content box is
+177px at 834, 211 at 1280 and 223 from 1520 up — **it never passes 239 at any
+width** — against "Belovezhskaya" at 247, 379 and 450, so the overrun gets
+worse as the window grows (1.40× → 2.02×). Three causes: the track is `.55fr`
+of 1.45/.55; `padding: clamp(2.25rem, 5vw, 5rem)` was written for the BLOCK
+axis and applied to all four sides, so a padding sized to the viewport sat
+inside a column that is a quarter of the viewport (128px of 339); and
+`--ed-display-2` keeps growing to 76px while the band caps at 1392 — **a
+viewport-scaled font inside a max-width column**. Solved for the worst name
+that CANNOT break, because the four longer all carry a hyphen and may break
+there. Media:copy 2.64:1 → 1.93:1, which is the feature scale this file
+already argues for rather than a new proportion. **129 → 0 on all 319 at six
+widths from 390 to 2560.**
+
+**AND THREE CEILINGS WERE TYPED TWICE, EVERY ONE LOOSER THAN THE REGISTER.**
+The h1's clamp is a 25th font-size value and the invariant register refused
+it, which is the register working. Moving it found that `checks.py` types its
+own copies: font sizes 24 against the register's 25, breakpoints 10 against 6,
+shadows 6 against 3. Nothing got through, because the register is a gate too
+and is the tighter of each pair — but the comment directly above that block
+ends *"One implementation"*, about the PARSER, which is shared, while the
+NUMBER was typed. That is the dispatch cap exactly, three times in one
+function, and the answer is the same as the third time it happened: stop
+having a second implementation. `checks.py` reads all three from the register,
+each proved red by lowering it.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

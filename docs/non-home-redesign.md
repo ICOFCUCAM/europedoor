@@ -241,3 +241,140 @@ words. The sheets now show a dark arrival, a cobalt journey field, a monument,
 an instrument in graphite, a year band, a contents page, eight bars, seventeen
 constellations and a warm parchment atlas — and the masthead is the only thing
 they have in common, which is what *one institution, many rooms* means.
+
+
+## The arrival band: a crop nobody could measure, and a column that could not hold a name
+
+The homepage was finished, so the instruments were asked what is next.
+`density.js` reported four runs under 3% covered and all four were the last
+~90 pixels of a plate — the section rhythm, which is not a hole. So the work
+moved to what the instruments cannot see, and the first question was the one
+`data/image-purposes.json` had left open with a trigger on it.
+
+### The trigger had fired and nobody pulled it
+
+`destination-hero` — the largest slot on the site, 319 pages — declared its
+container **`unmeasurable`**, with the reason written out: above 62rem
+`.placeband-art` is *"exactly as tall as the MAP BESIDE IT, and the map's
+height depends on the destination"*, and the trigger said **give it a declared
+aspect at every width in the same commit as the first destination photograph,
+and measure it then**.
+
+All 319 destinations now carry a photograph and `.placeband-art` wraps a
+`<picture>` on all 319 pages. And the reason had expired: measured in Chromium,
+the parent is `.ed-arrival-media`, `display: block`, and the photograph and the
+map are **two full-width rows**. `.placeband` — the 5fr/7fr grid the flag cited
+— is emitted on **no page at all**:
+
+    grep -rho 'class="[^"]*placeband[^"]*"' site --include=index.html | sort -u
+    class="placeband-art"
+    class="placeband-map"
+
+So four rules described a layout the site had stopped emitting (the columns,
+`align-items: stretch`, a spanning figcaption, and `.maponly` twice with an
+identical body 218 lines apart), and `.placeband-art { aspect-ratio: auto }`
+above 62rem — written to let that grid decide the height — left nothing giving
+the box a ratio. `picture { height: 100% }` against an auto-height parent
+resolves to `auto`, so **the container took the photograph's own shape**:
+
+| destination | source | container measured |
+|---|---|---|
+| Salzburg | 1.5 | 1.500–1.778 |
+| Porto | 1.778 | 1.777–1.779 (flat) |
+| Berchtesgaden | 2.045 | 1.778–2.044 |
+| Český Krumlov | **2.125** | 1.778–**2.126** |
+
+The opening band's height was decided by whatever was licensed. 259 of the 319
+sources are 3:2, 26 are 16:9 and one is 2.125, so 27 pages opened on a shape
+the other 292 did not.
+
+**And a first sample of twelve destinations reported 1.500–1.778 and was
+wrong**, because all twelve happened to be 3:2. A sample that is not spread is
+a fact about its own first entries; the sweep takes its instances spread across
+the list now, with that written on it.
+
+`aspect-ratio: 3 / 2` at every width — 3/2 rather than 16/9 because the slot's
+note asks for the vertical relationship, *"the valley floor against the wall
+above it"*, so height is what has to survive. Both give the same 62.5%
+guaranteed frame, so the arithmetic does not choose and the note does.
+240 of 240 samples at 1.500, and the real safe area 44.1% → **62.5%**.
+
+### And the measurement end had never looked at a slot
+
+`checks.py` merges `slots` into `purposes` with the reason on it — *a slot's
+crop rule is the same claim as a purpose's, and a template that escaped this
+check would be 319 pages of unchecked crop* — and `browser-checks.js`, whose own
+comment says the two exist so that *"neither can drift without the other
+noticing"*, read `.purposes` alone. **The arithmetic covered seventeen entries
+and the measurement covered seven.** The ten it had never looked at are every
+templated family on the site.
+
+Wired in, ten of twelve groups held and two were real:
+
+| | declared | measured |
+|---|---|---|
+| `.card-art.frame` (place-hero, 255 pages) | 1.778 | **2.333**, all 120 samples |
+| `.headshot` (country-hero) | 0.941–1.129 | **0.692–1.333** |
+
+`place-hero`'s number was read off `.card-art`, whose own rule is 16/9, and
+missed the `.frame` modifier that overrides it — reading a base class while the
+page renders the modifier. And `.headshot` measures 0.692–1.333 on **both**
+families that use it, at the identical viewports: the recorded finding that one
+class had two real boxes has stopped being true, so the remedy was one correct
+number rather than two selectors. Every `min_at`/`max_at` in the file is now a
+measured viewport; **the literal string `"declared"` is gone from all ten.**
+
+### The destination could not fit its own name
+
+Rendering Český Krumlov to check the crop showed the name set as
+**`Český / Krumlo / v`**. Measured across all 319 at 1280: **129 of them broke
+their own name mid-word.**
+
+The first instrument said zero, and was measuring the symptom — a Range over a
+word that is *already* wrapped returns the union of its line fragments, which is
+narrower than the word. Measured unbroken, against the h1's content box:
+
+| viewport | h1 column | "Belovezhskaya" | over by |
+|---|---|---|---|
+| 834 | 177px | 247px | 1.40× |
+| 1280 | 211px | 379px | 1.80× |
+| 1920 | 223px | 450px | **2.02×** |
+
+The column **never passes 239px at any width**, and the widest window is the
+worst case. Three causes, each survivable alone:
+
+1. the track is `.55fr` of 1.45/.55 — 27.5% of the band;
+2. `padding: clamp(2.25rem, 5vw, 5rem)` was written for the **block** axis and
+   applied to all four sides, so a padding sized to the *viewport* sat inside a
+   column that is a quarter of the viewport — **128px of a 339px column**, 42%
+   at 1920;
+3. `--ed-display-2` is `clamp(38px, 5vw, 76px)` and keeps growing while the band
+   caps at 1392 and the column at 383 — a viewport-scaled font in a max-width
+   column.
+
+Solved for the worst name that **cannot** break: Belovezhskaya, 379px, because
+the four longer than it all carry a hyphen and may legitimately break there.
+Track `.75fr`, inline padding off the viewport scale, and the h1 capped where
+the band stops growing. Media:copy is 1.93:1 where it was 2.64:1 — the feature
+scale this repository already argues for (1.35/.65 is 2.08:1) rather than a new
+proportion. **129 → 0, on all 319 at six widths from 390 to 2560.**
+
+### And three ceilings were typed twice
+
+The h1's clamp is a 25th font-size value and the invariant register refused it,
+which is the register working. Moving it revealed that `checks.py` types its own
+copy of three ceilings, and **every one had drifted looser**:
+
+| | register | `checks.py` |
+|---|---|---|
+| font sizes | 25 | 24 |
+| breakpoints | 6 | 10 |
+| shadows | 3 | 6 |
+
+Nothing got through, because the register is a gate too and is the tighter of
+each pair. But the comment directly above that block ends *"One
+implementation"* — about the **parser**, which is shared, while the **number**
+was typed. That is the dispatch cap exactly, three times in one function.
+`checks.py` reads all three from the register now, and each was proved red by
+lowering it.
+
