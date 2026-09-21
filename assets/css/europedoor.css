@@ -1265,9 +1265,57 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
    These are captions, so they take the caption step. */
 .nav { display: flex; gap: var(--s5); flex-wrap: wrap; font-size: var(--t-xs); letter-spacing: .04em; text-transform: uppercase; }
-.nav a { text-decoration: none; color: var(--ink-2); padding-bottom: 2px; border-bottom: 1.5px solid transparent; }
-.nav a:hover { color: var(--ink); border-bottom-color: var(--door); }
-.nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--door); }
+.nav .navtop { text-decoration: none; color: var(--ink-2); padding-bottom: 2px; border-bottom: 1.5px solid transparent; }
+.nav .navtop:hover { color: var(--ink); border-bottom-color: var(--door); }
+.nav .navtop[aria-current="page"] { color: var(--ink); border-bottom-color: var(--door); }
+
+/* ── A ROOM'S FIELD, AND IT IS CSS BECAUSE THE ALTERNATIVE IS THE FIRST
+   SCRIPT ON THE HOMEPAGE ────────────────────────────────────────────────
+   Most pages here load no JavaScript at all and the CSP carries no
+   `'unsafe-inline'`, so a navigation that needed a script would be a new
+   dependency on every one of 1,032 documents to reveal eight links. It
+   does not need one: `:hover` opens the field for a pointer and
+   `:focus-within` opens it for a keyboard.
+
+   THE ORDER OF THOSE TWO IS THE WHOLE TRICK. The field can be
+   `display: none` — which takes it out of the tab order and out of the
+   accessibility tree — only because the thing that reveals it is the ROOM
+   link, which is always visible and always focusable. Tab reaches the
+   room, `:focus-within` matches, the field displays, and the next Tab
+   enters it. A field revealed by focus ON ITSELF would be the
+   chicken-and-egg this pattern is usually got wrong by.
+
+   AND IT IS NOT ANIMATED. A fade would be motion that explains nothing —
+   the panel is either the room's directory or it is not — and this
+   stylesheet's own rule is that the shadow vocabulary is two and the
+   hover vocabulary is a colour. */
+.navroom { position: relative; }
+.navfield { display: none; }
+.navroom:hover > .navfield,
+.navroom:focus-within > .navfield {
+  display: grid; gap: var(--s2);
+  position: absolute; top: calc(100% + var(--s3)); left: calc(var(--s3) * -1);
+  min-width: 15rem; z-index: 1;
+  padding: var(--s4) var(--s5) var(--s5);
+  background: var(--paper-2); border: 1px solid var(--rule);
+  text-transform: none; letter-spacing: 0; font-size: var(--t-sm);
+}
+/* THE FIELD SAYS WHAT KIND OF SET IT IS, ONCE. Four links under a room
+   called ATLAS could be four more rooms; "The geography" is the line that
+   makes them a directory, and it is a label rather than a heading because
+   the homepage asserts its own heading count and a masthead is not a band
+   of the page. */
+.navfhead { font-size: var(--t-xs); letter-spacing: .12em; text-transform: uppercase;
+            color: var(--ink-3); margin: 0 0 var(--s2);
+            padding-bottom: var(--s2); border-bottom: 1px solid var(--rule); }
+.navfield a { text-decoration: none; color: var(--ink-2); }
+.navfield a:hover, .navfield a:focus-visible { color: var(--door); }
+/* AND THE ROOM KEEPS ITS OWN UNDERLINE WHILE ITS FIELD IS OPEN, because a
+   panel hanging off nothing is a panel a reader cannot trace back to the
+   word that opened it. */
+.navroom:hover > .navtop, .navroom:focus-within > .navtop {
+  color: var(--ink); border-bottom-color: var(--door);
+}
 
 main { max-width: var(--page); margin: 0 auto; padding: var(--s6) var(--s5) var(--s9); }
 main.wide { max-width: 92rem; }
@@ -2342,7 +2390,18 @@ a .kicker { color: var(--ink-3); }
 
      What is left wraps instead of scrolling: Countries, Experiences,
      Journeys, Stories and Events, all visible, all tappable, no gesture. */
-  .masthead-in .nav a.inthumb, .masthead-in .navutil a.inthumb { display: none; }
+  .masthead-in .nav .inthumb, .masthead-in .navutil a.inthumb { display: none; }
+  /* AND THE FIELDS COME OFF WITH THEM, WHICH IS A TRADE RATHER THAN A
+     SAVING. Six rooms with their fields flattened is fifteen links on a
+     390px screen, and the measurement directly above is that FIVE already
+     wrapped into two rows. Every field entry is one tap away in the footer
+     of the same document — which is where /themes, /interests, /map and
+     /europe-in have always been, because none of them was ever in this bar
+     at all. What a phone loses from the masthead is Experiences and the
+     year, and it gains a bar that is one row. */
+  .masthead-in .nav .navfield,
+  .masthead-in .nav .navroom:hover > .navfield,
+  .masthead-in .nav .navroom:focus-within > .navfield { display: none; }
   /* ONE ROW, AND THE ROW IS WHAT THE MEASUREMENT BOUGHT. Five sections at
      the desk tracking measured 332px of content plus four 16px gaps in a
      366px box, so they wrapped to two rows and the masthead grew from 93px
@@ -8137,7 +8196,32 @@ body[data-hero] .masthead { position: sticky; }
    behind an editorial page, which is the opposite of "UI restrained". The
    colour comes from photographs now. */
 body { position: relative; overflow-x: hidden; }
-.masthead, main, .sitefoot, .thumbbar { position: relative; z-index: 1; }
+/* THE MASTHEAD CAME OUT OF THIS LIST, AND IT WAS A SHIPPED DEFECT ON EVERY
+   PAGE RATHER THAN A CONSEQUENCE OF THE MEGA-NAV.
+
+   `.masthead` declares `z-index: 40` seven thousand lines up, with intent,
+   and this rule set it to 1 at equal specificity — so the sticky bar and
+   `main` were on the same layer and `main`, which comes later in the
+   document, painted OVER it. Measured with `elementFromPoint(640, 40)`
+   after scrolling 1,400 pixels: the topmost element inside the bar's own
+   band is `sheet sheet-bleed` on the homepage, `movedraw` on a country
+   page and `mapkey` on /map. The bar was behind the document on all 1,032
+   of them.
+
+   IT LOOKED CORRECT BECAUSE THE BAR IS 94% OPAQUE AND CARRIES A
+   `backdrop-filter`, so content passing under it is blurred and washed —
+   which reads exactly like a translucent bar with the page scrolling
+   beneath. Nothing could see it: every box was the right size in the right
+   place, every contrast ratio was measured against the bar's own paint,
+   and nothing in the masthead had ever overflowed its own box, so there
+   was nothing whose disappearance would show. A room's field is the first
+   thing that does, and it came out clipped at the band's bottom edge.
+
+   THE LIST IS ABOUT A RIBBON THAT NO LONGER EXISTS. The comment directly
+   above says so — the family gradient behind the page was built three ways
+   and removed — and these three elements are here to sit above it.
+   `.masthead` was swept in with them and its own declaration lost. */
+main, .sitefoot, .thumbbar { position: relative; z-index: 1; }
 /* The two plate pages paint their own grounds, so the ribbon reads through
    the door plate (which is transparent by design) and is covered by the
    plates that are not — which is the correct order rather than an accident:

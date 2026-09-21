@@ -1219,3 +1219,110 @@ out.
 **One label was not taken from the brief.** It lists */events* as *Europe in
 the year*; the page's own head says **The European year**, and a second name
 for one thing is two names waiting to disagree. The existing label stands.
+
+## Home 22 — six rooms, and a z-index that had been wrong on every page
+
+The bar was seven sibling indexes in a row — Discover, Countries,
+Experiences, Journeys, Plan, Stories, Events — which is a list of the
+indexes this site happens to have rather than a statement about what a
+reader is doing. And two of those seven are the SAME KIND of thing as four
+pages that were never in the bar at all: /themes, /interests, /map and
+/europe-in are geography and ways in, and they lived only in the footer.
+
+**SIX ROOMS, EACH A REAL PAGE, EACH CARRYING ITS OWN FIELD.**
+
+| room | is | its field |
+|---|---|---|
+| DISCOVER | /discover | Experiences · Europe in Motion · Beyond the obvious · The European year |
+| ATLAS | /countries | Countries · Ways to travel · Themes · Map |
+| JOURNEYS | /journeys | — |
+| PLAN | /plan | — |
+| STORIES | /stories | — |
+| EUROPE | /manifesto | About · How it works · Method · Sources & corrections · Europe Fund |
+
+**NOTHING IS IN TWO FIELDS**, which is a departure from the brief and the
+reason is that the brief lists Stories both as a room and inside DISCOVER:
+a reader seeing STORIES twice in one bar learns that the bar is decoration.
+And the sixth room is the one the brief named and did not fill — five rooms
+are ways through the atlas and this one is why it exists, which had no place
+in the bar at all and lived at the foot of 1,032 pages.
+
+**THE FIELD IS CSS, AND THE ORDER OF THE TWO SELECTORS IS THE WHOLE TRICK.**
+Most pages here load no script and the CSP carries no `'unsafe-inline'`, so
+a navigation that needed JavaScript would be the first script on the
+homepage — the trade the nine restraint marks on the hero were removed over.
+`:hover` opens the field for a pointer and `:focus-within` opens it for a
+keyboard. The field can be `display: none` — out of the tab order AND out of
+the accessibility tree — only because the thing that reveals it is the ROOM
+link, which is always visible and always focusable: Tab reaches the room,
+`:focus-within` matches, the field displays, the next Tab enters it. A field
+revealed by focus on ITSELF is the chicken-and-egg this pattern is usually
+got wrong by, and it is invisible to every static check, because the markup
+is identical either way. The browser suite asserts the SEQUENCE rather than
+the state — `display` on a focused room, then `Tab`, then whether focus
+landed inside — because a computed style cannot answer the second half.
+
+**AND `aria-current` STOPPED BEING A JOIN BETWEEN A LABEL AND A STRING.** It
+was `area == label.lower()`, so renaming COUNTRIES to ATLAS would have
+silently unlit all twelve area keys the country family passes, on several
+hundred documents, with nothing going red. Each row carries its own set of
+area keys now, in the one table. Measured after: /europe/austria/ lights
+ATLAS, /stories lights STORIES, /experiences lights DISCOVER.
+
+### The defect the field exposed
+
+**`.masthead { z-index: 40 }` WAS SILENTLY OVERRIDDEN SEVEN THOUSAND LINES
+LATER, AND THE STICKY BAR HAD BEEN BEHIND THE DOCUMENT ON ALL 1,032 PAGES.**
+`.masthead, main, .sitefoot, .thumbbar { z-index: 1 }` set it at equal
+specificity and later in the file, so the bar and `main` were on one layer
+and `main`, which comes after it in the document, painted over it. Measured
+with `elementFromPoint(640, 40)` after scrolling 1,400 pixels:
+
+| page | topmost element inside the bar's own band |
+|---|---|
+| / | `sheet sheet-bleed` |
+| /europe/austria/ | `movedraw` |
+| /map/ | `mapkey` |
+
+**It looked correct because the bar is 94% opaque and carries a
+`backdrop-filter`**, so content passing under it is blurred and washed —
+which reads exactly like a translucent bar with the page scrolling beneath.
+Nothing here could see it: every box was the right size in the right place,
+every contrast ratio was measured against the bar's own paint, and **nothing
+in the masthead had ever overflowed its own box**, so there was nothing whose
+disappearance would show. A room's field is the first thing that does, and
+it came out clipped at the band's bottom edge. After: the bar is the topmost
+element on all three.
+
+**And the list is about a ribbon that no longer exists.** The comment
+directly above it records that the family-colour gradient behind the page
+was built three ways and removed; those three elements are there to sit
+above it, and `.masthead` was swept in with them.
+
+### The two assertions that could not have failed
+
+**§5 READ `label in page("/")`** — true of a word appearing anywhere on a
+145 KB document, including the footer, which carries every one of these
+links on every page. Seven assertions about the PRIMARY navigation were
+satisfied by the FOOT of the page and would have stayed green on a bar that
+had stopped carrying any of them. §2 of the UX audit had the identical
+fault. Both slice the masthead out by its own element now, and both assert
+an **href** rather than a label: the specification's subject is the surface
+being reachable from the top of every page, and a label is a word somebody
+may rewrite. §5 also asserts that each of the six rooms is a page of its own
+— a room that were a heading over a field would be the chip that filters
+nothing, in the bar.
+
+**The phone loses two links from the masthead and that is the trade.** Six
+rooms with their fields flattened is fifteen links on a 390px screen, and
+the recorded measurement is that FIVE already wrapped into two rows. Below
+44rem the bar is the four rooms the thumb bar does not carry — Atlas,
+Journeys, Stories, Europe — and every field entry is one tap away in the
+footer of the same document, which is exactly where /themes, /interests,
+/map and /europe-in have always been. Measured at 320, 390, 834, 1024, 1280
+and 1440: no overflow, no wrapped entry in any panel, and every panel inside
+the viewport.
+
+`weight.max_page_kb` 601 → 602, recorded: the masthead went 916 → 1,685 raw
+bytes, 683 compressed, for thirteen links that were previously reachable
+only from the foot of the page.

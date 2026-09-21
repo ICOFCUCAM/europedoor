@@ -6408,6 +6408,61 @@ async function main() {
    * breadcrumb and every line of prose, on every page. Nothing counts a
    * gutter, and at thumbnail size nothing sees one.
    */
+  /* ── A ROOM OPENS ITS FIELD FOR A KEYBOARD, AND THE ORDER IS THE TRICK ──
+   * The bar names six rooms and two of them carry a field of four or five
+   * links. The field is `display: none` until `:hover` or `:focus-within`,
+   * with no JavaScript anywhere — this site loads no script on most of its
+   * pages and a navigation that needed one would be the first script on the
+   * homepage.
+   *
+   * `display: none` takes the field out of the tab order AND out of the
+   * accessibility tree, so the thing that reveals it cannot be inside it.
+   * It is the ROOM link, which is always visible and always focusable: Tab
+   * reaches the room, `:focus-within` matches, the field displays, and the
+   * next Tab enters it. A field revealed by focus on ITSELF is the
+   * chicken-and-egg this pattern is usually got wrong by, and it is
+   * invisible to every static check — the markup is identical either way.
+   *
+   * THE ASSERTION IS THE SEQUENCE RATHER THAN THE STATE. `display: grid`
+   * on a focused room proves the rule fires; only pressing Tab proves a
+   * reader can actually get in. */
+  {
+    const kp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await kp.goto(base + "/", { waitUntil: "load" });
+    const rooms = await kp.locator(".nav .navroom").count();
+    checked++;
+    ok(rooms >= 2, `the bar carries ${rooms} room(s) with a field, expected at least 2`);
+    for (let i = 0; i < rooms; i++) {
+      await kp.evaluate((n) => document.querySelectorAll(".nav .navroom .navtop")[n].focus(), i);
+      const r = await kp.evaluate((n) => {
+        const room = document.querySelectorAll(".nav .navroom")[n];
+        const f = room.querySelector(".navfield");
+        const links = [...f.querySelectorAll("a")];
+        return { name: room.querySelector(".navtop").textContent.trim(),
+                 display: getComputedStyle(f).display,
+                 n: links.length,
+                 seen: links.filter((a) =>
+                   a.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })).length };
+      }, i);
+      checked++;
+      ok(r.display !== "none" && r.n > 0 && r.seen === r.n,
+         `the room opens its field for a keyboard: ${r.name} computed ` +
+         `display:${r.display} with ${r.seen} of ${r.n} links visible while ` +
+         `its own link had focus — a field a keyboard cannot reveal is a ` +
+         `field a keyboard cannot enter`);
+      // And Tab must land inside it, which is the half a computed style
+      // cannot answer.
+      await kp.keyboard.press("Tab");
+      const inside = await kp.evaluate((n) => {
+        const f = document.querySelectorAll(".nav .navroom")[n].querySelector(".navfield");
+        return document.activeElement && f.contains(document.activeElement);
+      }, i);
+      checked++;
+      ok(inside, `${r.name}: Tab from the room did not land inside its field`);
+    }
+    await kp.close();
+  }
+
   {
     const NAVPAGES = ["/", "/europe/austria/", "/journeys/", "/stories/", "/events/",
                       "/europe/france/alps-and-east/chamonix/"];

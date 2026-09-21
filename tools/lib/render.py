@@ -1045,14 +1045,74 @@ def crumbs(trail):
 # two persistent utilities. The Fund moved to the footer when that spec
 # arrived: it is a community surface rather than a way into the continent,
 # and giving it a seventh of the masthead was overstating it.
+# ── SIX ROOMS RATHER THAN SEVEN SURFACES ─────────────────────────────
+#
+# The bar used to be seven sibling pages in a row — Discover, Countries,
+# Experiences, Journeys, Plan, Stories, Events — which is a list of the
+# indexes this site happens to have rather than a statement about what a
+# reader is doing. Two of those seven are the SAME KIND of thing as four
+# pages that were never in the bar at all: /themes, /interests, /map and
+# /europe-in are geography and ways in, and they lived only in the footer.
+#
+# So the bar names ROOMS and each room carries its own field. A room is a
+# real page and its field is the directory of that room: no room is a
+# heading over nothing, and nothing is in two fields, because a reader
+# seeing STORIES twice in one bar learns that the bar is decoration.
+#
+# THE FIELD IS CSS, NOT JAVASCRIPT. This site loads no script on most of
+# its pages and its CSP has no `'unsafe-inline'`; a navigation that needed
+# a script would be the first JavaScript on the homepage, which is the
+# trade the nine restraint marks on the hero were removed over. `:hover`
+# opens it for a pointer and `:focus-within` opens it for a keyboard —
+# the ROOM link is always visible and always focusable, so the field can
+# be `display: none` until the room has focus without ever being a target
+# nothing can reach.
+#
+# EACH ROW CARRIES ITS AREA KEYS RATHER THAN MATCHING ITS OWN LABEL.
+# `aria-current` used to be `area == label.lower()`, which is a join
+# between a page builder's string and a navigation label — so renaming
+# COUNTRIES to ATLAS would have silently unlit every one of the 12 area
+# keys that page passes, on several hundred documents, with nothing going
+# red. Forty-seven builders passing an area is the arrangement this
+# repository already has; what changes here is that the TABLE knows which
+# areas belong to which room, in one place.
+#
+# (href, label, {area keys}, blurb, field-label, ((href, label), ...))
 NAV = [
-    ("/discover", T("nav.discover"), "The map, the regions, the ways in."),
-    ("/countries", T("nav.countries"), "Every country, region and destination."),
-    ("/experiences", T("nav.experiences"), "What people actually do here."),
-    ("/journeys", T("nav.journeys"), "Curated routes across the continent."),
-    ("/plan", T("nav.plan"), "Days, budget, interests — an itinerary."),
-    ("/stories", T("nav.stories"), "People, places, history, food, faith."),
-    ("/events", T("nav.events"), "The European year, month by month."),
+    ("/discover", T("nav.discover"), {"discover", "experiences", "events"},
+     "The map, the regions, the ways in.", T("nav.field.discover"), (
+         ("/experiences", T("footer.experiences")),
+         ("/europe-in", T("footer.motion")),
+         ("/beyond-the-obvious", T("footer.beyond")),
+         ("/events", T("footer.events")),
+     )),
+    ("/countries", T("nav.atlas"), {"countries"},
+     "Every country, region and destination.", T("nav.field.atlas"), (
+         ("/countries", T("footer.countries")),
+         ("/interests", T("footer.interests")),
+         ("/themes", T("footer.themes")),
+         ("/map", T("footer.map")),
+     )),
+    ("/journeys", T("nav.journeys"), {"journeys"},
+     "Curated routes across the continent.", "", ()),
+    ("/plan", T("nav.plan"), {"plan"},
+     "Days, budget, interests — an itinerary.", "", ()),
+    ("/stories", T("nav.stories"), {"stories"},
+     "People, places, history, food, faith.", "", ()),
+    # AND THE SIXTH ROOM IS WHY THIS EXISTS RATHER THAN HOW TO USE IT.
+    # Five rooms are ways through the atlas; this one is the project's own
+    # position on the continent, which had no place in the bar at all and
+    # lived at the foot of 1,032 pages. Its room is the manifesto, because
+    # "what this is for" is the answer to the question the label asks.
+    ("/manifesto", T("nav.europe"), {"fund"},
+     "What this is for, how it is made, and who it is for.",
+     T("nav.field.europe"), (
+         ("/about", T("footer.about")),
+         ("/how-it-works", T("footer.how-it-works")),
+         ("/method", T("footer.method")),
+         ("/sources", T("footer.sources")),
+         ("/fund", T("footer.fund")),
+     )),
 ]
 
 # Secondary navigation, also from the specification: everything a visitor may
@@ -1738,12 +1798,30 @@ def page(title, body, *, path, description, trail=None, area=None, head_extra=""
     # a horizontal swipe inside a 24px strip whose only affordance was a
     # 44px mask fade; at 320 Journeys was off too. Three of seven primary
     # sections reachable on a phone only by a gesture nobody discovers.
+    #
+    # AND THE FIELDS COME OFF AT THE SAME BREAKPOINT, WHICH IS A TRADE
+    # RATHER THAN A SAVING. A room's field is four or five links; six
+    # rooms with their fields flattened is fifteen links wrapping into
+    # four rows on a 390px screen, and the measurement above is that five
+    # already wrapped into two. So below 44rem the bar is the four rooms
+    # the thumb bar does not carry, and every field entry is one tap away
+    # in the footer of the same document — which is exactly where /themes,
+    # /interests, /map and /europe-in have always been, because none of
+    # them was ever in this bar at all.
     nav = []
     thumbed = {href for href, _l, _d in BOTTOM_NAV}
-    for href, label, _blurb in NAV:
-        mark = ' aria-current="page"' if area == label.lower() else ''
-        dup = ' class="inthumb"' if href in thumbed else ''
-        nav.append(f'<a href="{href}"{mark}{dup}>{esc(label)}</a>')
+    for href, label, areas, _blurb, fhead, field in NAV:
+        mark = ' aria-current="page"' if area in areas else ''
+        dup = " inthumb" if href in thumbed else ''
+        if not field:
+            nav.append(f'<a class="navtop{dup}" href="{href}"{mark}>{esc(label)}</a>')
+            continue
+        rows = "".join(f'<a href="{fh}">{esc(fl)}</a>' for fh, fl in field)
+        nav.append(
+            f'<div class="navroom{dup}">'
+            f'<a class="navtop" href="{href}"{mark}>{esc(label)}</a>'
+            f'<div class="navfield"><p class="navfhead">{esc(fhead)}</p>{rows}</div>'
+            "</div>")
     # Scripts are hashed for the same reason the stylesheet is. Callers pass
     # "/assets/js/my-europe.js"; the published URL carries the content hash.
     scripts_html = "".join(

@@ -130,8 +130,31 @@ def s1():
          "The brief's desktop masthead exactly, and the five-item thumb bar "
          "on a phone. Both name the product EuropeDoor, not Europe Atlas.")
 def s2():
-    for label in ("Discover", "Countries", "Experiences", "Journeys", "Stories"):
-        yield label in CITY, f"the masthead carries {label}"
+    # THE MASTHEAD, SLICED OUT BY ITS OWN ELEMENT. This read
+    # `label in CITY` — true of a word anywhere on the page, and the footer
+    # carries every one of these links on all 1,032 documents, so five
+    # assertions about the BAR were satisfied by the FOOT of the page and
+    # could not have gone red for a masthead that had stopped carrying any
+    # of them.
+    #
+    # AND THE CLAIM IS AN HREF RATHER THAN A LABEL. The bar names six rooms
+    # and three of these surfaces live inside a room's field; what the
+    # brief is about is reaching them from the top of every page, which is
+    # what a link is. A label is a word somebody may rewrite.
+    mast = CITY[CITY.index('<header class="masthead"'):]
+    mast = mast[:mast.index("</header>")]
+    for href in ("/discover", "/countries", "/experiences", "/journeys", "/stories"):
+        yield f'href="{href}"' in mast, f"the masthead reaches {href}"
+    # A ROOM'S FIELD IS REVEALED BY CSS AND MUST BE REACHABLE BY KEYBOARD,
+    # which is a claim the browser suite owns because it needs focus. What
+    # is asserted here is that the mechanism has no script behind it: this
+    # site loads no JavaScript on most of its pages, and a navigation that
+    # needed one would be the first script on the homepage.
+    yield "navfield" in mast, "the rooms carry their fields"
+    yield ":focus-within" in CSS and "navroom" in CSS, \
+        "and the field opens for a keyboard, not only for a pointer"
+    yield "the room opens its field for a keyboard" in BROWSER, \
+        "measured in Chromium rather than asserted here"
     yield "navsearch" in CITY and "navmine" in CITY, "search and My Europe"
     from lib import render as R
     yield "BOTTOM_NAV" in RENDER, "the thumb bar exists"

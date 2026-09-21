@@ -260,8 +260,34 @@ def s4():
          "The specification's seven items exactly, plus search and My Europe, "
          "plus every secondary link it lists.")
 def s5():
-    for label in ("Discover", "Countries", "Experiences", "Journeys", "Plan", "Stories", "Events"):
-        yield label in page("/"), f"{label} in the primary nav"
+    # AND IT IS THE MASTHEAD RATHER THAN THE DOCUMENT, WHICH IS THE WHOLE
+    # CLAIM. This read `label in page("/")` — true of a word appearing
+    # anywhere on a 145 KB page, including in the footer, which carries
+    # every one of these links on all 1,032 documents. So the seven
+    # assertions could not tell a primary navigation from a footer, and
+    # would have gone green on a bar that had stopped carrying any of
+    # them. The masthead is sliced out by its own element: the promise is
+    # that a reader meets these seven at the top of the page.
+    #
+    # WHAT IT NO LONGER ASSERTS IS A LABEL. The bar names six ROOMS now —
+    # Discover, Atlas, Journeys, Plan, Stories, Europe — and Countries,
+    # Experiences and the year live inside a room's field. The
+    # specification's subject is the SURFACE being reachable from the top
+    # of every page, and an href is what that is; a label is a word
+    # somebody may rewrite, and pinning one is the thirteenth shape this
+    # audit has protected instead of a promise.
+    mast = page("/")
+    mast = mast[mast.index('<header class="masthead"'):]
+    mast = mast[:mast.index("</header>")]
+    for href in ("/discover", "/countries", "/experiences", "/journeys",
+                 "/plan", "/stories", "/events"):
+        yield f'href="{href}"' in mast, f"{href} is reachable from the masthead"
+    # And the six rooms are real pages rather than headings over a field.
+    import re as _re
+    rooms = _re.findall(r'class="navtop[^"]*" href="([^"]+)"', mast)
+    yield len(rooms) == 6, f"six rooms in the bar, not {len(rooms)}"
+    for href in rooms:
+        yield exists(href), f"the room {href} is a page of its own"
     for u in ("/for-businesses", "/for-tourism-boards", "/about", "/contact", "/help",
               "/privacy", "/terms", "/cookies", "/accessibility"):
         yield exists(u), f"{u} exists and is linked from the footer"

@@ -700,7 +700,23 @@ def measure():
                        "site-wide frame is the one thing that has to be on "
                        "every document, and the alternative is a footer "
                        "that says less on 1,031 pages so the heaviest one "
-                       "can stay under a number."},
+                       "can stay under a number."
+                       "  601 -> 602 WHEN THE BAR BECAME SIX ROOMS WITH "
+                       "FIELDS. The masthead went 916 -> 1,685 raw bytes "
+                       "— 683 compressed — on every one of 1,032 "
+                       "documents, for thirteen links in three panels "
+                       "that were previously reachable only from the "
+                       "foot of the page. It is the same kind of move as "
+                       "the footer one row up and it is paid for the same "
+                       "reason: the two ends of the frame are the one "
+                       "component that has to be on every document, and "
+                       "the alternative is a navigation that says less on "
+                       "1,031 pages so the heaviest one can stay under a "
+                       "number. The FIELDS are markup rather than script: "
+                       "a navigation that needed JavaScript would be the "
+                       "first script on the homepage, which costs more "
+                       "than 769 bytes and is a dependency rather than "
+                       "text."},
             # A CEILING, not a floor, and the direction is the point. The
             # rule is that a visual earns its position — so what needs
             # guarding is plates SPREADING back onto pages that do not need
