@@ -4618,8 +4618,21 @@ picture:hover .credit, picture:focus-within .credit { opacity: 1; }
    drawing and `auto` back on the anchors: an anchor set back to `auto` under
    a `none` ancestor did not receive the click here, and a rule that has to be
    overridden is a rule that will be got wrong again. */
+/* AND THE LABEL LAYER WAS THE ONE LEFT OFF THE LIST, on the drawing whose
+   countries ARE the page's navigation. The comment above names the terrain,
+   the rivers, the frontiers and the dusk and says each is set individually
+   *because a rule that has to be overridden is a rule that will be got wrong
+   again* — and then `.lyr-labels` was not one of them. It is the worst layer
+   to miss: `NameGround` places a country's name so that its MIDDLE is on the
+   country it names, so the label is guaranteed to sit exactly where a reader
+   aims. Measured in Chromium at 1440: 14 of 42 country links were not
+   reachable at the centre of their own shape and eleven of the fourteen were
+   blocked by `text.cname` — Germany, Spain, Finland, Belarus among them. The
+   other three are a bbox centre falling outside the country's own shape,
+   which is geometry rather than furniture and is a different question. */
 .heroeurope .lyr-beyond, .heroeurope .lyr-terrain, .heroeurope .lyr-rivers,
 .heroeurope .lyr-country-bounds, .heroeurope .heroctxg,
+.heroeurope .lyr-labels,
 .heroeurope .herodusk { pointer-events: none; }
 /* PAINTED BY INHERITANCE, NEVER BY ID, and that is what makes the boundary
    pass free. The frontiers are a `<use>` of the same path above the terrain,
