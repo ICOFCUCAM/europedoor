@@ -2519,6 +2519,19 @@ stops Python WRITING bytecode, not reading it. Delete `tools/**/__pycache__`
 before measuring a constant you have just changed, or the measurement is of
 the last build.
 
+**AND `pgrep -f "[p]hoto-tests"` MATCHED A WAITER THAT NAMED THE FILE, NOT
+THE RUN.** The bracket trick stops the pattern matching its OWN shell and
+says nothing about a DIFFERENT shell that mentions the same path: a
+background loop polling for `…/wt24/tools/photo-tests.py` carried that string
+unbracketed on its command line, so the regex found it. The gate had finished
+in seven minutes and the poll went on reporting *(still running)* for
+fifteen, against a process that was waiting for a directory this session had
+already deleted. **A liveness check that matches on a NAME is matching
+whoever says the name**, which is `cell` catching `cellar` arriving in
+process management — and the tell was there the whole time in a log the poll
+never read, at 42 bytes. Read the artefact, not the process table: the run
+writes its verdict, and `wc -c` on the log answers the question directly.
+
 **The browser suite crashed mid-run because `site/` was rebuilt under it.**
 `ENOENT: site/404.html`, the same concurrency failure this file already
 records as a green run that had stopped counting. Do not build while the
@@ -6630,6 +6643,92 @@ order and editorial copy were never for sale and are not now.
 `tools/monotony.js` read /for-businesses at 51% before this and reads 27%
 after, because the page gained three bands that are not its provider list.
 
+
+
+**TWO LABEL FAMILIES ON ONE DRAWING, AND ONLY ONE OF THEM HAD A BOX.** Every
+label here goes through one machine — `place_label_box` measures it against
+`LABEL_METRICS`, tests it against the aperture, tests it against the names
+already down, and drops it when it fits nowhere — and that machine is why
+the destination plates went from 271 overlapping pairs to zero. **The water
+labels went through none of it**: `sea_names()` picked a point with enough
+open sea round it and emitted a `<text>`, with no width model, no aperture
+test, no collision test and nothing for anybody else to avoid. So
+`name_countries()`, which has all four, was arranging half a layer — its own
+comment promises each name is tested *against every name already down*, and
+that was true of its own family and of nothing else. Measured in Chromium at
+1280, 1440 and 1920: NORTH SEA through UNITED KINGDOM by **68px** and /map's
+by **80**, BAY OF BISCAY through FRANCE by 41, IONIAN SEA through GREECE by
+49, BLACK SEA through ROMANIA by 18.
+
+**AND THE TWO DRAWINGS IT HAPPENS ON ARE THE TWO NO OVERLAP CHECK HAS EVER
+LOOKED AT.** Twenty-nine shapes on the built site carry more than one label
+family and **twenty-eight are a `.minimap`**, which is the selector both
+existing sweeps read; the twenty-ninth is the hero, which is not a `<figure>`
+at all, and the thirtieth is `#europemap`. The only two drawings that carry
+`.seaname` beside `.cname` are the largest pictures on the site and they sat
+outside the check by a selector nobody re-read when the sea names were added.
+Fourth occurrence of the same shape — the check matching
+`pointsmap arched"><svg` that examined 0 dots on a site with 130 region maps,
+`c_one_plate_per_thing` reading zero once the last abstract plate came off,
+and the crop-box sweep making two green assertions a run about elements the
+site no longer had. **A selector, not a figure class**: whether two labels on
+one drawing overlap is not a question about which element wraps it.
+
+**THE PINNED FAMILY IS COMPOSED FIRST AND THE FREE ONE IS TOLD WHERE IT
+WENT.** A sea name has one position, the middle of its own water; a country
+name has nine anchors and four positions at each. The country plate settled
+that order already, when reserving a box across the middle of Albania ate
+Tirana's label and left a star nothing named. `sea_names()` returns its boxes
+with its markup and `name_countries(reserved=…)` seeds them into `taken`.
+**`/map` had the order backwards** and composed the free family two lines
+before the fixed one existed. **One model per type size, and this family
+needed two**: the face and the .34em tracking are shared and the size is not
+— 13 units in the hero's 1,120-unit frame against 11 in /map's 1,000 — so the
+boxes differ by 18% and one model cannot serve both. Fitted as the upper
+envelope over every name each drawing renders, with the browser's own
+`getBBox`, and the browser re-measures it, because a static check re-running
+a fitted model only ever agrees with it and **an envelope that UNDERSTATES
+lets a country name into ground the drawing has already spent.**
+
+**What it cost is counted rather than glossed.** Five pairs to zero at all
+three widths. The hero held its cap of sixteen with four names moved:
+UNITED KINGDOM came down 22 units off the North Sea onto the slot IRELAND
+wanted, so Ireland lost its name and LATVIA — the next country by drawn area
+— took the freed place. /map went 13 → 12 and the one that went is GREECE,
+precisely the name that had been drawn through IONIAN SEA. Each keeps its
+shape, its frontier, its link and its accessible name. **Raising the cap to
+save Ireland would be tuning the design to one case**, and drawn area is
+deliberately a property of THIS picture rather than a judgement about the
+country. And **`most` was a parameter nothing read** — the body sliced `[:6]`,
+so a caller asking for four got six; neither caller passed it, so nothing a
+reader sees was ever wrong and the lie was in the interface.
+
+
+**A CANDIDATE WAS RENDERED UNDER A DIFFERENT PICTURE'S SUPPRESSION, AND THE
+COMMENT ABOVE THE LINE STATED THE RULE IT NEEDED.** `contact_sheet.py` renders
+the real homepage once per candidate so a person can judge a photograph inside
+the composition before it is bought, and it substitutes by **replacing the
+register and leaving `design` untouched**. `home()` suppresses the hero's
+credit while a design asset claims that purpose — correctly, because printing
+a photographer's name under somebody else's picture is a false attribution
+worse than clutter — so from the commit that registered `london-thames` as
+standing in for `home-hero`, the sheet drew the CANDIDATE and credited NOBODY.
+The one artefact whose job is to show the real composition was showing neither
+state, and the credit is a measured part of that composition rather than a
+footnote: its own scrim, 6.90:1 by arithmetic. The comment directly above the
+substitution says *the register is REPLACED for this render, never merged
+into: a candidate must not inherit a real row's provenance by sitting beside
+it in the same dict* — **applied to `images` and not to `design`**, which is
+*a rule stated once and applied to one of its call sites*, inside the comment
+that states it.
+
+**And nothing caught it for six commits because the gate was not run.**
+`python3 tools/photo-tests.py` is on the list above, costs about five minutes,
+and five consecutive commits shipped without it while every other gate was
+green. **A gate people skip finds things six commits late**, which is the same
+sentence this file already writes about a gate that cannot fail — and the
+`git log -S` that dated the cause took one command, where the reasoning that
+would have guessed at it took twenty minutes.
 
 ## Gates
 

@@ -1468,3 +1468,145 @@ test slices to the enclosing one: the claim itself rather than a stand-in
 for it, and **stricter as well as more accurate**, because a band longer than
 1,200 characters is no longer partly out of reach. Proved red by putting a
 credit inside the window's own band.
+
+## Home 25 — two label families on one drawing, and only one of them had a box
+
+Every label on this site goes through one machine: `place_label_box` measures
+it against `LABEL_METRICS`, tests it against the aperture, tests it against
+the names already down, and drops it when it fits nowhere. That machine is
+the reason the destination plates went from 271 overlapping pairs to zero and
+the reason 184 labels stopped being drawn into the removed corners of the
+arch.
+
+**The water labels went through none of it.** `sea_names()` picked a point
+with enough open sea around it and emitted a `<text>` — no width model, no
+aperture test, no collision test, and nothing for anybody else to avoid. So
+`name_countries()`, which has all four, was arranging half a layer: its own
+comment promises each name is tested "against every name already down", and
+that was true of its own family and of nothing else.
+
+Measured in Chromium at 1280, 1440 and 1920:
+
+| | | |
+|---|---|---|
+| NORTH SEA | UNITED KINGDOM | 68px · the homepage |
+| BAY OF BISCAY | FRANCE | 41px · the homepage |
+| BLACK SEA | ROMANIA | 18px · the homepage |
+| NORTH SEA | UNITED KINGDOM | 80px · /map |
+| IONIAN SEA | GREECE | 49px · /map |
+
+**AND THE TWO DRAWINGS IT HAPPENS ON ARE THE TWO NO OVERLAP CHECK HAS EVER
+LOOKED AT.** Counted across the built site, twenty-nine shapes carry more
+than one label family and **twenty-eight of them are a `.minimap`** — which
+is the selector both existing overlap sweeps read. The twenty-ninth is the
+hero, which is not a `<figure>` at all, and the thirtieth is `#europemap`.
+Those two are the only drawings here that carry `.seaname` beside `.cname`,
+they are the largest pictures on the site, and they sat outside the check by
+a selector nobody had re-read since the day the sea names were added.
+
+That is this repository's own recorded failure for the fourth time: the
+check matching `pointsmap arched"><svg` that examined **0 dots** on a site
+with 130 region maps, `c_one_plate_per_thing` reading zero once the last
+abstract plate came off, and the crop-box sweep making two green assertions
+a run about elements the site no longer had. **A selector, not a figure
+class** — whether two labels on one drawing overlap is not a question about
+which element the build chose to wrap it in.
+
+**THE PINNED FAMILY GOES FIRST AND THE FREE ONE IS TOLD WHERE IT WENT.** A
+sea name has exactly one position, the middle of its own water; a country
+name has nine anchors and four positions at each. The country plate already
+settled which of those is composed first, when reserving a box across the
+middle of Albania ate Tirana's label and left a star nothing named. So
+`sea_names()` returns its boxes as well as its markup and
+`name_countries(reserved=…)` seeds them into `taken`, which is the one list
+`place_label_box`'s `clears` predicate reads. **`/map` had the order
+backwards** — it composed the country names and the sea names two lines
+later, so the free family chose before the fixed one existed.
+
+**ONE MODEL PER TYPE SIZE, and this family needed two.** The face and the
+.34em tracking are shared; the size is not. The hero sets this family at 13
+units in an 1,120-unit frame and /map at 11 in a 1,000-unit one, so their
+boxes differ by 18% and one model cannot serve both. Fitted as the upper
+envelope over every name each drawing renders, measured with the browser's
+own `getBBox` in the drawing's own user units:
+
+    seaname        11.0 + 10.20 * chars      up 9.85   down 2.95
+    seaname-hero    0.5 + 12.75 * chars      up 11.68  down 3.34
+
+**What it cost, counted rather than glossed.** Five pairs to **zero**, at all
+three widths. On the hero four names moved and the count held at its cap of
+sixteen: UNITED KINGDOM came down 22 units off the North Sea and onto the
+slot IRELAND wanted, so Ireland lost its name and **LATVIA**, the next
+country by drawn area, took the freed place. On /map the count went 13 → 12
+and the one that went is **GREECE** — precisely the name that had been drawn
+through IONIAN SEA. Each of those keeps its shape, its frontier, its link and
+its accessible name, which is what a dropped label has always promised here.
+The substitution is the drawn-area rule doing what it says: that order is a
+property of THIS picture rather than a judgement about the country, and
+raising the cap to save Ireland would be tuning the design to one case.
+
+**AND `most` WAS A PARAMETER NOTHING READ.** `sea_names(land, view, most=6)`
+sliced `[:6]` in its body, so a caller asking for four got six and a caller
+asking for ten got six. Neither caller passed it, so nothing a reader sees
+was ever wrong — the lie was in the interface. *An ignored argument is dead
+code that looks like a decision*, which is what `kindfilters` cost /events
+and `opts.geoTooNarrow` cost /plan.
+
+**The instrument, and it asserts its own reach.** The new sweep reads every
+`<text>` whatever its class, on any `<svg>` carrying two label families, at
+three widths — three because the hero is `preserveAspectRatio="slice"` and
+crops a different part of its frame at every window shape. It fails when it
+stops finding six drawings over two pages and three widths, because a
+selector that matches nothing reports zero overlapping pairs and passes.
+
+**And the model is checked against the drawing, because it cannot check
+itself.** `LABEL_METRICS` is a fitted envelope, so the build reserves a box
+it has MODELLED rather than one it has measured, and a static check
+re-running that model would only ever agree with it. `getBBox` is the
+different implementation of the same question. The failure that matters is an
+envelope that UNDERSTATES: the reserved box would be smaller than the type
+and a country name would be let through into it.
+
+Proved red four ways — the hero's wiring removed (9 pairs), /map's order put
+back (6 pairs), the envelope shrunk (11 names wider than their box), and the
+sweep pointed at pages with no two-family drawing (0 of an expected 6).
+
+**And one thing was measured and deliberately not built.** The sea-name pass
+tests its POINT against the rectangle and never its BOX against the arch —
+which is, word for word, the failure that put 184 labels' corners outside the
+aperture and drew fourteen of them entirely inside a removed corner. Measured
+against `in_arch` at the hero's own frame, all five of the names it draws are
+four corners inside with the mason's clearance, so the test would change
+nothing today. It is recorded rather than added for a second reason that is
+not thrift: **the hero is `preserveAspectRatio="slice"` and crops a different
+part of its 1,120-unit frame at every window shape** — 1,078 units shown at
+1280 and 961 at 1920 — so a build-time arch test would be testing a frame no
+reader is ever shown. The trigger is a sea name measuring outside the
+aperture, which the browser sweep above would see as a name that is placed
+and not drawn.
+
+**AND RUNNING THE ACQUISITION GATE FOUND SOMETHING THIS COMMIT DID NOT
+CAUSE — WHICH IS WHY IT IS A GATE.** `photo-tests.py` failed on *the credit
+the provider requires is still on it*, and `git log -S` puts the cause in
+**Home 19**, six commits back: that commit added the design-asset state and
+registered `london-thames` as standing in for `home-hero`. `home()` suppresses
+the hero's credit while a design asset claims the purpose — correctly, because
+printing a photographer's name under somebody else's picture is a false
+attribution worse than clutter — and `contact_sheet.py` substitutes a
+candidate by **replacing the register and leaving `design` untouched**. So the
+sheet drew the candidate and credited nobody: the one artefact whose job is to
+show a person the real composition was showing neither state, on a page where
+the credit is a measured part of the composition with its own scrim and 6.90:1
+by arithmetic.
+
+The comment directly above that substitution states the principle it needed —
+*the register is REPLACED for this render, never merged into: a candidate must
+not inherit a real row's provenance by sitting beside it in the same dict* —
+and it was applied to `images` and not to `design`. **A rule stated once and
+applied to one of its call sites**, in the comment that states it.
+
+**The honest half is that nothing caught it for six commits because the gate
+was not run.** It is on the list in `CLAUDE.md`, it takes about five minutes,
+and Home 20 to Home 24 each shipped without it. A gate people skip is a gate
+that finds things six commits late, which is the same sentence this repository
+already writes about a gate that cannot fail.

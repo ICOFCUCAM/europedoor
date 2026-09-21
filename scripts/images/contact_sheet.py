@@ -209,7 +209,25 @@ def main(argv):
         # The register is REPLACED for this render, never merged into: a
         # candidate must not inherit a real row's provenance by sitting
         # beside it in the same dict.
-        page = dict(d, images={spec["key"]: row})
+        #
+        # AND THE DESIGN ASSET STANDING IN FOR THIS PURPOSE HAS TO GO WITH
+        # IT, which is the same sentence applied to the other half of the
+        # state. `home()` suppresses the credit when a design asset claims
+        # the purpose — correctly, because printing a photographer's name
+        # under somebody else's picture is a false attribution worse than
+        # clutter — and this substitution left `design` untouched while
+        # replacing `images`. So the sheet drew the CANDIDATE and credited
+        # NOBODY: the one artefact whose job is to show a person the real
+        # composition was showing neither state, and the credit is a
+        # measured part of that composition rather than a footnote, with
+        # its own scrim and 6.90:1 by arithmetic. `photo-tests.py` caught
+        # it on "the credit the provider requires is still on it".
+        #
+        # *A rule stated once and applied to one of its call sites*, in the
+        # comment directly above that states it.
+        page = dict(d, images={spec["key"]: row},
+                    design={_k: _a for _k, _a in (d.get("design") or {}).items()
+                            if _a.get("stands_in_for") != spec["key"]})
         path, html = P.home(page)
         del path
         out = os.path.join(args.out, f"cand-{c['id']}")

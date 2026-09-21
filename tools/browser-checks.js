@@ -5082,6 +5082,126 @@ async function main() {
     await lc.close();
   }
 
+  /* AND THE SWEEP ABOVE READS `figure.minimap`, WHICH IS EVERY MULTI-FAMILY
+   * DRAWING ON THIS SITE EXCEPT THE TWO LARGEST.
+   *
+   * Counted across the built site, twenty-nine shapes carry more than one
+   * label family and twenty-eight of them are a `.minimap`. The twenty-ninth
+   * is the hero — `.heroeurope`, which is not a figure at all — and the
+   * thirtieth is `#europemap`. Those two are the only drawings here that
+   * carry `.seaname` beside `.cname`, they are the biggest pictures on the
+   * site, and no arrangement check has ever looked at either. Measured in
+   * Chromium at 1280, 1440 and 1920 before this block existed:
+   *
+   *     "NORTH SEA" through "UNITED KINGDOM"      68px   /
+   *     "BAY OF BISCAY" through "FRANCE"          41px   /
+   *     "BLACK SEA" through "ROMANIA"             18px   /
+   *     "NORTH SEA" through "UNITED KINGDOM"      80px   /map
+   *     "IONIAN SEA" through "GREECE"             49px   /map
+   *
+   * A selector, not a figure class: the question is whether two labels on
+   * one drawing overlap, and which element the build chose to wrap it in is
+   * not part of that question. That is what confined the sweep above.
+   *
+   * AND IT ASSERTS ITS OWN REACH, because a selector that matches nothing
+   * reports zero overlapping pairs and passes — which is how `.qtile` printed
+   * "it examined 0 states" for three redesigns and how the crop-box sweep
+   * made two green assertions a run about elements the site no longer had.
+   * Three widths rather than one, because the hero is `slice` and crops a
+   * different part of its frame at every window shape. */
+  {
+    const lc = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    let drawings = 0, pairs = 0, worst = 0, worstAt = "";
+    for (const [vw, vh] of [[1280, 900], [1440, 900], [1920, 1080]]) {
+      await lc.setViewportSize({ width: vw, height: vh });
+      for (const u of ["/", "/map"]) {
+        const r0 = await lc.goto(base + u, { waitUntil: "load" });
+        if (!r0 || r0.status() !== 200) continue;
+        await lc.evaluate(() => new Promise((r) =>
+          requestAnimationFrame(() => requestAnimationFrame(r))));
+        const r = await lc.evaluate(() => {
+          const out = { svgs: 0, hits: [] };
+          for (const svg of document.querySelectorAll("svg")) {
+            const fams = new Set();
+            const t = [...svg.querySelectorAll("text")]
+              .filter((e) => e.getClientRects().length &&
+                             getComputedStyle(e).display !== "none")
+              .map((e) => { fams.add(e.getAttribute("class") || "(none)");
+                            const b = e.getBoundingClientRect();
+                            return [e.textContent.trim(), b.x, b.y, b.width, b.height]; });
+            if (fams.size < 2) continue;
+            out.svgs++;
+            for (let i = 0; i < t.length; i++)
+              for (let j = i + 1; j < t.length; j++) {
+                const a = t[i], c = t[j];
+                const ox = Math.min(a[1] + a[3], c[1] + c[3]) - Math.max(a[1], c[1]);
+                const oy = Math.min(a[2] + a[4], c[2] + c[4]) - Math.max(a[2], c[2]);
+                if (ox > 0 && oy > 0) out.hits.push([a[0] + " / " + c[0], ox]);
+              }
+          }
+          return out;
+        });
+        drawings += r.svgs;
+        for (const [names, ox] of r.hits) {
+          pairs++;
+          if (ox > worst) { worst = ox; worstAt = `${vw}px ${u}: ${names}`; }
+        }
+      }
+    }
+    ok(drawings === 6,
+       `the two-family sweep found ${drawings} drawing(s) carrying two label ` +
+       `families over 2 pages x 3 widths, expected 6. The hero and /map are ` +
+       `the only two, and a sweep that stops finding them reports zero ` +
+       `overlaps and passes`);
+    ok(pairs === 0,
+       `${pairs} overlapping label pair(s) where two label families share one ` +
+       `drawing — worst ${worst.toFixed(0)}px, ${worstAt}. The sea names are ` +
+       `PINNED (one position each, the middle of their own water) and the ` +
+       `country names are FREE (nine anchors, four positions), so the pinned ` +
+       `family is composed first and name_countries() is handed its boxes as ` +
+       `reserved. A pair here means that wiring came undone`);
+    checked += drawings;
+
+    /* AND THE MODEL THAT RESERVES THEM IS CHECKED AGAINST THE DRAWING.
+     *
+     * `LABEL_METRICS["seaname"]` is a fitted upper envelope on the width of a
+     * sea name, so the build reserves a box it has MODELLED rather than one
+     * it has measured — and a static check re-running that model would only
+     * ever agree with it. getBBox is the different implementation of the same
+     * question, in the drawing's own user units, which is what the model is
+     * stated in. An envelope that UNDERSTATES is the failure that matters:
+     * the reserved box would be smaller than the type and a country name
+     * would be let through into it. */
+    const MODEL = { "/": [0.5, 12.75], "/map": [11.0, 10.2] };
+    let names = 0, under = [];
+    for (const u of ["/", "/map"]) {
+      await lc.setViewportSize({ width: 1280, height: 900 });
+      const r0 = await lc.goto(base + u, { waitUntil: "load" });
+      if (!r0 || r0.status() !== 200) continue;
+      const got = await lc.evaluate(() => [...document.querySelectorAll("text.seaname")]
+        .map((e) => { const b = e.getBBox();
+                      return { t: e.textContent.trim(), w: b.width,
+                               up: parseFloat(e.getAttribute("y")) - b.y,
+                               down: (b.y + b.height) - parseFloat(e.getAttribute("y")) }; }));
+      const [pad, ch] = MODEL[u];
+      for (const g of got) {
+        names++;
+        const model = pad + ch * g.t.length;
+        if (model < g.w - 0.01)
+          under.push(`${u} "${g.t}" real ${g.w.toFixed(1)}u model ${model.toFixed(1)}u`);
+      }
+    }
+    ok(names >= 11,
+       `the sea-name model check measured ${names} rendered name(s), expected ` +
+       `at least 11 — it has stopped finding the layer it is about`);
+    ok(under.length === 0,
+       `${under.length} sea name(s) are WIDER than the box the build reserves ` +
+       `for them: ${under.slice(0, 3).join("; ")}. The envelope in ` +
+       `LABEL_METRICS understates the type, so a country name can be placed ` +
+       `into ground the drawing has already spent`);
+    await lc.close();
+  }
+
 
   /* THE RATIO IS THE INSTRUCTION, AND NOTHING HAD EVER MEASURED IT.
    *

@@ -787,7 +787,7 @@ def graticule_layer():
     return graticule_markup
 
 
-def sea_names(land, view, most=6):
+def sea_names(land, view, most=6, metric="seaname"):
     """The seas with enough open water around them to carry a name.
 
     Lifted out of the hero when /map needed the same layer, because the set
@@ -795,6 +795,22 @@ def sea_names(land, view, most=6):
     the nearest drawn coastline — and two implementations of a measurement
     disagree within a month. The hero's own output is asserted byte-identical
     across the move.
+
+    IT RETURNS ITS BOXES AS WELL AS ITS MARKUP, because this is the PINNED
+    family and the country names are the free one. A sea name has exactly one
+    position — the middle of its own water — and a country name has nine
+    anchors and four positions each; the country plate already settled which
+    of those goes first, when reserving a box across the middle of Albania
+    ate Tirana's label and left a star nothing named. So the pinned label is
+    placed first and the free one is told where it went, and a caller that
+    draws both hands these to `name_countries(reserved=...)`.
+
+    AND `most` WAS A PARAMETER NOTHING READ. The body sliced `[:6]`, so a
+    caller asking for four got six and a caller asking for ten got six —
+    an ignored argument is dead code that looks like a decision, which is
+    what `kindfilters` cost /events and `opts.geoTooNarrow` cost /plan.
+    Neither caller passed it, so nothing a reader sees was ever wrong; the
+    lie was in the interface.
     """
     vw, vh = view[2], view[3]
     LABEL_ROOM = 12.0
@@ -833,16 +849,27 @@ def sea_names(land, view, most=6):
             continue
         _seas.append((_room, _x, _y, _nm))
     _seas.sort(reverse=True)
+    _drawn = _seas[:most]
+    _pad, _ch, _up, _down = LABEL_METRICS[metric]
+    boxes = [_label_box(x, y, _pad + _ch * len(nm), "middle", _up, _down)
+             for _r, x, y, nm in _drawn]
     seanames = ('<g class="lyr lyr-water-labels" aria-hidden="true">'
                 + "".join(
                     f'<text class="seaname" text-anchor="middle"'
                     f' x="{x:.1f}" y="{y:.1f}">{esc(nm)}</text>'
-                    for _r, x, y, nm in _seas[:6]) + '</g>') if _seas else ""
-    return seanames
+                    for _r, x, y, nm in _drawn) + '</g>') if _drawn else ""
+    return seanames, [(bx, by, bx + bw, by + bh) for bx, by, bw, bh in boxes]
 
 
-def name_countries(land, view, max_names=16):
+def name_countries(land, view, max_names=16, reserved=()):
     """Set a country's name across its own drawn shape, once, for anybody.
+
+    AND `reserved` IS WHATEVER IS ALREADY ON THE PICTURE. This pass has
+    always tested a name against the names it has itself placed and against
+    nothing else, so on the two drawings that carry a SECOND label family it
+    was arranging half a layer. The caller passes the pinned family's boxes
+    — see `sea_names` — and they are seeded into `taken`, which is the one
+    list `place_label_box`'s `clears` predicate reads.
 
     THREE DRAWINGS ON THIS SITE NAME COUNTRIES AND ONLY ONE HAD THE RULES.
     `NameGround` was lifted to module level the last time that was true: the
@@ -877,7 +904,7 @@ def name_countries(land, view, max_names=16):
                 min(bb[2] - bb[0], bb[3] - bb[1]) / 2.0, bb)
 
     NAME_INSET = 14.0
-    taken = []
+    taken = [tuple(b) for b in reserved]
 
     # WHOSE GROUND IS THIS? The two rules and the tolerance now live in
     # NameGround at module level, because there are TWO drawings on this site
@@ -1244,7 +1271,7 @@ def heroeurope(data, featured=(), beyond_ground=True):
     # shore. The floor is the same question from the other end — the
     # Strait of Gibraltar and the Bristol Channel are real entries at 0.8
     # units, and are exactly what a printed sheet leaves out at this scale.
-    seanames = sea_names(land, view)
+    seanames, seaboxes = sea_names(land, view, metric="seaname-hero")
 
     # AND THE RELIEF, which is the whole reason this is worth doing. Every
     # destination plate on this site carries hypsometric bands and the front
@@ -1296,7 +1323,14 @@ def heroeurope(data, featured=(), beyond_ground=True):
     # Tracked uppercase at the plates' own size and colour, so this is the
     # same typography one level up rather than a new one: no font size is
     # introduced, and `checks.py` counts them.
-    names = name_countries(land, view)
+    #
+    # AND THE SEAS ARE ALREADY DOWN. "every name already down" was true of
+    # this family and of nothing else: the water labels are placed above and
+    # were invisible here, so UNITED KINGDOM was set through NORTH SEA by 68
+    # pixels, FRANCE through BAY OF BISCAY by 41 and ROMANIA through BLACK
+    # SEA by 18, at every width this drawing is shown at. The pinned family
+    # goes first and the free family is told where it went.
+    names = name_countries(land, view, reserved=seaboxes)
 
     # A LITTLE WATER, AND THE RANK IS WHERE THE RESTRAINT LIVES. The plates
     # draw rank 6 and every lake, which over the whole continent is 153 rivers
@@ -8174,6 +8208,30 @@ LABEL_METRICS = {
     # too wide for the country it belongs to. Same width model — the wider
     # half decides — and a box two lines deep, centred on the anchor.
     "cname2": (10.4, 17.35, 17.9 + CNAME_LEAD / 2, 4.7 + CNAME_LEAD / 2),
+    # AND THE SEA NAMES, WHICH HAD NO BOX AT ALL.
+    #
+    # Every other label family on this site goes through `place_label_box`:
+    # it is measured, tested against the aperture, tested against the names
+    # already down, and dropped when it fits nowhere. The water labels went
+    # through none of it — `sea_names()` chose a point and emitted a `<text>`
+    # — so the country pass, which does have all four, had nothing to avoid
+    # and could not have avoided it. Measured in Chromium at 1280, 1440 and
+    # 1920, on the two drawings that carry both families:
+    #
+    #     "NORTH SEA" through "UNITED KINGDOM"      68px  the homepage
+    #     "BAY OF BISCAY" through "FRANCE"          41px  the homepage
+    #     "BLACK SEA" through "ROMANIA"             18px  the homepage
+    #     "NORTH SEA" through "UNITED KINGDOM"      80px  /map
+    #     "IONIAN SEA" through "GREECE"             49px  /map
+    #
+    # ONE MODEL PER TYPE SIZE, which is this table's own rule: the face and
+    # the .34em tracking are shared and the size is not — the hero sets this
+    # family at 13 units in an 1,120-unit frame and /map at 11 in a 1,000-unit
+    # one, so their boxes differ by 18% and one model cannot serve both.
+    # Fitted as the upper envelope over every name each drawing renders,
+    # measured with the browser's own getBBox, which understates none of them.
+    "seaname": (11.0, 10.2, 9.85, 2.95),
+    "seaname-hero": (0.5, 12.75, 11.68, 3.34),
 }
 
 
@@ -12789,10 +12847,19 @@ def map_page(data):
     # `fill: rgb(0,0,0)` at the SVG default in a palette that contains no
     # black. A layer with no group is a layer no rule reaches, which is the
     # `<stop>` that no rule reaches in another costume.
-    mapnames = name_countries(_mland, _mview, max_names=24)
+    #
+    # AND THE PINNED FAMILY IS COMPOSED FIRST, WHICH IS THE OPPOSITE OF THE
+    # ORDER THIS BLOCK HAD. The country names were built here and the sea
+    # names two lines below, so the free family chose its positions before
+    # the fixed one existed: NORTH SEA carried UNITED KINGDOM through it by
+    # 80 pixels and IONIAN SEA carried GREECE by 49, at every width. Program
+    # order is the placement order, and a sea name has one position where a
+    # country name has thirty-six.
+    mapseas, _mapseaboxes = sea_names(_mland, _mview)
+    mapnames = name_countries(_mland, _mview, max_names=24,
+                              reserved=_mapseaboxes)
     mapnames = (f'<g class="lyr lyr-labels" aria-hidden="true">{mapnames}</g>'
                 if mapnames else "")
-    mapseas = sea_names(_mland, _mview)
     mapgrat = graticule_layer()
     # RANK 3 AND THE BIG LAKES, WHICH IS THE HERO'S ANSWER RATHER THAN THE
     # PLATES'. A plate is a picture of somewhere and wants the watercourses
