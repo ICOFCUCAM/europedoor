@@ -3384,6 +3384,23 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    last thing in the drawing now, and `pointer-events: none` keeps every dot
    and every country reachable underneath them. */
 .europemap :is(.lyr-labels, .lyr-water-labels) { pointer-events: none; }
+/* AND THE 817 PLATES NEVER GOT IT, WHICH COST REAL LINKS. The rule above
+   carries its own reason — *the type is on top of the drawing and takes no
+   clicks, which is what a printed sheet does* — and was scoped to
+   `.europemap`, the one map on the site that is not a plate. Measured in
+   Chromium at 1280 over 80 destination plates: **29 destination links of 349
+   are not reachable at the centre of their own touch target, on 23 of the 80
+   plates**, and the elements on top are `text.minilabel`, `text.fname` and
+   `path.archedge` — a neighbour's name, a physical feature's name, and the
+   reveal drawn at the aperture. Himare's own label sits on Gjirokaster's dot,
+   which is an `<a href>`.
+   The scale bar is in the list for the same reason and a stronger one: it is
+   `aria-hidden="true"` furniture, so a click it swallows is a click nothing
+   on the page will ever explain. It sits over a dot on 14 of 80 plates.
+   `.lyr-summits` is deliberately NOT in the list: the peak carries its own
+   `<title>`, and that tooltip is a hover the drawing owes a reader. */
+.minimap :is(.lyr-labels, .lyr-water-labels, .scalebar, .archedge) {
+  pointer-events: none; }
 /* AND THEY COME OFF BELOW 44rem. A label is sized in VIEWBOX UNITS and the
    browser scales the viewBox to its container: 11 units in a 1000-unit frame
    is 7.0 pixels at 390 — not small type, type that does not resolve into
