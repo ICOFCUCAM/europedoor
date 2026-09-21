@@ -2164,6 +2164,22 @@ a .kicker { color: var(--ink-3); }
 .checks { display: flex; flex-wrap: wrap; gap: var(--s2); }
 .checks label { font-size: var(--t-sm); border: 1px solid var(--rule); background: var(--paper); border-radius: 999px; padding: var(--s2) var(--s4); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: var(--s2); }
 .checks input { margin: 0; }
+/* THE SEVENTEEN INTERESTS WRAPPED INTO THIRTEEN RAGGED ROWS. `.checks` is
+   `flex-wrap`, which is right for the four geography layers beside it and
+   wrong for seventeen pills of different lengths in a fixed 352px column.
+   Measured in Chromium at 1280, 1440 and 1920 — identically, because the
+   column does not move — 17 chips take 13 rows and the width each row fills
+   runs 53% 54% 47% 83% 92% 94% 46% 58% 94% 57% 59% 59% 40%: NINE of the
+   thirteen hold a single chip at about half the width, so the block reads as
+   spillage rather than as a set. A filter list is scanned down, and the
+   column beside it is already a list — this makes the two grammars agree
+   rather than inventing a third. One column, each chip the full width, so
+   the boxes align and the names start on one left edge.
+   SCOPED TO `#layers`, because `.checks` is shared: the geography layers,
+   the planner and the events month all use it, and a flex row of four short
+   labels is the case it was written for. */
+#layers { display: grid; grid-template-columns: 1fr; }
+#layers label { justify-content: flex-start; }
 .checks label:has(input:checked) { border-color: var(--door); background: color-mix(in srgb, var(--door) 12%, var(--paper)); color: var(--ink); }
 .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--s4); }
 
