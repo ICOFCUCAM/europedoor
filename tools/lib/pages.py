@@ -2645,10 +2645,39 @@ def home(data):
             f'<span class="rdtitle">{esc(x["title"])}</span>'
             f'<span class="rdmin">{esc(x.get("reading", ""))}</span></a>'
             for x in _others)
+        # AND THIS WAS THE ONE BAND ON THE HOMEPAGE THAT NEVER SAID HOW BIG
+        # ITS SET IS. Measured across the eight plates, every other one states
+        # its own extent — the places band says eight more corners, the
+        # crossing says 31,213 km over seventeen routes, the atlas says fifty
+        # countries and nine corners, the year says 150 fixtures and
+        # forty-seven countries — and this one printed a headline and nine
+        # stories and no number at all. *An index exists to say how big a set
+        # is*, and the missing sentence was also the missing second column:
+        # with nothing beside it the head left 610 × 194 pixels of empty plate
+        # at 1280, which is the `headwide` shape with nothing to put in it.
+        #
+        # BOTH BRANCHES ARE WRITTEN, because *one to each desk* is a fact
+        # about today. The nine essays are filed to nine desks, one each —
+        # which is the same 1:1 mapping the /stories index records as its
+        # reason for refusing a desk band — and a tenth essay on an existing
+        # desk makes that sentence false, so the count decides which sentence
+        # is printed rather than a person deciding once.
+        _desks = [x.get("section", "Story") for x in _st]
+        _ndesk = len(set(_desks))
+        _oneeach = _ndesk == len(_st)
+        _splaces = len({c for x in _st for c in x.get("places", [])})
+        _rdlede = (
+            f'{numword(len(_st), cap=True)} essays, one to each desk, '
+            f'naming {numword(_splaces)} destinations between them.'
+            if _oneeach else
+            f'{numword(len(_st), cap=True)} essays across '
+            f'{numword(_ndesk)} desks, naming {numword(_splaces)} '
+            f'destinations between them.')
         reading = f"""
   <div class="galwrap">
-  <div class="sheettext">
+  <div class="sheettext headwide">
     <h2 class="mega">Read the continent <br>differently.</h2>
+    <p class="lede">{_rdlede}</p>
   </div>
   <div class="lead">
     <a class="leadshot" href="/stories/{esc(_lead_st["slug"])}" aria-label="{esc(_lead_st["title"])}">{_leadshot}</a>
@@ -2691,7 +2720,7 @@ def home(data):
     _nfix, _nsh = year_totals(data)
     year = f"""
   <div class="galwrap">
-  <div class="sheettext">
+  <div class="sheettext headwide">
     <h2 class="mega">Every month opens <br>a different Europe.</h2>
     <p class="lede">{numword(_nfix, cap=True)} recurring fixtures this atlas
     holds a month for, and the quieter shoulder {numword(_nsh)} countries record
@@ -6162,7 +6191,7 @@ def journeys_index(data):
     tales = ""
     if onroad:
         tales = f"""
-  <div class="sheettext">
+  <div class="sheettext headwide">
     <h2 class="mega">Between the <br>destinations.</h2>
     <p class="lede">The {numword(len(onroad))} essays that name a place these
     routes pass through. A station, a ferry, a pass, a table &mdash; the part
@@ -11295,7 +11324,7 @@ def experiences_index(data):
             + (f' · +{len(where) - 5} more' if len(where) > 5 else "")
             + '</span></span></a>')
     samefeeling = f"""
-  <div class="sheettext">
+  <div class="sheettext headwide">
     <h2 class="mega">Same feeling. <br>Different Europe.</h2>
     <p class="lede">Where each kind actually concentrates, counted rather
     than chosen. A kind whose largest corner holds under a third of it is
@@ -11346,7 +11375,7 @@ def experiences_index(data):
                if names else "")
             + '</span></a>')
     about = f"""
-  <div class="sheettext">
+  <div class="sheettext headwide">
     <h2 class="mega">What they <br>are about.</h2>
     <p class="lede">The other axis, and this one overlaps on purpose: an
     experience may be in several at once, so {len(data["categories"])}
@@ -11379,7 +11408,7 @@ def experiences_index(data):
             for s in st[:3])
         tales = f"""
   <div class="galwrap">
-  <div class="sheettext">
+  <div class="sheettext headwide">
     <h2 class="mega">Why anybody <br>goes at all.</h2>
     <p class="lede">An experience is a thing you can book. A story is the
     reason you would. {len(data["stories"])} of them, and every place either

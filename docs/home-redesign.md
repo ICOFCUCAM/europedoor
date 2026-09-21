@@ -2620,3 +2620,103 @@ for a version that set an `aspect-ratio` on `.atwin` and was reversed in the
 same commit, one paragraph down, without the argument coming with it. *A
 comment claiming evidence is read as evidence*, and this one contradicted the
 declaration eight lines below it.
+
+
+## Home 46 — a band whose emptiness is all on one side, and the rule that named a family that does not exist
+
+The plate-05 work was finished, so the instruments were asked what is next.
+`density.js` read the homepage at 17% of slices under a fifth covered and its
+largest runs were all plate-to-plate transitions — deliberate rhythm, not a
+fault. **Looking at the eight plates found what neither instrument reports.**
+
+### Two plates had nothing beside the head
+
+Measured at four widths, with the head's own box and the first thing that
+starts below it:
+
+| | at 1280 | at 1920 |
+|---|---|---|
+| `act7` The year | **791 × 352 px empty**, 62% of the width | 41% of the width |
+| `act6` The reading | 610 × 194 px empty beside a head with no lede at all | — |
+
+Across the eight plates, three have nothing to the right of the head. Two of
+those are correct — `act2` sets its type over a full-bleed photograph and
+`act8` is a deliberately centred close — so the real cases are 06 and 07.
+
+**Neither instrument here can see it.** `voids.js` finds a band with NOTHING
+painted in it, and these have a 76px headline on the left; `density.js`
+measures the painted UNION as a share of the page's own width, and a 566px
+headline column over 1,280 is 44% covered, which clears its fifth. A band
+whose emptiness is all on ONE SIDE is the one shape that passes both. A third
+instrument was prototyped for it and is **not** kept: the first version
+scoped itself to `main` and reported the 2,000px footer as the largest hole
+on the page, and the second counted a plate's own `--white` ground as
+"painted" and reported zero everywhere. What it would measure — the widest
+unbroken empty interval per slice — is a real quantity and the prototype is
+recorded rather than shipped, because *a gate that cannot fail is a gate
+people stop running* and this one has no threshold anybody can defend.
+
+### The rule for it already existed and named three families, one of which is not a family
+
+`.sheet-pairs > .sheettext, .sheet-about > .sheettext, .sheet-tales >
+.galwrap > .sheettext` — written for /experiences, with its reason on it:
+*one column … leaves the right two-thirds of a full-width band empty.* That
+is *a rule stated once and applied to one of its call sites* written as a
+selector list, and it went wrong in both available directions:
+
+- **The homepage's two plates were never added**, which is the 791 × 352
+  above.
+- **`.sheet-tales` matched on /experiences and never on /journeys**, whose
+  plate is `sheet-jtales` and whose head is a direct child of the section
+  rather than of a `.galwrap`. So /journeys' *Between the destinations.* head
+  has been one column for the life of that band. Measured: the lede moved
+  from x=64 under the title to x=800 beside it, the head fell **333 → 191px**
+  and the plate **1,123 → 982**.
+
+The rule is a property of the HEAD now — `.sheettext.headwide` — so five call
+sites state it where three were named and the nesting stops mattering. Proved
+the way this repository requires rather than argued: /experiences shot
+full-page at 1280 and 390 before and after, **byte-identical at both**, with a
+run-to-run control first (4 of 4 identical) because *the count jitters* is a
+lesson this repository has already paid for. The first attempt reported
+/experiences as DIFFERING and it was right: I had marked /journeys' `jtales`
+head and missed /experiences' `tales` head, which the rule did reach.
+
+### And the reading plate never said how big its set is
+
+Every other plate states its own extent — eight more corners, 31,213 km over
+seventeen routes, fifty countries and nine corners, 150 fixtures and
+forty-seven countries. This one printed a headline and nine stories and no
+number, which is *an index exists to say how big a set is* on the one band
+that had no lede to put beside its title either. It is one derived sentence:
+nine essays, one to each desk, naming thirty-two destinations between them.
+
+**Both branches are written.** *One to each desk* is a fact about today — the
+nine essays are filed to nine desks, one each, which is the same 1:1 mapping
+the /stories index records as its reason for refusing a desk band — and a
+tenth essay on an existing desk makes that sentence false. The count decides
+which sentence prints rather than a person deciding once.
+
+### And the photograph gate was killed mid-run and took the library with it
+
+`photo-tests.py` was killed by a worker restart while the session's disk
+allowance was exhausted, so `cleanup()` never ran: **12,390 licensed
+derivatives deleted from `assets/img`, 818 originals renamed aside, and
+`data/images.json` left holding the suite's stub register** — 123,348 lines
+gone. Every count went with it.
+
+Nothing was lost, because all four are tracked: `git checkout -- data/images.json
+assets/img photographs` restores them, `site/` is regenerated, and the two
+backup directories the suite had made were verified file-by-file against the
+restored library (12,390 and 826, none missing) before being deleted. The 120
+leftover derivatives were confirmed as stubs by their hashes appearing
+**zero** times in the restored register rather than by their names.
+
+Two things are worth recording beyond the recovery. **A restore has to be
+verified by the gate rather than by the absence of errors**: `checks.py`
+re-run on the restored tree reports the same 343,524 things examined as
+before the crash, which is the evidence the library is whole. And **the
+disk-exhaustion is the reason the gate could not simply be re-run**:
+`site/` is 1.7 GB, `assets/img` 2.4, `photographs` 3.6 and `.git` 14, against
+a session allowance that had 4.1 MB left. Deleting the regenerable build
+artifact first is what made the restore possible at all.

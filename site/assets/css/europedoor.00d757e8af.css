@@ -12370,14 +12370,33 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    right two-thirds of a full-width band empty — measured at 350 pixels of
    nothing under `Same feeling. Different Europe.` A head is a title and a
    sentence about it, and on a band with nothing beside them they belong on
-   one line. */
+   one line.
+
+   AND IT WAS A LIST OF THREE FAMILY NAMES, WHICH IS *a rule stated once and
+   applied to one of its call sites* WAITING TO HAPPEN — and it did. The
+   homepage's own reading and year plates are the identical shape and were
+   never added, so measured at 1280 the year band left **791 × 352 pixels of
+   nothing** beside `Every month opens a different Europe.` (62% of the
+   width, and still 41% at 1920) and the reading band left 610 × 194 with
+   its head alone on a full-width plate. Neither is visible to any
+   instrument here: `voids.js` needs a band with NOTHING painted in it and
+   these have a headline on the left, and `density.js` measures the painted
+   UNION as a share of the width, where a 566px headline column over 1,280
+   is 44% covered and clears its fifth. **A band whose emptiness is all on
+   one side is the one shape neither of them can see.**
+
+   So the rule is a property of the HEAD rather than a list of families:
+   `headwide` says this head is full width with nothing beside it. Five call
+   sites state it where three were named, the nesting stops mattering
+   (`.sheet-tales` put its head inside a `.galwrap` and needed a third
+   selector for it), and a sixth inherits the rule by saying so. Proved the
+   way this repository requires: /experiences and /journeys shot at 1280 and
+   390 before and after, byte-identical at both widths. */
 @media (min-width: 62rem) {
-  .sheet-pairs > .sheettext, .sheet-about > .sheettext,
-  .sheet-tales > .galwrap > .sheettext {
+  .sheettext.headwide {
     grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
     column-gap: var(--s8); align-items: end; }
-  .sheet-pairs > .sheettext > .mega, .sheet-about > .sheettext > .mega,
-  .sheet-tales > .galwrap > .sheettext > .mega { grid-row: 1; }
+  .sheettext.headwide > .mega { grid-row: 1; }
 }
 
 /* THE FIELD'S HEAD WAS THE INDEX HEAD IN A BAND THAT IS NOT AN INDEX.

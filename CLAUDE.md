@@ -7572,6 +7572,67 @@ lines — caught by `css.line_heights` in the run that introduced it; and the
 weight ceiling, which is the only instrument here that measures bytes.
 
 
+**A BAND WHOSE EMPTINESS IS ALL ON ONE SIDE IS THE ONE SHAPE NEITHER
+INSTRUMENT CAN SEE.** `voids.js` finds a band with NOTHING painted in it and
+`density.js` measures the painted UNION as a share of the page's own width —
+so a 566px headline column over 1,280 is 44% covered, clears density's fifth,
+and is not empty. Measured on the homepage: the year plate left **791 × 352
+pixels of nothing** beside *Every month opens a different Europe.* (62% of
+the width at 1280 and still 41% at 1920) and the reading plate left 610 × 194
+beside a head that had no lede at all. Three of the eight plates have nothing
+to the right of the head and two of those are right — one sets its type over
+a full-bleed photograph and one is a deliberately centred close.
+
+**AND THE RULE FOR IT EXISTED AND NAMED A FAMILY THAT DOES NOT EXIST.**
+`.sheet-pairs > .sheettext, .sheet-about > .sheettext, .sheet-tales >
+.galwrap > .sheettext` carries its own reason — *one column … leaves the
+right two-thirds of a full-width band empty* — and that is *a rule stated
+once and applied to one of its call sites* written as a selector list. It
+failed in both directions at once: the homepage's two plates were never
+added, and **`.sheet-tales` matched on /experiences and never on /journeys**,
+whose plate is `sheet-jtales` with its head a direct child of the section
+rather than of a `.galwrap`. So /journeys' *Between the destinations.* head
+was one column for the life of that band — the lede moved from x=64 under the
+title to x=800 beside it, the head fell 333 → 191px and the plate 1,123 →
+982. **The dead-rule scan could not have caught it**: it removes each
+declaration and asks whether anything moves, which is a question about a rule
+that MATCHES elements, and this selector matched none. The rule is a property
+of the HEAD now — `.sheettext.headwide`, five call sites stating it where
+three were named — and the nesting stops mattering. Proved rather than
+argued: /experiences shot full-page at 1280 and 390 before and after,
+byte-identical at both, with a **run-to-run control first** (4 of 4
+identical), because *the count jitters* is already on this record.
+
+**AND THE READING PLATE NEVER SAID HOW BIG ITS SET IS.** Every other plate
+states its extent — eight more corners, 31,213 km over seventeen routes,
+fifty countries and nine corners, 150 fixtures and forty-seven countries —
+and this one printed a headline and nine stories and no number, which is *an
+index exists to say how big a set is* on the one band that also had no lede
+to put beside its title. **Both branches are written**, because *one to each
+desk* is a fact about today: nine essays filed to nine desks, one each, and a
+tenth on an existing desk makes that sentence false, so the count decides
+which sentence prints.
+
+**A GATE KILLED MID-RUN TAKES THE LIBRARY WITH IT, AND EVERYTHING IT TOUCHES
+IS TRACKED FOR EXACTLY THIS REASON.** `photo-tests.py` was killed by a worker
+restart while the session's disk allowance was exhausted, so `cleanup()`
+never ran: **12,390 licensed derivatives deleted from `assets/img`, 818
+originals renamed aside, and `data/images.json` left holding the suite's stub
+register** — 123,348 lines gone, and every count with them. `git checkout --
+data/images.json assets/img photographs` restores all three and `site/` is
+regenerated; the suite's two backup directories were verified file-by-file
+against the restored library (12,390 and 826, none missing) before being
+deleted, and the 120 leftover derivatives were confirmed as stubs by their
+hashes appearing **zero** times in the restored register rather than by their
+names. **A restore is verified by the gate rather than by the absence of
+errors** — `checks.py` re-run on the restored tree reports the same 343,524
+things examined as before the crash, which is the evidence the library is
+whole. And the sizes are why the gate could not simply be re-run: `site/` is
+1.7 GB, `assets/img` 2.4, `photographs` 3.6 and `.git` 14, against an
+allowance that had **4.1 MB** left. Deleting the regenerable build artifact
+first is what made the restore possible at all.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
