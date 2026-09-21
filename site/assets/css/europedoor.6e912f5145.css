@@ -11500,7 +11500,14 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    set tight and the file already has the value for that. */
 .atsum { font-family: var(--display); font-size: var(--ed-display-2);
          line-height: .96; letter-spacing: -.02em;
-         margin: 0 0 var(--s5); color: var(--ink); }
+/* AND NOT `color: var(--ink)`. `.sheet-gal` binds `--ink` to a literal for
+   the whole room — because a white wall in BOTH preferences needs ink that
+   is dark in both, which this stylesheet already paid for once — so a `<p>`
+   inside it already inherits exactly that value and the declaration could
+   never move a pixel. The dead-rule scan named it in the first run after
+   this composition shipped; the rest of the rule is real, which is why the
+   DECLARATION comes out and not the rule. */
+         margin: 0 0 var(--s5); }
 .atsum span { font-variant-numeric: tabular-nums; }
 /* THE PHONE IS DESIGNED RATHER THAN SCALED. A 26rem reading track beside a
    sticky drawing is a desk composition; at this width the drawing goes to

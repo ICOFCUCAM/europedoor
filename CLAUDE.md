@@ -6987,6 +6987,19 @@ register in the commit that introduced it; and the ground beyond thinned at
 and both are the same picture at this size — 11.5 KB against 7, measured by
 rendering both.
 
+
+**AND THE BROWSER SUITE FOUND A SEVENTH REDUNDANT DECLARATION IN THE SAME
+COMMIT.** `.atsum` — the register's closing resolution — set
+`color: var(--ink)` inside `.sheet-gal`, and that room binds `--ink` to a
+literal for everything in it, because *a room whose ground is white in both
+preferences needs ink that is dark in both* is a lesson this stylesheet has
+already paid for. So the `<p>` already inherited exactly that value and the
+declaration could never move a pixel. **The DECLARATION came out and not the
+rule** — the scan names declarations, and the first pass that deleted a whole
+rule on its word put an underline back under two homepage story links.
+Verified the way this repository requires: plate 05 shot at 1280 and 390
+before and after, byte-identical at both.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
