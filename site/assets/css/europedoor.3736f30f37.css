@@ -11624,9 +11624,26 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
   .atlas[data-ready] .atg,
   .atlas[data-ready] .atdoor { transition: none; }
 }
-.atplate .lyr-land path { fill: var(--map-land);
-                          stroke: var(--map-border); stroke-width: .6;
-                          vector-effect: non-scaling-stroke; }
+/* PAINTED BY INHERITANCE, WHICH IS WHAT LETS A CLONE DIFFER FROM ITS
+   SOURCE. `fill`, `stroke` and `stroke-width` are inherited properties and
+   sit on the LAYER; only `vector-effect` is on the path, because it is not
+   inherited and a `<use>` clone needs it from a selector that matches the
+   source. The hero paid for this rule once already — *nothing selects
+   `#heroland` any more* — and the socket below is the second thing it buys:
+   a clone takes whatever matches the ORIGINAL in its own position, so a
+   fill declared on the path would reach the clone and there would be no way
+   to say that the socket is ground where the corner over it is lit. */
+.atplate .lyr-land { fill: var(--map-land);
+                     stroke: var(--map-border); stroke-width: .6; }
+.atplate .lyr-land path { vector-effect: non-scaling-stroke; }
+/* THE SOCKET A CORNER LIFTS OUT OF. The band's paper is the map's water, so
+   the void a translated corner leaves was painted SEA — measured at 2x on
+   the eastern step as a channel from the Baltic to the Adriatic, on the one
+   drawing that may not state a geography it does not hold. The clone sits
+   exactly under its corner and is invisible until the corner moves.
+   `stroke: none` because a socket is GROUND: stroking it would ghost the
+   corner's own frontiers into the gap and draw the edge twice. */
+.atplate .atsock { fill: var(--map-land); stroke: none; }
 /* THE NAMES ARE THE ARTWORK, SO THEY ARE THE INK AND THE LAND IS THE
    GROUND. `--ink-2` on stone rather than the accent: fifty marks in the
    accent is a texture rather than an accent, which this stylesheet already
@@ -11660,15 +11677,19 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    dimming — a map that faded its unlit places would be a different Europe
    on every step, which is the argument `/discover` settled about an unlit
    destination. */
-.atstage[data-at="nordic"] .lyr-land path.atc-nordic,
-.atstage[data-at="baltic"] .lyr-land path.atc-baltic,
-.atstage[data-at="british-isles"] .lyr-land path.atc-british-isles,
-.atstage[data-at="western"] .lyr-land path.atc-western,
-.atstage[data-at="alpine-central"] .lyr-land path.atc-alpine-central,
-.atstage[data-at="mediterranean"] .lyr-land path.atc-mediterranean,
-.atstage[data-at="adriatic-balkans"] .lyr-land path.atc-adriatic-balkans,
-.atstage[data-at="eastern"] .lyr-land path.atc-eastern,
-.atstage[data-at="caucasus-bosphorus"] .lyr-land path.atc-caucasus-bosphorus {
+/* AND THE LIT FILL IS ON THE GROUP RATHER THAN ON ITS PATHS, for the same
+   reason: a rule naming `path.atc-nordic` matches the SOURCE of the socket's
+   clone, so the socket would light with the corner that has lifted off it
+   and the gap would fill with a ghost of the thing that moved. */
+.atstage[data-at="nordic"] .atg[data-corner="nordic"],
+.atstage[data-at="baltic"] .atg[data-corner="baltic"],
+.atstage[data-at="british-isles"] .atg[data-corner="british-isles"],
+.atstage[data-at="western"] .atg[data-corner="western"],
+.atstage[data-at="alpine-central"] .atg[data-corner="alpine-central"],
+.atstage[data-at="mediterranean"] .atg[data-corner="mediterranean"],
+.atstage[data-at="adriatic-balkans"] .atg[data-corner="adriatic-balkans"],
+.atstage[data-at="eastern"] .atg[data-corner="eastern"],
+.atstage[data-at="caucasus-bosphorus"] .atg[data-corner="caucasus-bosphorus"] {
   fill: var(--atlas-here); }
 .atstage[data-at] .atname { opacity: .34; }
 .atstage[data-at="nordic"] .atdoor[data-corner="nordic"] .atname,

@@ -6,7 +6,7 @@ Every section of the product specification, checked against the dataset and the
 generated HTML as they stand. A section is BUILT only if every assertion under it
 holds right now, so this file cannot drift from the product without CI noticing.
 
-**102 sections · 40 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 built, and nothing is serving · 1450 assertions · 0 failing**
+**102 sections · 40 partial · 30 built · 17 deferred · 11 recorded · 2 built (deliberately smaller) · 1 locked · 1 built, and nothing is serving · 1457 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
@@ -15,7 +15,7 @@ holds right now, so this file cannot drift from the product without CI noticing.
 | 2 | Product objectives | RECORDED | 6 | Eight objectives; six have a surface today and two are blocked on an entity. |
 | 3 | Target users | PARTIAL | 5 | Seven traveller types have a route through the product. Two — family and luxury — are derived by published rule rather than by data we hold, and the accessibility needs of any of them are not held at all. |
 | 4 | Core product principle | BUILT | 2 | Inspire → discover → understand → plan is built; book → experience → share is where the blocked half sits. |
-| 5 | Primary navigation | BUILT | 25 | The specification's seven items exactly, plus search and My Europe, plus every secondary link it lists. |
+| 5 | Primary navigation | BUILT | 32 | The specification's seven items exactly, plus search and My Europe, plus every secondary link it lists. |
 | 6 | Homepage | BUILT | 6 | The hero, the question in the hero itself, and the calls to action. The AI box is a sentence box that works rather than a promise that does not, and it says so under the field. |
 | 7 | Homepage sections | BUILT (deliberately smaller) | 15 | Three bands: the hero over a real map of Europe, the eight ways in, the journeys. The specification's geography index and its hero-map filter row were REMOVED from this page — both still exist as pages, and both are linked from every page's masthead or footer. |
 | 8 | Hidden Europe | BUILT | 2 | A quiet tag, a page that collects it, and a rule that we never call anywhere undiscovered. |

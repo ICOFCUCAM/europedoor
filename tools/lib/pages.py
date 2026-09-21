@@ -7801,6 +7801,17 @@ def atlas_register(data):
     # those frontiers — the Scandinavian borders, the Alpine ones, the
     # Balkan ones, one in the Caucasus. One device pixel of anti-aliasing on
     # a .6px stroke drawn in one ink at one width. Nothing else moved.
+    # AND THE WRAPPER IS RENAMED, WHICH IS THE ONLY WAY A CLONE CAN DIFFER
+    # FROM ITS SOURCE. `.instrmap .countries path` is the instrument skin and
+    # sets `fill` and `stroke` ON THE PATH — measured, the register's paths
+    # were taking `--atlas-coast` rather than `--map-border` the moment this
+    # figure's own declarations moved to the layer. Inheritance can never
+    # beat a rule that matches the element, whatever its specificity, so
+    # while the corner paths sit inside `.countries` there is no cascade in
+    # which the socket is ground and the corner over it is lit. Outside it,
+    # nothing matches the paths and the layer's own inherited paint reaches
+    # both the source and the clone.
+    land = land.replace('<g class="countries"', '<g class="atland"', 1)
     chunks = re.split(r'(<path\b[^>]*>(?:.*?</path>)?)', land, flags=re.S)
     base, grouped = [], {}
     for i in range(1, len(chunks), 2):
@@ -7810,9 +7821,48 @@ def atlas_register(data):
             grouped.setdefault(macro_of[slug], []).append(chunks[i])
         else:
             base.append(chunks[i])
+    # AND THE VOID A LIFTED CORNER LEAVES IS PAINTED SEA, WHICH IS A CLAIM
+    # ABOUT EUROPE THAT IS FALSE.
+    #
+    # This band's paper IS the map's water — the decision that removed the
+    # plate's own seam, because a drawing that paints no ocean over a ground
+    # that is the ocean has no edge to find. So nothing is UNDER the fifty:
+    # the moment a corner translates, what shows where it used to be is the
+    # band, and the band is `--map-water`. Rendered at 2x on the eastern
+    # step, the Alpine corner opens a sea-coloured channel from the Baltic
+    # to the Adriatic, down the middle of a drawing whose whole argument is
+    # that the geography IS the design. *A bay and the margin were the same
+    # colour*, arrived at from the other side; at full-page scale it is
+    # eighteen pixels and reads as a fine line, which is why the first look
+    # missed it.
+    #
+    # A corner lifts out of a SOCKET: its own shape, in the land's own tone,
+    # left where it was. Invisible until something moves — the clone sits
+    # exactly under the group and is covered by it — and no new geometry,
+    # because it is a `<use>` of the group's own paths.
+    #
+    # IT CLONES AN INNER GROUP AND NOT `.atg` ITSELF, because a clone takes
+    # whatever matches the ORIGINAL in its own position, which this
+    # repository settled with a two-case probe. `.atg` is what the transform
+    # rule targets, so cloning it would clone the transform and the socket
+    # would travel with the corner it exists to stay behind. The inner group
+    # carries no attribute any rule here reads.
+    #
+    # AND IT IS PAINTED BY INHERITANCE, which is the hero's own escape from
+    # this trap. Fill and stroke moved off `.lyr-land path` onto the LAYER,
+    # so the clone takes its fill from the wrapper it sits in rather than
+    # from a rule matching its source — the socket is ground rather than a
+    # lit corner, and `stroke: none` on that wrapper reaches it for the same
+    # reason. `vector-effect` stays on the path because it is not inherited
+    # and the clone needs it from a selector that matches the source.
+    socket = ("".join(f'<use href="#atgi-{esc(k)}"/>' for k in grouped)
+              if grouped else "")
     land = (chunks[0] + "".join(base)
+            + (f'<g class="atsock" aria-hidden="true">{socket}</g>'
+               if socket else "")
             + "".join(f'<g class="atg" data-corner="{esc(k)}" '
-                      f'data-lift="{lift[k]}">{"".join(v)}</g>'
+                      f'data-lift="{lift[k]}"><g id="atgi-{esc(k)}">'
+                      f'{"".join(v)}</g></g>'
                       for k, v in sorted(grouped.items(),
                                          key=lambda kv: -reach[kv[0]]))
             + "".join(chunks[2::2]))

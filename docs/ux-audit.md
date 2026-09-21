@@ -8,12 +8,12 @@ its requirements are about how something looks and nobody can check a feeling.
 So every row here asserts against the generated HTML, the CSS and the JavaScript
 as they actually are.
 
-**52 sections · 23 built · 13 already · 12 partial · 1 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 421 assertions · 0 failing**
+**52 sections · 23 built · 13 already · 12 partial · 1 built (deliberately smaller) · 1 refused · 1 locked · 1 deferred · 424 assertions · 0 failing**
 
 | § | section | verdict | assertions | note |
 |---|---|---|---|---|
 | 1 | Design direction | PARTIAL | 6 | Editorial, map-led, typography-forward, and every page leads to another. Photography leads discovery is answered by an enforced pipeline and zero licensed photographs — the architecture is built, the library is empty, and those are different claims. |
-| 2 | Global navigation | BUILT | 15 | The brief's desktop masthead exactly, and the five-item thumb bar on a phone. Both name the product EuropeDoor, not Europe Atlas. |
+| 2 | Global navigation | BUILT | 18 | The brief's desktop masthead exactly, and the five-item thumb bar on a phone. Both name the product EuropeDoor, not Europe Atlas. |
 | 3 | Design tokens | PARTIAL | 6 | One 8px-derived spacing scale, one type scale, the brief's radii. The named webfonts are refused: a font CDN would hand every reader's address to a third party and contradict /privacy. |
 | 4 | Homepage hero | PARTIAL | 4 | The first plate of a sequence: the headline on a limestone wall, the continent lit inside an arch cut into it, and one way through to the planner. The ask box moved OFF this page — a sentence box in the emotional centre of a homepage reads as a booking engine. |
 | 5 | Homepage — Explore | BUILT (deliberately smaller) | 9 | The map is on the homepage, drawn from real coastlines. Its filter row is NOT: eleven chips under a map are eleven links into filtered views of the map the reader is already looking at. The filters live on /map, which is one tap away and is where they act. |

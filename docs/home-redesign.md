@@ -2156,3 +2156,78 @@ false in the commit that removed it. `PAN_MARGIN` and `PAN_VIEW` are
 because `landmass` clips to the view it is given and a margin generated over
 the narrow frame comes out empty, and nothing pans. `weight.home_kb` 179 → 180
 — nine `<g>` wrappers and sixteen attributes.
+
+## Home 38 — the corner lifts out of a socket, not out of a hole
+
+### The lift was measured at the pixel and nobody looked underneath
+
+A corner that moves eighteen units off its own ground exposes what is under
+it, and what is under it is the plate's ground — `--map-water`, because *the
+band's paper IS the map's water* is the repair that made this drawing a room
+rather than an object on a page. So at 2x:
+
+| the step | what opened |
+|---|---|
+| Alpine & Central | a channel from the Baltic to the Adriatic, through Poland's eastern frontier |
+| Mediterranean | Iberia cut off from France at the Pyrenees — an island |
+
+That is not a rendering artefact, it is **a false statement about the ground**,
+on the one drawing whose whole argument is that geography is the design. Every
+gate was green: nothing in this repository measures whether a drawing still
+says something true.
+
+### The socket
+
+Each corner's own shape, left where it was, in the land's own tone, revealed
+only where the group has moved off it. Nine `<use>` elements against a second
+copy of 26 KB of country rings. Three things had to be right:
+
+| | |
+|---|---|
+| it clones the INNER group | `#atgi-<corner>` sits inside `.atg`, and `.atg` carries the transform. *A clone takes whatever matches the ORIGINAL in its own position*, so cloning the transformed group moves the socket with the corner — the hole again, with extra bytes |
+| it is painted by INHERITANCE | the lit fill is on `.atg[data-corner]` and a clone inherits from its own parent, so `fill` on `.atsock` gives the socket stone while the corner above it is lit. Paint it by id and the socket lights with the corner it stands in for |
+| the wrapper had to be renamed | moving fill and stroke onto the LAYER so the clone could inherit them let `.instrmap .countries path` repaint the frontier ink at `rgb(61,68,65)` against `--map-border`'s `rgb(104,113,110)` — a rule that matches the path directly, which inheritance can never beat. `.atland`. **And the note on that rename overstated it**: it said the rename would have shrunk `c_land_credit`'s reach, so the trigger was widened from `class="countries"` to the declared layer `lyr-land` — measured afterwards, 919 pages before and 919 after, zero gained, because the homepage's `class="countries"` is the HERO's drawing. Kept as a guard, not a repair, and proved red through its own path |
+
+### What is refused
+
+*One territory, one outer ink stroke* — the other half of the proposal. The
+card beside the drawing says **9 COUNTRIES** and lists nine links, so the
+internal frontiers of the lit corner are the doors that count claims exist.
+Dissolving them makes the drawing disagree with its own caption. A corner is a
+grouping, not a country.
+
+### The instrument counted moving type as opening sea, twice
+
+Shoot the plate per corner with the lift frozen and live; count pixels that
+were land and became water.
+
+| classifier | reported | what it actually was |
+|---|---|---|
+| `blue > red + 4` | 872 on the Adriatic & Balkans | true of water `#DDE8E7` (221/231) and of pine `#0F433E` (15/62). 833 were the words ROMANIA and BULGARIA at their new position — the names travelling with their ground |
+| + `red > 190` | 160 on the Mediterranean | Portugal's Atlantic coast under `.atstats`: the lead column's wash lightens the moved coastline's ink over 190 while it stays blue-dominant, 199/204. Washed WATER reads as land by the same arithmetic, so the furniture comes off in both shots |
+| + furniture off | 57 on the Caucasus | anti-aliased edges of AZERBAIJAN — a pine fraction between .232 and .249 satisfies both tests. The names come off too; the question is about the geography |
+
+### A hole is an area and anti-aliasing is not
+
+The count alone could never have settled it, so the instrument reports the
+largest **connected run** beside it.
+
+| | count | largest run |
+|---|---|---|
+| eight corners, socket on | 0–1 | 0–1 |
+| Caucasus, socket on | 17 | **2** |
+| Mediterranean, `.atsock` removed | 9,800 | **2,896** |
+
+Proved red. And the diff map is what diagnosed all three false readings: *a
+failure message with no measurement in it cannot be diagnosed*, and a
+measurement with no picture beside it cannot be interpreted.
+
+### And the screenshot came back unstyled
+
+`site/` is deleted and rewritten on every build, and the stylesheet's filename
+is its content hash — so a page shot mid-rebuild 404s its own stylesheet and
+renders as a wall of blue links. That is the ENOENT the browser suite has died
+on twice, arriving in a screenshot, where it does not crash: **it produces an
+image that looks like a design regression.**
+
+`weight.home_kb` 180 → 181, recorded.

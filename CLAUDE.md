@@ -7210,6 +7210,91 @@ for the same reason: the frame is still wider than the window, because
 narrow frame comes out EMPTY, but nothing pans and a constant that says so is
 a comment claiming evidence.
 
+**THE LIFTED CORNER LEFT A HOLE AND THE BAND PAINTED ITS WATER.** The lift
+was measured at the pixel and the one thing nobody looked at is what is
+UNDERNEATH: a corner that moves eighteen units off its own ground exposes the
+plate's ground, which is `--map-water`, because *the band's paper IS the map's
+water* is the repair that made this drawing a room rather than an object. So
+the Alpine step opened a channel from the Baltic to the Adriatic and the
+Mediterranean step cut Iberia off the continent — **a false geographic
+statement, on the one drawing whose whole argument is that geography IS the
+design**, and it is a claim about the ground rather than a rendering artefact,
+which is worse. Every count was green: nothing here measures whether a drawing
+still says something true. Rendering the plate at 2x is what found it.
+
+**A SOCKET, NOT A HOLE: each corner's own shape, left where it was, in the
+land's own tone, revealed only where the group has moved off it.** It costs
+nine `<use>` elements rather than a second copy of 26 KB of country rings, and
+three things about it are the parts that had to be got right:
+
+- **It clones the INNER group.** `<use href="#atgi-<corner>"/>` points at a
+  `<g>` inside `.atg`, and `.atg` is where the transform lives — because *a
+  clone takes whatever matches the ORIGINAL in its own position*, cloning the
+  transformed group would have moved the socket with the corner, which is the
+  hole again with extra bytes.
+- **It is painted by INHERITANCE.** The lit fill sits on `.atg[data-corner]`
+  and a clone inherits from its own parent, so `fill` on `.atsock` gives the
+  socket the land's stone while the corner above it is lit — paint it by id
+  and the socket lights with the corner it is standing in for.
+- **And the wrapper had to be renamed.** Moving fill and stroke off
+  `.lyr-land path` onto the LAYER so the clone could inherit them silently
+  changed the frontier ink: `.instrmap .countries path` matches the path
+  directly, and inheritance can never beat a rule that matches. Measured at
+  `rgb(61,68,65)` where `--map-border` is `rgb(104,113,110)`. The register's
+  wrapper is `.atland`, so the instrument skin no longer reaches it.
+
+**AND THE NOTE ON THAT RENAME CLAIMED A LOSS THE COUNT DOES NOT SUPPORT.** Its
+first draft said the rename *would have silently shrunk `c_land_credit`'s
+reach*, because that check triggered on `class="countries"` — so the trigger
+was widened to `lyr-land`, the declared layer. Measured afterwards rather than
+before: **the old trigger and the new examine the same set, and there is not
+one page that only the new one reaches.** The homepage's `class="countries"`
+is the HERO's drawing, at line 59, and never the register's, so nothing was
+ever at risk. The widening stays — a wrapper's class is a name somebody
+renames and `lyr-land` is asserted from both ends by `cartography.ORDER`, so a
+trigger on what the page DRAWS cannot be lost to a rename — and it is recorded
+as a **guard** rather than as a repair, proved red through its own path: a
+page carrying `lyr-land`, no `countries`, no `context` and no credit fails and
+is named. *A comment claiming evidence is read as evidence*, and this one was
+mine, in the commit that quotes that rule twice.
+
+**THE OTHER HALF OF PROPOSAL 2 IS REFUSED AND THE CARD IS WHY.** *One
+territory, one outer ink stroke* would dissolve the internal frontiers of the
+lit corner — and the card beside it says **9 COUNTRIES** and lists nine links.
+Those frontiers are the doors that count says are there, so merging them would
+make the drawing disagree with its own caption. A corner is a grouping, not a
+country.
+
+**AND THE INSTRUMENT WRITTEN TO PROVE IT COUNTED MOVING TYPE AS OPENING SEA,
+IN TWO DIFFERENT COSTUMES.** Shoot the plate per corner with the lift frozen
+and live, count pixels that were land and became water: it reported **872 on
+the Adriatic & Balkans** and the socket looked right at 2x, which is the
+*eye finds a defect and does not confirm one* problem from the other end.
+
+| | |
+|---|---|
+| `blue > red + 4` | true of water `#DDE8E7` (221/231) and **also of pine `#0F433E` (15/62)** and of the frontier ink `#68716E` (104/110). 833 of those 872 were the words ROMANIA and BULGARIA arriving at their new position — the names travelling with their ground, working exactly as designed |
+| adding *pale*, `red > 190` | left **160 on the Mediterranean**, all of them on Portugal's Atlantic coast, under `.atstats`: the lead column's wash lightens the moved coastline's INK back over 190 while it stays blue-dominant, 199/204. **Washed WATER reads as land by the same arithmetic**, so no classifier can be trusted under that wash — the furniture comes off in both shots instead |
+| hiding the furniture | left **57 on the Caucasus**, scattered along the word AZERBAIJAN: anti-aliased glyph edges at a pine fraction between .232 and .249, the narrow band where a blend of pine and the lit stone satisfies both tests. The names come off too, because the question is about the GEOGRAPHY |
+
+**A HOLE IN A SOCKET IS AN AREA AND ANTI-ALIASING IS NOT, SO THE COUNT ALONE
+COULD NEVER HAVE SETTLED IT.** The instrument reports the largest CONNECTED
+RUN beside the count. With the socket: 0 or 1 on eight corners, **17 on the
+Caucasus with a largest run of 2**, which is single ink-edge pixels on
+frontiers that have moved eighteen units — a drawing being drawn. With
+`.atsock` removed: **9,800 pixels and a 2,896-pixel run** on the Mediterranean.
+Proved red, and the diff map is what diagnosed all three of the false
+readings — *a failure message with no measurement in it cannot be diagnosed*,
+and a measurement with no PICTURE beside it cannot be interpreted.
+
+**AND THE SCREENSHOT CAME BACK UNSTYLED BECAUSE A BUILD WAS RUNNING UNDER
+IT.** `site/` is deleted and rewritten on every build and the stylesheet's
+filename is its content hash, so a page shot mid-rebuild 404s its own
+stylesheet and renders as a wall of blue links. That is the ENOENT the browser
+suite already died on twice, arriving in a screenshot rather than in a gate,
+where it does not crash — **it produces an image that looks like a design
+regression.** Nothing may read `site/` while anything is writing it.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

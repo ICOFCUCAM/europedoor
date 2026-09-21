@@ -3796,7 +3796,28 @@ def c_land_is_credited():
     n = 0
     for f in site_files():
         html = open(f, encoding="utf-8").read()
-        if '<g class="context"' not in html and 'class="countries"' not in html:
+        # THE TRIGGER IS THE LAYER RATHER THAN A WRAPPER'S NAME, AND IT
+        # GAINED NOTHING THE DAY IT WAS WIDENED — 919 pages before and 919
+        # after, measured, because the homepage's `class="countries"` is the
+        # HERO's drawing and never the atlas register's. So this is a GUARD
+        # and not a repair, and the difference is worth stating: the first
+        # draft of the note on it said the register's rename "would have
+        # silently shrunk this check's reach", which is what the argument
+        # predicted and not what the count said.
+        #
+        # It is still the right trigger. A wrapper's class is a name somebody
+        # renames — `.atland` exists precisely because that group's paint had
+        # to differ from a `<use>` clone's — and `lyr-land` is the DECLARED
+        # layer every drawing of land on this site emits, asserted by
+        # `cartography.ORDER` from both ends. A trigger on what the page
+        # DRAWS cannot be lost to a rename; one on what a container happens
+        # to be called is the `pop_line` shape waiting to happen, where
+        # coverage that depends on a different element being present looks
+        # like a policy. Proved red through the new path alone: a page
+        # carrying `lyr-land`, no `countries`, no `context` and no credit
+        # fails and is named.
+        if ('<g class="context"' not in html and 'class="countries"' not in html
+                and "lyr-land" not in html):
             continue
         n += 1
         if "Natural Earth" not in html:
