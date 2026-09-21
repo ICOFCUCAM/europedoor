@@ -5136,20 +5136,50 @@ def c_cartography():
             f"layer {name} paints through .{cls} and the stylesheet has no "
             f"rule for it")
         n += 1
+    # THE ORDER IS A PROMISE ABOUT ONE DRAWING, AND THIS READ IT ACROSS A
+    # WHOLE PAGE. A flat list per document is the same question only while a
+    # page carries one map: the homepage draws the hero and then the atlas
+    # register, and the register's first layer ranks below the hero's last,
+    # so two correctly ordered drawings read as one page out of order. It
+    # went red on the composition that added the second drawing, which is
+    # the shape-rather-than-promise failure this repository has now recorded
+    # more than a dozen times — the claim is that a MAP paints its layers in
+    # the declared order, and a map is an `<svg>`.
     rank = {f"lyr-{name}": i for i, name in enumerate(C.ORDER)}
-    pages = 0
+    pages = draws = 0
     for path in site_files():
         html = open(path, encoding="utf-8").read()
-        got = re.findall(r'<g class="lyr (lyr-[a-z-]+)"', html)
-        if not got:
+        if '<g class="lyr ' not in html:
             continue
         pages += 1
-        seen = [rank[g] for g in got if g in rank]
-        assert seen == sorted(seen), (
-            f"{rel(path)} emits its map layers out of the declared order: "
-            f"{got}")
-        n += len(seen)
+        for svg in re.finditer(r"<svg\b.*?</svg>", html, re.S):
+            got = re.findall(r'<g class="lyr (lyr-[a-z-]+)"', svg.group(0))
+            if not got:
+                continue
+            draws += 1
+            # AND EVERY EMITTED LAYER MUST BE A DECLARED ONE, which is the
+            # half that was missing: `if g in rank` silently skipped any
+            # class the register had never heard of, so `lyr-beyond` — the
+            # ground beyond the atlas, on the hero since it was drawn — sat
+            # outside the one table that decides paint order and could be
+            # moved anywhere without a gate saying a word. Found by mutating
+            # its position and watching the check stay green.
+            for g in got:
+                assert g in rank, (
+                    f"{rel(path)} paints {g} and cartography.ORDER does not "
+                    f"declare it — a layer outside the table that decides "
+                    f"paint order")
+            seen = [rank[g] for g in got]
+            assert seen == sorted(seen), (
+                f"{rel(path)} emits one drawing's map layers out of the "
+                f"declared order: {got}")
+            n += len(seen)
     assert pages >= 40, f"only {pages} pages carry a layered plate"
+    # A FLOOR ON THE DRAWINGS AS WELL AS ON THE PAGES, because the loop now
+    # depends on an `<svg>` boundary it did not before: a regex that stopped
+    # matching would examine nothing and report green, which is this file's
+    # own most repeated failure.
+    assert draws >= pages, f"only {draws} drawings inside {pages} pages"
     return n
 
 
@@ -7085,21 +7115,56 @@ def c_hero_dusk_reach():
     # "no drawing" must not look the same: with no gradients there must be
     # no layer referencing one, and with a ground drawn there must be a
     # fade over it. Each half fails on the thing it was written for.
-    has_grad = 'id="heroedge"' in h or 'id="herofootg"' in h
+    # AND THE SUBJECT IS ONE DRAWING, WHERE THIS READ THE WHOLE DOCUMENT.
+    # The homepage carries two pictures of Europe now — the hero and the
+    # atlas register on plate 05 — and `"lyr-beyond" not in h` was a claim
+    # about the page. It went red for the register, which draws the ground
+    # beyond the atlas and no fade and is RIGHT to: there are two honest
+    # answers to a straight data cut through real land, and the hero uses
+    # one while the register uses the other.
+    #
+    #   the hero      drops the one country the cut runs through and draws
+    #                 no ground beyond it, so there is no cut in the picture
+    #   the register  draws the ground in the SAME stone, so the fill
+    #                 crosses the cut with no seam, and clips the frontier
+    #                 ink two units short of the meridian so the ink does
+    #                 not draw what the fill stopped saying
+    #
+    # What is refused is a THIRD answer: a ground beyond with a stroked cut
+    # over it and nothing hiding either. So each drawing is asked the
+    # question separately, and a drawing that answers with the clip has to
+    # show the clip.
+    svgs = [m.group(0) for m in re.finditer(r"<svg\b.*?</svg>", h, re.S)]
+    hero = next((v for v in svgs if 'id="heroland"' in v), "")
+    assert hero or "heroeurope" not in h, (
+        "the homepage draws a hero and this check cannot find its <svg> — "
+        "it is measuring nothing")
+
+    for v in svgs:
+        if v is hero or "lyr-beyond" not in v:
+            continue
+        land = re.search(r'<g class="lyr lyr-land"([^>]*)>', v)
+        assert land and "clip-path" in land.group(1), (
+            "a drawing on the homepage carries the ground beyond the atlas "
+            "with no fade over the cut and no clip on the land, so the "
+            "frontier ink is drawn along the data cut — the ruled diagonal "
+            "through Russia this repository has now removed twice")
+
+    has_grad = 'id="heroedge"' in hero or 'id="herofootg"' in hero
     if not has_grad:
-        assert "herodusk" not in h, (
+        assert "herodusk" not in hero, (
             "the homepage draws the dusk layer and ships neither gradient, "
             "so its two rectangles fall back to the SVG default and paint "
             "solid black over the continent")
-        assert "lyr-beyond" not in h, (
-            "the homepage draws the ground beyond the atlas and no fade "
+        assert "lyr-beyond" not in hero, (
+            "the hero draws the ground beyond the atlas and no fade "
             "over the data cut, so the continent ends on a straight line "
             "through real land — the rendering fault the fade exists for")
         return 1
 
     def grad(gid):
         m = re.search(r'<(linear|radial)Gradient id="%s"([^>]*)>(.*?)</\1Gradient>'
-                      % gid, h, re.S)
+                      % gid, hero, re.S)
         if not m:
             fail(f"/: the hero has no gradient #{gid} — the data-cut fade this "
                  f"check measures is not in the shipped page")

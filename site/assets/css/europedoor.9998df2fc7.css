@@ -11358,6 +11358,171 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .dcorner h3 { display: flex; align-items: baseline; gap: .6em; }
 .dccount { margin-left: auto; font-variant-numeric: tabular-nums;
   color: var(--ink-3); letter-spacing: .04em; }
+/* ══ 05 · THE ATLAS REGISTER ═══════════════════════════════════════════
+   ONE CONTINENT, FIFTY DOORS, AND THE DRAWING STAYS WHERE IT IS.
+
+   THE WINDOW IS STICKY RATHER THAN FIXED, which is the one decision that
+   keeps this out of the six-property trap the homepage's photographic
+   window records at length: `transform`, `filter`, `backdrop-filter`,
+   `perspective`, `will-change` and `contain` each make an ancestor a
+   containing block for a FIXED descendant and none of them touches a
+   STICKY one. A sticky box also needs no `clip-path` to be bounded — its
+   own scroll container bounds it — so the composition is a grid whose left
+   track scrolls and whose right track stays.
+
+   AND THE SECOND CONTINENT ON THIS PAGE IS A DIFFERENT DRAWING RATHER THAN
+   A SECOND COPY. Plate 01 is warm parchment on graphite with relief,
+   rivers, lakes, two data-cut fades and six photographs clipped into
+   countries: it is atmosphere. This is stone on paper with one hairline
+   frontier and twenty-five names: it is a register. Different ground,
+   different ink, different content, different job — which is the test
+   `docs/redesign-doctrine.md` sets for a family that reuses a method.
+
+   NO ARCH. The door is cut once on this page, at the largest size it
+   appears anywhere, and a second one five plates down is the signature as
+   wallpaper — the refusal `docs/signature-moments.md` asks question 2
+   for. What frames this is what a reveal draws at a cut: the map's own
+   border ink, on a rectangle, which is what an atlas plate is. */
+.atstage { display: grid; gap: var(--s7);
+           grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); }
+.atwin { grid-column: 2; position: sticky; align-self: start;
+         top: calc(var(--mast) + var(--s5)); }
+.atread { grid-column: 1; grid-row: 1; }
+/* A PLATE THAT IS NOT ITS DRAWING'S PROPORTION IS A LETTERBOX, and this
+   repository has measured that twice: `.card-art` is 16/9 because that is a
+   PHOTOGRAPH's proportion and every drawing put inside one is 1.282, so a
+   third of its width was padding and the waste read as more sea. The frame
+   is 1120x800 and the plate takes the same 1.4, so the continent fills it
+   and the ruled edge is the drawing's edge rather than a box around it.
+   Capped by the viewport as well, because a sticky window taller than the
+   screen is a window a reader cannot see the whole of. */
+.atplate { margin: 0; position: relative; aspect-ratio: 1120 / 800;
+           max-height: calc(100svh - var(--mast) - var(--s7));
+           background: var(--paper-2);
+           outline: 1px solid var(--map-border); outline-offset: 0; }
+/* THE REVEAL, WHICH IS THE WHOLE OF THE ARCHITECTURE HERE. One hairline
+   says "a border"; the wall's face and a fine line just inside it say "two
+   surfaces at different depths" — the masthead and the footer already draw
+   exactly this pair at their own edges, and the aperture draws it at every
+   cut on this site. `inset` rather than a second element, because the
+   register counts shadows and two is the whole vocabulary. */
+.atplate::after { content: ""; position: absolute; inset: 3px;
+                  pointer-events: none;
+                  border: 1px solid color-mix(in srgb, var(--map-border) 38%, transparent); }
+.atplate svg { display: block; width: 100%; height: 100%; }
+.atplate .lyr-land path { fill: var(--map-land);
+                          stroke: var(--map-border); stroke-width: .6;
+                          vector-effect: non-scaling-stroke; }
+/* THE NAMES ARE THE ARTWORK, SO THEY ARE THE INK AND THE LAND IS THE
+   GROUND. `--ink-2` on stone rather than the accent: fifty marks in the
+   accent is a texture rather than an accent, which this stylesheet already
+   records about a kicker on every row of a list. */
+/* THE GROUND BEYOND THE ATLAS IS THE SAME STONE AS THE ATLAS, which is
+   what takes the 52°E cut out of the picture without a fade over it. Drawn
+   under the fifty and stroked in its own fill, because two datasets
+   simplified independently do not share an edge and a tenth of a unit of
+   paper along a 700-unit cut is a bright hairline exactly where this
+   drawing must not have one. */
+.atplate .lyr-beyond path { fill: var(--map-land); stroke: var(--map-land);
+                            stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.atplate .atname { font-family: var(--display); font-size: var(--t-md);
+                   letter-spacing: .10em; text-transform: uppercase;
+                   fill: color-mix(in srgb, var(--ink) 62%, transparent);
+                   transition: fill .45s ease, opacity .45s ease; }
+.atplate .atdoor { text-decoration: none; }
+.atplate .atdoor:hover .atname,
+.atplate .atdoor:focus-visible .atname { fill: var(--door); }
+/* INK DEVELOPING ON AN ATLAS, NOT A DASHBOARD SELECTION. A corner in view
+   lifts its own names to full ink and quiets the rest; the rest stay
+   VISIBLE, because a register that deleted the countries you are not
+   reading about would be a different Europe on every screen — which is the
+   same argument `/discover` settled about an unlit destination taking the
+   land's own tone rather than vanishing. */
+.atstage[data-at] .atname { opacity: .34; }
+.atstage[data-at="nordic"] .atdoor[data-corner="nordic"] .atname,
+.atstage[data-at="baltic"] .atdoor[data-corner="baltic"] .atname,
+.atstage[data-at="british-isles"] .atdoor[data-corner="british-isles"] .atname,
+.atstage[data-at="western"] .atdoor[data-corner="western"] .atname,
+.atstage[data-at="alpine-central"] .atdoor[data-corner="alpine-central"] .atname,
+.atstage[data-at="mediterranean"] .atdoor[data-corner="mediterranean"] .atname,
+.atstage[data-at="adriatic-balkans"] .atdoor[data-corner="adriatic-balkans"] .atname,
+.atstage[data-at="eastern"] .atdoor[data-corner="eastern"] .atname,
+.atstage[data-at="caucasus-bosphorus"] .atdoor[data-corner="caucasus-bosphorus"] .atname {
+  opacity: 1; fill: var(--pine-ink); }
+/* THE OPENING IS THE BAND'S OWN HEAD AND TAKES THE WHOLE COLUMN. Inside
+   the reading rail it set on three lines at 416 pixels — a headline in a
+   rail is a rail's headline, and this is the band the brief asks to be one
+   of the largest typographic moments on the page. */
+.atopen { padding-bottom: var(--s7); max-width: var(--page); }
+.atopen .mega { max-width: 18ch; }
+/* A SCROLL STATE IS A STEP RATHER THAN A BAND. Nine stacked blocks at
+   their own content height made this section 3,683 pixels — four screens of
+   homepage for a band whose brief asks for two and a bit. Each corner is a
+   step of the same measured height, its content set in the middle of it, so
+   the reading moves at one pace and the section's length is the product of
+   nine and a number rather than of nine paragraphs of different lengths.
+   20svh, which is 180svh over the nine and inside the 180-240 the brief
+   asks for once the head and the resolution are added. */
+.atcorner { min-height: 20svh; display: grid; align-content: center;
+            padding: var(--s5) 0; border-top: 1px solid var(--rule); }
+.atcorner h3 { display: flex; align-items: baseline; gap: .6em;
+               font-size: var(--t-xs); font-family: var(--text);
+               letter-spacing: .08em; text-transform: uppercase;
+               color: var(--door-dark); margin: 0 0 var(--s3); }
+.atcorner h3 a { text-decoration: none; }
+.atcorner h3 a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.atcount { margin-left: auto; font-variant-numeric: tabular-nums;
+           color: var(--ink-3); }
+.atsay { font-family: var(--display); font-size: var(--t-md);
+         max-width: 30rem; margin: 0 0 var(--s4); }
+/* A LIST OF NAMES IS NOT PROSE AND MUST NOT TAKE A MEASURE, which this
+   stylesheet records about a middot list of place names broken at 544px
+   inside a 948px column. `max-width: none` is a declaration rather than the
+   absence of one, because `p { max-width: var(--measure) }` is the rule
+   above it. */
+.atlist { max-width: none; margin: 0;
+          display: flex; flex-wrap: wrap; gap: .3em 1.1em;
+          font-size: var(--t-sm); }
+.atlist a { text-decoration: none; color: var(--ink-2);
+            border-bottom: 1px solid transparent; }
+.atlist a:hover { color: var(--ink); border-bottom-color: var(--door); }
+/* THE RESOLUTION LEAVES THE RAIL, for the reason the opening did. "50
+   countries · 9 corners · 1 continent" is the sentence the whole section
+   exists to arrive at, and inside a 384-pixel reading track it set on three
+   lines. A conclusion in a rail is a rail's conclusion. */
+.atend { padding-top: var(--s6); margin-top: var(--s7);
+         border-top: 2px solid var(--ink); max-width: var(--page); }
+.atend .lede { max-width: 42rem; }
+/* `.96` AND NOT 1.02, WHICH WAS AN EIGHTH LINE-HEIGHT A HUNDREDTH FROM TWO
+   THE FILE ALREADY HAD. The register caught it in the run that introduced
+   it — the same guard, and the same fault, as the `line-height: 1.24` one
+   hundredth from 1.25 that /countries paid for. A display line this size is
+   set tight and the file already has the value for that. */
+.atsum { font-family: var(--display); font-size: var(--ed-display-2);
+         line-height: .96; letter-spacing: -.02em;
+         margin: 0 0 var(--s5); color: var(--ink); }
+.atsum span { font-variant-numeric: tabular-nums; }
+/* THE PHONE IS DESIGNED RATHER THAN SCALED. A 26rem reading track beside a
+   sticky drawing is a desk composition; at this width the drawing goes to
+   the top, sticks under the masthead at a height that leaves room to read,
+   and the nine corners scroll under it. The names come off entirely below
+   44rem for the reason every map label on this site does — `--t-xs` is a
+   length in a 1,120-unit viewBox, so at 390 a thirteen-unit name renders at
+   four and a half pixels, which is not small type but type that does not
+   resolve into glyphs. Every country is a link in the register under it. */
+@media (max-width: 62rem) {
+  .atstage { grid-template-columns: minmax(0, 1fr); }
+  .atwin { grid-column: 1; grid-row: 1; height: min(46svh, 22rem);
+           top: calc(var(--mast) + var(--s3));
+           margin-bottom: var(--s6); z-index: 2;
+           background: var(--paper); }
+  .atread { grid-column: 1; grid-row: 2; }
+}
+@media (max-width: 44rem) {
+  .atplate .lyr-labels { display: none; }
+  .atwin { height: min(38svh, 17rem); }
+}
+
 /* The hoisted clause under the list, not on nine rows. */
 .doornote { margin-top: var(--s5); max-width: 46rem; color: var(--ink-3); }
 

@@ -1928,3 +1928,71 @@ Uniform, and by construction rather than by three numbers happening to sum.
 and nobody wrote: one page, a `setViewportSize` per width, eighteen widths
 with 961 and 960 both in it on purpose, because the two-row transition is
 between them. Proved red on the old values: thirteen widths over.
+
+## Home 28 — the ruled line through Russia
+
+The owner said it twice, and the second time named the country: *the map you
+are using is not good as it had a straight line around Russia … remove the
+line inside Russia.*
+
+**The fill had already stopped saying it.** Plate 05 draws the ground beyond
+the atlas under the fifty, in the *same* stone, precisely so that the 52°E
+data cut is not a boundary between two treatments — that was the previous
+pass, and it is why the fade came off rather than being tuned. What was left
+was the INK. `.lyr-land path` strokes every edge a country ring has, and
+Russia's ring has one edge that is not a frontier: the meridian this
+repository's data stops at. It rendered in the same weight and the same
+colour as the Poland–Germany border, from the White Sea to the north Caspian.
+
+| | |
+|---|---|
+| what it is | the eastern edge of `doc["bbox"]`, which `europe-lod1.json` carries as `[-32.0, 33.0, 52.0, 72.5]` |
+| why it is straight | a meridian is a straight line under a Lambert conformal conic, so two projected points describe the whole cut |
+| what drew it | the frontier stroke, at .6 CSS px, `vector-effect: non-scaling-stroke` |
+
+**The land group is clipped two units short of the meridian.** The easternmost
+thing this atlas draws is Azerbaijan at 50.6°E — about eighteen drawn units
+west of the cut — so no real frontier is anywhere near the clip, and the
+two-unit sliver taken off Russia shows the ground beyond underneath it, which
+is the identical fill. The polygon is built from `doc["bbox"]` rather than
+from a typed 52.
+
+**A clip rather than a second, stroke-only pass.** The obvious shape is a
+`<use>` of the land drawn twice — fill unclipped, stroke clipped — and it
+cannot carry this stroke, because a clone inherits `stroke` and does not
+inherit `vector-effect`. Duplicating the path data is 26 KB for one hairline.
+
+### What the repair found in the gates
+
+**Two honest answers to a data cut, and the check knew one.** The hero drops
+the one country the cut runs through and draws no ground beyond it, so there
+is no cut inside the picture. The register draws the ground and clips the
+ink. `c_hero_dusk_reach` asserted `"lyr-beyond" not in h`, which is a claim
+about the whole document, so it went red for a drawing that was right. It
+reads the hero's own `<svg>` now and asks every other drawing the question in
+the form that drawing answers it. The third answer — a stroked cut with
+nothing hiding it — is what stays refused, and the check is proved red on it.
+
+**`lyr-beyond` had never been a declared layer.** Found by mutation: moving it
+under the land proved nothing, because the order check ranked only the names
+`cartography.ORDER` knows and `if g in rank` skipped the rest. Declared, and
+the converse asserted — every `lyr-` class the site emits must be in the
+table.
+
+**And the order check read a page where the promise is about a drawing.** Two
+correctly ordered maps on one document read as one page out of order the
+moment the second one's first layer ranks below the first one's last. It is
+per-`<svg>` now, with a floor on the drawings as well as on the pages.
+
+### Cost
+
+| | |
+|---|---|
+| `weight.home_kb` | 150 → 173, recorded |
+| the register plate | 36 KB: 26 of country rings, 7 of ground beyond, 1.2 of names, 119 bytes of clipPath |
+| the ground beyond | 11.5 KB → 7, thinned at 6 units and nothing under 200 square, because it carries no name, no link and no frontier and both are the same picture at this size |
+
+Two more the run caught: the role was declared on the `<figure>` where
+`c_map_roles` reads the `<svg>`, which is the slip /countries already paid
+for; and `.atsum` carried an eighth `line-height`, a hundredth from two the
+file already had.

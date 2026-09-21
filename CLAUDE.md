@@ -6926,6 +6926,67 @@ each, and the landing is a uniform 24–25px at every width where it ran 65 to
 nobody wrote, with 961 and 960 both in it because the two-row transition is
 between them. Proved red on the old values at thirteen widths.
 
+
+**THE RULED DIAGONAL THROUGH RUSSIA WAS THE FRONTIER INK DRAWING A FACT
+ABOUT OUR DATASET.** The atlas register on the homepage's fifth plate had
+the ground beyond the atlas under it already, in the same stone, so the FILL
+crossed the 52°E cut with no seam — and `.lyr-land path` strokes every edge a
+country ring has, and Russia's ring has one edge that is not a frontier. It
+came out as a hard line from the White Sea to the north Caspian, in the same
+ink as the Poland–Germany border, on the one drawing whose ground is meant to
+be continuous. **The fill had stopped saying it and the ink had not.**
+
+The land group is clipped two units short of that meridian. Nothing real is
+lost: the easternmost thing this atlas draws is Azerbaijan at 50.6°E, about
+eighteen drawn units west of the cut, and the two-unit sliver taken off Russia
+shows the ground beyond underneath it, which is the identical fill. The
+number comes from `doc["bbox"]` rather than from a typed 52, because it
+belongs to the dataset. **And a meridian is a straight line under a conic**,
+which is why two projected points describe the whole cut — and why it read as
+ruled in the first place.
+
+**A CLIP RATHER THAN A SECOND, STROKE-ONLY PASS.** The obvious shape is a
+`<use>` of the land drawn twice, fill unclipped and stroke clipped, and it
+cannot carry this stroke: a clone inherits `stroke` and does **not** inherit
+`vector-effect`, which this file already records, and this frontier is .6 CSS
+px at every render size on purpose. Duplicating 26 KB of path data for one
+hairline is the other way.
+
+**THERE ARE TWO HONEST ANSWERS TO A DATA CUT AND THE CHECK KNEW ONE.** The
+hero drops the one country the cut runs through and draws no ground beyond
+it, so there is no cut inside the picture; the register draws the ground and
+clips the ink. `c_hero_dusk_reach` asserted `"lyr-beyond" not in h` — a claim
+about the whole DOCUMENT — so it went red for a second drawing that was
+right. It reads the hero's own `<svg>` now, and asks every other drawing on
+the page the same question in the form that drawing answers it: a ground
+beyond with no fade must show the clip. What stays refused is the third
+answer, which is a stroked cut with nothing hiding it.
+
+**AND `lyr-beyond` HAD NEVER BEEN A DECLARED LAYER.** `cartography.ORDER` is
+the one place paint order is decided and the hero has emitted that class
+since the ground beyond was drawn. Found by **mutation**: moving it under the
+land proved nothing, because the order check ranked only the names the table
+knows and `if g in rank` skipped the rest — so an undeclared layer could be
+painted anywhere and no gate would say a word. Declared, and the converse is
+asserted now: every `lyr-` class the site emits has to be in the table.
+
+**AND THE ORDER CHECK READ A WHOLE PAGE WHERE THE PROMISE IS ABOUT ONE
+DRAWING.** A flat list per document is the same question only while a page
+carries one map. The homepage draws the hero and then the register, and the
+register's first layer ranks below the hero's last, so two correctly ordered
+drawings read as one page out of order. It is per-`<svg>` now, with a floor
+on the drawings as well as on the pages, because a boundary regex that
+stopped matching would examine nothing and report green.
+
+**AND THE ROLE WAS DECLARED ON THE `<figure>` WHERE THE CHECK READS THE
+`<svg>`** — /countries paid for exactly that slip, and a declared role on the
+wrong element is a map with no declared role. Two more from the same run: an
+eighth `line-height` a hundredth from two the file already had, caught by the
+register in the commit that introduced it; and the ground beyond thinned at
+6 units rather than 2.5, because it carries no name, no link and no frontier
+and both are the same picture at this size — 11.5 KB against 7, measured by
+rendering both.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

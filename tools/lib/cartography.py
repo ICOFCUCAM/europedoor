@@ -68,6 +68,16 @@ from .render import arch_clip, arch_edge, arch_rim
 # absence. Nothing here describes how anything looks.
 SOURCES = {
     "ocean":          None,
+    # THE GROUND BEYOND THE ATLAS, AND IT WAS EMITTED FOR THE LIFE OF THE
+    # HERO WITHOUT BEING A DECLARED LAYER. `lyr-beyond` is Asia and Africa
+    # out to the Yenisei — anonymous rings with no country, no relief and no
+    # label — and this table is the one place paint order is decided, so a
+    # `lyr-` class it has never heard of is a layer outside the rule the
+    # module exists to hold. Found by MUTATION: moving it under the land
+    # proved nothing, because the order check ranked only declared names and
+    # skipped the rest, so an undeclared layer could go anywhere and no gate
+    # would say a word. Both halves are asserted now.
+    "beyond":         "beyond-lod0.json",
     "coastal-water":  "derived",      # from the coastline, by stroking it
     "land":           "countries",
     "terrain":        "terrain-lod1.json",
@@ -89,7 +99,7 @@ SOURCES = {
 # THE PAINT ORDER, DECIDED IN ONE PLACE. This is the whole reason the module
 # exists; every other file may add content to a layer and none of them may
 # reorder it.
-ORDER = ("ocean", "coastal-water", "land", "terrain", "hillshade", "rivers",
+ORDER = ("ocean", "beyond", "coastal-water", "land", "terrain", "hillshade", "rivers",
          "coastline", "country-bounds", "region-bounds", "cities",
          "summits", "destinations", "feature-labels", "water-labels", "labels",
          "route", "selected")

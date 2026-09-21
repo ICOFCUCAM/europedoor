@@ -861,7 +861,8 @@ def sea_names(land, view, most=6, metric="seaname"):
     return seanames, [(bx, by, bx + bw, by + bh) for bx, by, bw, bh in boxes]
 
 
-def name_countries(land, view, max_names=16, reserved=()):
+def name_countries(land, view, max_names=16, reserved=(),
+                   metric="cname", metric2="cname2", decorate=None):
     """Set a country's name across its own drawn shape, once, for anybody.
 
     AND `reserved` IS WHATEVER IS ALREADY ON THE PICTURE. This pass has
@@ -926,7 +927,7 @@ def name_countries(land, view, max_names=16, reserved=()):
         return not any(not (b[2] < q[0] or b[0] > q[2]
                             or b[3] < q[1] or b[1] > q[3]) for q in taken)
 
-    def _inframe(x, y, wide, anchor, mine=None, metric="cname", tol=0):
+    def _inframe(x, y, wide, anchor, mine=None, metric=metric, tol=0):
         x0, y0, w0, h0 = _label_box(
             x, y, wide, anchor, *LABEL_METRICS[metric][2:])
         if not (x0 >= view[0] + NAME_INSET
@@ -1011,7 +1012,7 @@ def name_countries(land, view, max_names=16, reserved=()):
         # decides now; this stops a name four times its own country's length
         # from paying for nine anchors and forty polygon tests to be told so.
         span = max(bbox[2] - bbox[0], bbox[3] - bbox[1])
-        pad_, ch_, _u, _d = LABEL_METRICS["cname"]
+        pad_, ch_, _u, _d = LABEL_METRICS[metric]
         one = pad_ + len(up) * ch_
         two = (pad_ + max(len(a) for a in up.rsplit(" ", 1)) * ch_
                if " " in up else one)
@@ -1021,8 +1022,8 @@ def name_countries(land, view, max_names=16, reserved=()):
         for tol_ in (0, CROSS_OK):
             for fx, fy in ANCHORS:
                 got = place_label_box(
-                    cx + fx * rad, cy + fy * rad, up, vw, vh, cls="cname",
-                    off=10.0, prefer="over", metric="cname", clears=_clear,
+                    cx + fx * rad, cy + fy * rad, up, vw, vh, cls=metric,
+                    off=10.0, prefer="over", metric=metric, clears=_clear,
                     fits=lambda *a, _i=idx, _t=tol_: _inframe(
                         *a, mine=_i, tol=_t))
                 if got:
@@ -1042,16 +1043,26 @@ def name_countries(land, view, max_names=16, reserved=()):
 
             for fx, fy in ANCHORS:
                 got = place_label_box(cx + fx * rad, cy + fy * rad, long_,
-                                      vw, vh, cls="cname", off=10.0,
-                                      prefer="over", metric="cname2",
+                                      vw, vh, cls=metric, off=10.0,
+                                      prefer="over", metric=metric2,
                                       clears=_clear, wrap=_two,
                                       fits=lambda *a, _i=idx: _inframe(
-                                          *a, mine=_i, metric="cname2",
+                                          *a, mine=_i, metric=metric2,
                                           tol=CROSS_OK))
                 if got:
                     break
         if got:
-            names.append(got[0])
+            # A CALLER THAT NEEDS THE NAME TO BE A LINK GETS THE NAME AND THE
+            # MARKUP, NOT A SECOND PLACEMENT PASS. The atlas register sets
+            # the same fifty names as doors rather than as labels, and a
+            # second implementation of this placement would be a second
+            # chance to make its mistakes — which this file records seven
+            # times about a predicate, a number, a URL and a separator. It
+            # is handed the country's own `<title>` text, which is what the
+            # land markup carries and is unique across the fifty.
+            raw = (m.group(2).replace("&amp;", "&").replace("&lt;", "<")
+                   .replace("&gt;", ">").replace("&quot;", '"'))
+            names.append(decorate(raw, got[0]) if decorate else got[0])
             taken.append((got[1], got[2], got[1] + got[3], got[2] + got[4]))
     names = "".join(names)
     return names
@@ -2450,21 +2461,42 @@ def home(data):
     _missing = [c for c in data["countries"].values() if c["slug"] not in _drawn]
     _nadvisory = sum(1 for c in _missing if (c.get("advisory") or {}).get("level"))
     _nsmall = len(_missing) - _nadvisory
+    _atfig, _atcorners, _atdrawn = atlas_register(data)
+    _nmacro = len(data.get("macros", []))
+    # THE OPENING IS FULL WIDTH AND THE STAGE IS UNDER IT, which the first
+    # composition got the other way round and the render settled in one look:
+    # inside a 26rem reading track "One continent. Fifty doors." set on three
+    # lines at 416 pixels, on the band the brief asks to be one of the
+    # largest typographic moments on the page. A headline in a rail is a
+    # rail's headline. The window is present from the first corner on, which
+    # is where the reading it belongs to starts.
     atlas = f"""
-  <div class="galwrap">
-  <div class="sheettext">
+  <div class="atopen">
     <h2 class="mega">One continent. <br>{numword(ncountries, cap=True)} doors.</h2>
-    <p class="lede">{numword(len(data.get("macros", [])), cap=True)} corners of
-    the continent, each with a page of its own, and every country sits in
-    one.</p>
+    <p class="lede">{numword(_nmacro, cap=True)} corners of the continent,
+    {numword(ncountries)} countries, and every one of them a way in. The
+    drawing stays where it is; what changes is what you are reading.</p>
+    {golink('/countries', 'Open the atlas')}
+  </div>
+  <div class="atstage">
+  <div class="atwin">{_atfig}</div>
+  <div class="atread">
+    {_atcorners}
+  </div>
+  </div>
+  <div class="atend">
+      <p class="atsum"><span>{ncountries}</span> countries ·
+      <span>{_nmacro}</span> corners · <span>1</span> continent</p>
+      <p class="lede">{numword(_atdrawn, cap=True)} of the
+      {numword(ncountries)} are named on the drawing: a name that fits
+      nowhere on its own ground is dropped rather than laid across its
+      neighbours, and every country is a link in the nine corners above.</p>
     {golink('/map', 'Open the map')}
   </div>
-  <div class="doorindex">{corners}</div>
   <p class="small doornote">The picture at the top of this page opens
-  {len(_lz)} of them: the {numword(len(_missing))} it does not are
+  {len(_lz)} of the {ncountries}: the {numword(len(_missing))} it does not are
   {numword(_nsmall)} too small to draw at that scale and {numword(_nadvisory)}
-  carrying a travel advisory, which keep their page and the warning on it.</p>
-  </div>"""
+  carrying a travel advisory, which keep their page and the warning on it.</p>"""
 
     # ── 06 · THE READING ─────────────────────────────────────────────
     # A CONTENTS PAGE WITH A LEAD, WHICH IS WHAT NINE ESSAYS ARE.
@@ -7475,6 +7507,211 @@ DOOR_BAND_KB = 90
 # the region maps already draw for them: the measurement is real and the
 # outline is not, and inventing one is the failure the whole register
 # exists to refuse.
+# ── THE ATLAS REGISTER: ONE CONTINENT, FIFTY DOORS ───────────────────
+#
+# THE HOMEPAGE ALREADY DRAWS EUROPE ONCE, AND THAT IS THE FIRST THING TO
+# SETTLE RATHER THAN THE LAST. Plate 01 is the continent as a PICTURE —
+# warm parchment on graphite, four relief bands, rank-3 rivers and lakes,
+# the two data-cut fades, photographs clipped into the countries wide
+# enough to hold one, fifteen names. It is atmosphere, and it is the one
+# drawing here no competitor can reproduce.
+#
+# A second continent five plates down is *the signature as wallpaper*,
+# which this repository refuses by name — and the refusal is about a
+# drawing that says the same thing twice. This one does not. It is the
+# continent as a REGISTER: no water, no relief, no rivers, no lakes, no
+# photograph and no dusk. Stone silhouettes, one hairline frontier, and as
+# many of the fifty NAMES as the geography will hold, set small. Plate 01
+# answers *where am I*; this answers *what is in it*, and the names are the
+# artwork rather than a label layer over one.
+#
+# AND THERE IS NO ARCH ON IT, WHICH IS A REFUSAL WITH A REASON. The brief
+# asks for the door to become functional here, and on this page it already
+# is: plate 01 cuts the aperture at the largest size it appears anywhere.
+# `docs/signature-moments.md` asks question 2 before a family gets one and
+# records that a signature applied to everything is wallpaper. So this is
+# the same architecture seen from the other side — you are THROUGH the
+# door, and what a reveal draws at a cut is what frames the register: the
+# map's own border ink, on a rectangle, which is what an atlas plate is.
+#
+# THE PLACEMENT IS THE ATLAS'S OWN SINGLE RULE. `name_countries` measures
+# each name against a fitted envelope, tests it against the frame, against
+# its own country's ground (`NameGround`: the middle on its own country, at
+# most two of ten samples on a neighbour) and against every name already
+# down, and drops what fits nowhere. Fifteen place at the hero's face and
+# the same fifteen place when the cap is raised to ninety-nine, because the
+# constraint is the TYPE SIZE; this face is a little over half of it and
+# is fitted in Chromium over all fifty names.
+#
+# A NAME THAT FITS NOWHERE KEEPS ITS PAGE. The countries are every one of
+# them a link in the register column below, in geographic order by corner,
+# which is also the reading a keyboard and a screen reader get and the
+# whole of what the section is without JavaScript.
+def atlas_register(data):
+    """The continent, the fifty names on it, and the nine corners beside it.
+
+    Returns (figure_markup, corner_blocks, drawn_count).
+    """
+    doc = geo.load("europe-lod1.json")
+    macro_of, macro_order = {}, {}
+    for i, m in enumerate(data.get("macros", [])):
+        macro_order[m["slug"]] = i
+        for cs in (m.get("countries") or []):
+            macro_of[cs if isinstance(cs, str) else cs.get("slug")] = m["slug"]
+    by_name = {c["name"]: c for c in data["countries"].values()}
+
+    # THINNED HARDER THAN THE HERO AND FOR THE OPPOSITE REASON. Plate 01
+    # pays for 1.8 units because its subject is the coast; this drawing's
+    # subject is the type on it, so the silhouette is a ground rather than a
+    # picture — 3.0 units, which is 26 KB against the hero's 42.6.
+    # AND NO GROUND BEYOND THE ATLAS, WHICH IS THE HERO'S DEVICE AND NOT
+    # THIS ONE'S. On graphite the context land reads as shadow and hands the
+    # eye from the lit continent to the dark around it; on paper it is a grey
+    # mass east of the cut that the fade then lightens unevenly — measured by
+    # looking, and it is the *quieter Europe* reading the hero itself
+    # rejected. The register's subject is the fifty, so the fifty are what it
+    # draws. `_ctx` is discarded rather than never asked for, because
+    # `geo.landmass` returns both and a caller that ignores one is clearer
+    # than a second entry point.
+    _ctx, land = geo.landmass(
+        MAPPROJ, HERO_VIEW, doc=doc, thin_units=3.0, min_units=6.0,
+        path_id=lambda ent: ("at-" + ent["slug"]) if ent.get("slug") else "")
+
+    def _door(name, text):
+        c = by_name.get(name)
+        if not c:
+            return text
+        corner = macro_of.get(c["slug"]) or ""
+        return (f'<a class="atdoor" data-corner="{esc(corner)}" '
+                f'href="{urls.country(c)}">{text}</a>')
+
+    names = name_countries(land, HERO_VIEW, max_names=99,
+                           metric="atname", metric2="atname2",
+                           decorate=_door)
+    drawn = names.count("<text")
+    # THE LAND CARRIES ON, WHICH IS HOW THE HERO REMOVES THIS LINE AND WHY
+    # THE FADE IS GONE RATHER THAN TUNED.
+    #
+    # `data/geo/` stops at 52°E and 33°N, and under the conic that eastern
+    # meridian is a straight diagonal through Russia — *a rendering fault at
+    # screen scale*. The hero solved it twice: first by FADING the cut, which
+    # is an honest way to hide an edge and a poor way to draw a continent,
+    # and then by drawing the real ground beyond it so there is no edge to
+    # hide. Its own comment says so: **Europe is not an island, and for three
+    # commits the hero drew it as one.**
+    #
+    # On graphite the hero can make that ground shadow and run the fades from
+    # lit parchment into it. This plate is stone on paper and has no shadow
+    # to go to: the first version drew the ground at a third of the land tone
+    # and the ramp over it read as a grey wedge across Russia — *quieter
+    # Europe*, the exact reading the hero rejected, arrived at from the other
+    # side. So the ground beyond is the SAME STONE as the atlas in front of
+    # it, and then there is nothing to cross-fade: the continent simply
+    # continues to the edge of the frame, the cut is not a boundary between
+    # two treatments, and the fade comes off entirely.
+    #
+    # Thinned much harder than the atlas — 6 units and nothing under 200 —
+    # because it carries no name, no link and no frontier; it is the ground
+    # the register stands on. Stroked in its own fill for the reason
+    # `#heroland` is: two datasets simplified independently do not share an
+    # edge, and along a 700-unit cut a tenth of a unit of paper is a bright
+    # hairline exactly where the picture must not have one.
+    beyond = [b for b in geo.beyondmass(MAPPROJ, HERO_VIEW, thin_units=6.0,
+                                        min_units=200.0, pad=0.0) if b]
+    ground = ('<g class="lyr lyr-beyond" aria-hidden="true">'
+              + "".join(f'<path d="{d}"/>' for d in beyond) + "</g>") if beyond else ""
+
+    # THE FRONTIER INK STOPS WHERE THE DATASET STOPS, AND THE GROUND DOES NOT.
+    #
+    # `.lyr-land path` strokes every edge a country ring has, and Russia's
+    # ring has one edge that is not a frontier: `data/geo/` is cut at the
+    # bbox this document carries, so the ring ends on a meridian. Stroked in
+    # the frontier ink that came out as a ruled diagonal from the White Sea
+    # to the north Caspian — *a rendering fault at screen scale*, and the one
+    # line on this drawing that is a claim about our dataset rather than
+    # about Europe. The FILL had already stopped saying it: the ground beyond
+    # the atlas is the same stone, so the continent crosses the cut with no
+    # seam. Only the ink still spoke.
+    #
+    # So the land group is clipped two units short of that meridian. Nothing
+    # real is lost: the easternmost thing this atlas draws is Azerbaijan at
+    # 50.6 degrees, eighteen drawn units west of the cut, and the two-unit
+    # sliver taken off Russia shows the beyond ground underneath it, which is
+    # the identical fill. The clip is derived from `doc["bbox"]` rather than
+    # from a typed 52, because the number belongs to the dataset and this
+    # would otherwise be a second copy of it.
+    #
+    # A CLIP RATHER THAN A SECOND, STROKE-ONLY PASS. The obvious shape is a
+    # `<use>` of the land drawn twice — fill unclipped, stroke clipped — and
+    # it cannot carry this stroke: a clone inherits `stroke` and does NOT
+    # inherit `vector-effect`, which is written out one file over, and this
+    # frontier is .6 CSS px at every render size on purpose. Duplicating the
+    # path data instead is 26 KB for one hairline.
+    #
+    # AND A MERIDIAN IS A STRAIGHT LINE UNDER A CONIC, which is why two
+    # projected points describe the whole cut — and is also why the cut read
+    # as ruled in the first place.
+    bb = doc.get("bbox") or []
+    east, south, north = (bb[2], bb[1], bb[3]) if len(bb) == 4 else (52.0, 33.0, 72.5)
+    tx, ty = MAPPROJ.xy(north, east)
+    bx, by = MAPPROJ.xy(south, east)
+    ux, uy = bx - tx, by - ty
+    ln = math.hypot(ux, uy) or 1.0
+    ux, uy = ux / ln, uy / ln
+    nx, ny = -uy, ux
+    if nx > 0:                      # the half-plane kept is the one Europe is on
+        nx, ny = uy, -ux
+    PAD, REACH = 2.0, 4000.0
+    keep = [(tx - REACH * ux + PAD * nx, ty - REACH * uy + PAD * ny),
+            (bx + REACH * ux + PAD * nx, by + REACH * uy + PAD * ny)]
+    keep += [(keep[1][0] + REACH * nx, keep[1][1] + REACH * ny),
+             (keep[0][0] + REACH * nx, keep[0][1] + REACH * ny)]
+    cut = f"atcut{next(_CUT_N)}"
+    clip = ('<defs><clipPath id="' + cut + '"><path d="M'
+            + "L".join(f"{px:.1f} {py:.1f}" for px, py in keep)
+            + 'Z"/></clipPath></defs>')
+
+    fig = (
+        # THE ROLE GOES ON THE `<svg>`, WHICH IS WHERE THE CHECK READS IT —
+        # `c_map_roles` matches the element carrying the map class, and this
+        # figure's class is `atplate`. /countries paid for the same slip one
+        # commit over: a declared role on the wrong element is a map with no
+        # declared role.
+        f'<figure class="atplate">'
+        f'<svg class="instrmap atlas" data-role="illustration" '
+        f'viewBox="0 0 {HERO_VIEW[2]:g} '
+        f'{HERO_VIEW[3]:g}" role="img" aria-labelledby="atplate-t">'
+        f'<title id="atplate-t">Europe, with the countries this atlas writes '
+        f'about named on their own ground. Every country is listed under the '
+        f'nine corners beside this drawing.</title>'
+        f'{clip}{ground}'
+        f'<g class="lyr lyr-land" clip-path="url(#{cut})">{land}</g>'
+        f'<g class="lyr lyr-labels">{names}</g>'
+        f'</svg></figure>')
+
+    blocks = []
+    for m in sorted(data.get("macros", []), key=lambda x: macro_order[x["slug"]]):
+        cs = sorted((c for c in data["countries"].values()
+                     if macro_of.get(c["slug"]) == m["slug"]),
+                    key=lambda c: c["name"])
+        # THE SENTENCE IS THE REGION'S OWN `blurb`, WHICH THIS ATLAS ALREADY
+        # WROTE. Inventing nine lines of travel copy here would be authoring
+        # an editorial record, which is the one thing the Data Integrity Rule
+        # forbids outright; the count beside it is derived.
+        blocks.append(
+            f'<section class="atcorner" data-corner="{esc(m["slug"])}" '
+            f'aria-labelledby="atc-{esc(m["slug"])}">'
+            f'<h3 id="atc-{esc(m["slug"])}"><a href="{urls.macro(m)}">'
+            f'{esc(m["name"])}</a>'
+            f'<span class="atcount">{len(cs)}</span></h3>'
+            f'<p class="atsay">{esc(m.get("blurb") or "")}</p>'
+            f'<p class="atlist">'
+            + "".join(f'<a href="{urls.country(c)}">{esc(c["name"])}</a>'
+                      for c in cs)
+            + "</p></section>")
+    return fig, "".join(blocks), drawn
+
+
 def country_mark(c, w=100, h=70):
     """One country, fitted to its own extent, at the size of a word.
 
@@ -8291,6 +8528,7 @@ LABEL_CLEAR = 4.0
 # leading a second line needs — see the two-line branch in countryportrait().
 CNAME_LEAD = 22.6
 
+ATNAME_LEAD = 11.0
 LABEL_METRICS = {
     "minilabel": (LABEL_PAD, LABEL_CH, LABEL_UP, LABEL_DOWN),
     "rlabel": (18.8, 8.89, 14.0, 5.0),
@@ -8323,6 +8561,23 @@ LABEL_METRICS = {
     # measured with the browser's own getBBox, which understates none of them.
     "seaname": (11.0, 10.2, 9.85, 2.95),
     "seaname-hero": (0.5, 12.75, 11.68, 3.34),
+    # THE REGISTER FACE, FITTED IN CHROMIUM OVER ALL FIFTY COUNTRY NAMES.
+    #
+    # NAMED `atname` BECAUSE `rname` WAS ALREADY TAKEN — it is the region
+    # name on the region maps, and it is already in `dense_class`'s own list
+    # of label families. *Grep before naming a composition* is written here
+    # about a CSS class and about a Python function; a key in a metrics table
+    # is the same rule a third time, and this one would have silently changed
+    # the box model of every region label on 130 pages.
+    # The atlas register sets the same names as `cname` at a little over half
+    # the size, because fifteen is what the hero's face fits on this frame —
+    # measured, and unchanged when the cap was raised to ninety-nine, since
+    # the constraint is the type rather than the ceiling. One model per type
+    # size is this repository's rule and a fitted envelope that UNDERSTATES
+    # lets a name into ground the drawing has already spent, so this is the
+    # upper envelope over every name the plate renders, by `getBBox`.
+    "atname": (10.06, 14.29, 17.11, 4.67),
+    "atname2": (10.06, 14.29, 17.11 + ATNAME_LEAD / 2, 4.67 + ATNAME_LEAD / 2),
 }
 
 
