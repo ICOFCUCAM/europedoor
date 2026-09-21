@@ -3461,7 +3461,56 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
  * Europe -> country -> region -> destination, and before there was geometry
  * it did not exist: a country page could list its regions and could not show
  * you where any of them were. */
+/* AND A PORTRAIT FRAME NEEDS A HEIGHT CAP, which is the full-width-glyph
+   finding one family over: `.minimap svg` is `width: 100%; height: auto`, so
+   the moment a country's frame became its own shape Sweden's 640 x 800 drew
+   1392 x 1740 in a 1392 column — where the 900 x 560 it replaced drew 866,
+   and where a full-width glyph at 600 once made /interests 11,972 pixels
+   tall. Capped by HEIGHT and centred, so the drawing keeps the proportion the
+   frame exists to state and the page keeps its rhythm: a portrait comes out
+   about 794 x 992, an upright 1270 x 992, and a panoramic is bound by the
+   column at 1392 x 668 and never reaches the cap at all.
+   `min(80vh, 62rem)` rather than a flat rem, because the figure competes with
+   the fold as well as with the column — the same pair /map's own budget uses. */
+/* ONE HEIGHT FOR EVERY PORTRAIT, AND THE WIDTH STATES THE COUNTRY'S SHAPE.
+   `.minimap svg` is `width: 100%; height: auto`, so the moment a country's
+   frame became its own shape Sweden's 640 x 800 drew 1392 x 1740 in a 1392
+   column — where the 900 x 560 it replaced drew 866, and where a full-width
+   glyph at 600 once made /interests 11,972 pixels tall. Fixing the HEIGHT
+   instead is what makes the fifty comparable: every portrait is the same
+   height on the page and how wide it is IS the shape. Measured at 1440x1000:
+   Sweden 544 x 680, France 870 x 680, Turkiye column-bound at 1392 x 668.
+   TWO EARLIER ATTEMPTS ARE RECORDED BECAUSE EACH LOOKED RIGHT. `max-height`
+   with `margin-inline: auto` centres the DRAWING inside a full-width figure
+   and leaves the caption at the far left, 376px from the thing it captions.
+   Moving the centring to the figure with `width: fit-content` is worse and
+   quieter: the svg sizes from its container and the container sizes from the
+   svg, so Sweden collapsed from 640 to 592 — the circular sizing this file
+   already records about `1fr` and `min-content`. A fixed height has no
+   circularity in it, and the figure stays a block, so the arch, the caption
+   and the source note share one left edge without anything being centred. */
 .countrymap svg { background: var(--atlas-sea); border-radius: var(--radius); }
+/* THE ORIENTATION IS CAPPED ON THE FIGURE, AND THE DRAWING KEEPS
+   `width: 100%; height: auto`. Three attempts are recorded because each
+   looked right and each failed in its own way:
+     `max-height` + `margin-inline: auto` centres the DRAWING inside a
+       full-width figure and strands the caption 376px from the thing it
+       captions;
+     `width: fit-content` on the figure is worse and quieter — the svg sizes
+       from its container and the container from the svg, so Sweden collapsed
+       640 to 592, which is the circular sizing this file already records
+       about `1fr` and `min-content`;
+     a fixed HEIGHT letterboxes the moment the column is narrower than the
+       frame wants: at 390 Sweden's box stayed 680 tall with the drawing
+       448 inside it, and nothing counts a letterbox.
+   Capping the FIGURE's width has none of those: the svg keeps the one rule
+   every other map on the site uses, the caption and the arch share the
+   figure's left edge, and a narrow column simply makes the whole figure
+   narrower. Measured at 1440: Sweden 544 x 680, France 871 x 680, Turkiye
+   1392 x 668 — one height across the three orientations, and the width IS
+   the country's shape. */
+.countrymap[data-shape="portrait"] { max-width: 34rem; }
+.countrymap[data-shape="upright"]  { max-width: 55rem; }
 .countrymap .context path { fill: var(--atlas-far); }
 /* The two rules that were here — `.countrymap .countries path` and the same
    with `.here` — set a fill and a stroke and never won anywhere. Both are

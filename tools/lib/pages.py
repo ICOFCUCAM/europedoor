@@ -7438,6 +7438,61 @@ def _declutter(items, w, h):
     return out
 
 
+COUNTRY_FRAMES = ((0.85, "portrait", (640, 800)),
+                  (1.60, "upright", (820, 640)),
+                  (99.0, "panoramic", (1000, 480)))
+
+
+def country_shape(bbox):
+    """The frame a country PORTRAIT is drawn in, from the country's own shape.
+
+    FIFTY PORTRAITS WERE FIFTY IDENTICAL BOXES. `countrymap` opened
+    `w, h = 900, 560` and every one of the fifty was drawn at 1.61, which is
+    `glyph_view`'s own recorded sentence one family over — *held to the canvas
+    proportion, so a set of glyphs is a set of boxes of the same shape and only
+    the geography inside them differs* — and the owner's second doctrine rule
+    calls that visual consistency bought with editorial difference.
+
+    Measured on the built site, the subject's bounding box as a share of its
+    frame ran 18.7% (Sweden, 189 x 500 inside a 900 x 560) to 76.2%
+    (Switzerland), median 42.5%: four fifths of Sweden's portrait was its
+    neighbours. Measured as GEOGRAPHY rather than as drawn units, the
+    countries' own shapes run 0.42 (Liechtenstein) to 2.37 (Turkiye), median
+    1.17.
+
+    KILOMETRES RATHER THAN PROJECTED UNITS, for the reason `macro_shape`
+    already gives: the projection is conformal and a conic's units are not the
+    same length at 35 N and 65 N, so Sweden measured against Cyprus in canvas
+    units is the scale-error finding arriving in a layout decision. Haversine
+    on the principal frame, which is the box the projection is fitted to.
+
+    THREE ORIENTATIONS AND NOT FIFTY NUMBERS. A frame per country is fifty
+    arbitrary values — the nine-clamps fault this repository refuses for a
+    type scale — and the three bands are descriptions rather than fitted
+    numbers: taller than wide, upright, and half again as wide as tall. They
+    fall 16 / 24 / 9. The three frames hold their AREA within 5% of each other
+    and of the 900 x 560 they replace, because orientation is the editorial
+    difference here and size is not: a country is not more important for being
+    wide, which is the departure `macro_shape` records from /themes' three
+    scales.
+
+    THE PORTRAIT ONLY, AND NOT `country_door`. That one draws the same
+    geometry on the same default canvas and is laid out as a GRID of doors on
+    /countries, where one tile shape is what makes the set comparable — the
+    case this rule does not cover, and the reason it takes a bbox rather than
+    being wired into the shared geometry.
+    """
+    lon0, lat0, lon1, lat1 = bbox
+    mlat, mlon = (lat0 + lat1) / 2, (lon0 + lon1) / 2
+    kw = haversine({"lat": mlat, "lon": lon0}, {"lat": mlat, "lon": lon1})
+    kh = haversine({"lat": lat0, "lon": mlon}, {"lat": lat1, "lon": mlon})
+    a = (kw / kh) if kh else 1.0
+    for edge, name, wh in COUNTRY_FRAMES:
+        if a < edge:
+            return name, wh
+    return COUNTRY_FRAMES[-1][1], COUNTRY_FRAMES[-1][2]
+
+
 def countrymap(data, c):
     """The country, drawn, with its regions and every destination on it.
 
@@ -7456,8 +7511,6 @@ def countrymap(data, c):
     allpts = [(r, t) for r in c["regions"] for t in r["cities"]]
     if not doc or not allpts:
         return ""
-    w, h = 900, 560
-
     # The frame is the country's own geometry, and nothing else. An earlier
     # version widened it to hold every destination, which for Norway means
     # Longyearbyen at 78°N — 700 km beyond the top of the drawn coastline —
@@ -7476,6 +7529,7 @@ def countrymap(data, c):
         lons = [t["lon"] for _r, t in allpts]
         lats = [t["lat"] for _r, t in allpts]
         bbox = [min(lons) - 0.25, min(lats) - 0.2, max(lons) + 0.25, max(lats) + 0.2]
+    shape, (w, h) = country_shape(bbox)
     proj = geo.Projection(bbox, w, h, pad=0.05)
     ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
 
@@ -7575,7 +7629,8 @@ def countrymap(data, c):
         # families on what the drawing IS — so it takes the page's world and
         # the light map with it. `data-role` keeps saying it is an
         # instrument-shaped figure, which is a different claim.
-        f'<figure class="minimap countrymap arched{dense_class(drawn)}" data-role="instrument">'
+        f'<figure class="minimap countrymap arched{dense_class(drawn)}"'
+        f' data-shape="{shape}" data-role="instrument">'
         f'<svg viewBox="0 0 {w} {h}" role="img" '
         f'aria-label="Map of {esc(c["name"])} showing its regions and the destinations in the '
         f'Atlas"><defs>{arch_clip("cm" + c["slug"][:14].replace(chr(45), ""), w, h)}</defs>'
