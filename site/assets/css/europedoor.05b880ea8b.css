@@ -3511,6 +3511,17 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    the country's shape. */
 .countrymap[data-shape="portrait"] { max-width: 34rem; }
 .countrymap[data-shape="upright"]  { max-width: 55rem; }
+/* AND THE MACRO PAGE'S OWN MAP TAKES THE SAME TREATMENT, for the same reason
+   and from the same measurement: `macro_shape` exists because the nine
+   regions were nine identical bands on /countries, and the region's own page
+   went on drawing 900 x 420 for all nine — the lit members filling 18% of the
+   frame on /discover/eastern and 31% at the median. Three orientations, one
+   height, the width stating the shape. The names are `macro-` rather than the
+   bands' own `mac-por`/`mac-up`/`mac-pan`, because those belong to a row on
+   /countries and a class name already in the stylesheet is a rule you inherit
+   silently. */
+.macromap.macro-portrait { max-width: 30rem; }
+.macromap.macro-upright  { max-width: 46rem; }
 .countrymap .context path { fill: var(--atlas-far); }
 /* The two rules that were here — `.countrymap .countries path` and the same
    with `.here` — set a fill and a stroke and never won anywhere. Both are

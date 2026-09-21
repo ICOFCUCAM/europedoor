@@ -3260,7 +3260,20 @@ def macromap(data, m):
         return ""
     bbox = [min(b[0] for b in boxes), min(b[1] for b in boxes),
             max(b[2] for b in boxes), max(b[3] for b in boxes)]
-    w, h = 900, 420
+    # THE MACRO PAGE'S OWN MAP WAS THE ONE CALL SITE `macro_shape` DID NOT
+    # REACH. That function exists because the nine regions were nine identical
+    # bands on /countries, and it is spent there twice — on the rhythm and on
+    # the printed extent. The region's OWN page went on drawing 900 x 420 for
+    # all nine. Measured on the built site: the lit members fill 18% of the
+    # frame on /discover/eastern (223 x 298 in a 900 x 420, a 0.75 subject in
+    # a 2.14 box) and 43% at best, median 31%. A rule stated once and applied
+    # to one of its call sites, in the function written to state it.
+    # The same three bands and the same constant, so the page and the band
+    # that links to it cannot disagree about which way up a region is.
+    _kw, _kh, _asp = macro_shape(data, m)
+    shape, (w, h) = (("panoramic", (1000, 380)) if _asp >= MACRO_WIDE
+                     else ("upright", (700, 540)) if _asp >= 1.0
+                     else ("portrait", (520, 720)))
     proj = geo.Projection(bbox, w, h, pad=0.10)
     ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=members)
     uid = "mm" + "".join(ch for ch in m["slug"] if ch.isalnum())[:14]
@@ -3295,7 +3308,8 @@ def macromap(data, m):
         cut_reach=dusk_reach(),
         land=f"{ctx}{land}", labels=drawn,
         caption=f'<figcaption>{cap}</figcaption>',
-        figure_class=f"minimap macromap arched atlas{dense_class(drawn)}",
+        figure_class=f"minimap macromap macro-{shape} arched"
+                     f" atlas{dense_class(drawn)}",
         aria=(f'Map of {esc(m["name"])}: its {len(members)} countries filled, '
               f'the rest of Europe behind them'))
 
