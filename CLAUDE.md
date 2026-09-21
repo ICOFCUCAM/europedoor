@@ -6730,6 +6730,43 @@ sentence this file already writes about a gate that cannot fail — and the
 `git log -S` that dated the cause took one command, where the reasoning that
 would have guessed at it took twenty minutes.
 
+
+**THE EMPTY PART OF THE HOMEPAGE WAS A MARGIN THAT ESCAPED ITS BOX, AND
+`clip-path` CLIPS WITHOUT CONTAINING.** The window plate uses `clip-path:
+inset(0)` because it is the one property that clips a `position: fixed`
+descendant — recorded at length above — and the assumption that arrived free
+with it is that it also establishes a block formatting context. It does not.
+`.shotsay` is the window's first child and takes `margin-top: 62svh` to set
+the type two-thirds down the picture; with no BFC that margin **collapses
+through** the window and moves the window itself down the page instead. The
+plate mark ended at y=964 and the window opened at y=1523: **558 pixels of
+blank wall at 1280 and 523 at 390**, which is 62svh of 900 and of 844 to the
+pixel. `display: flow-root` contains it and is the one repair that does NOT
+also make the box a containing block for a fixed descendant — the picture
+still stands still, proved by scrolling 300 pixels and measuring 0. 558 → 16,
+plate 03 1,653 → 1,111, the document 542 pixels shorter.
+
+**AND `voids.js` REPORTED ZERO VOIDS ON THAT PAGE, CORRECTLY.** It finds a
+band over 90px with NOTHING painted in it, and every slice of this run
+carried the plate mark, a hairline or the top edge of the window — so not one
+was empty and the band still read as a hole. **A band with ALMOST nothing in
+it is a different measurement** and nothing here had ever taken it.
+`tools/density.js` is the horizontal union of everything that paints, per
+50px slice, as a share of the page's own width; 27% of the homepage was under
+a fifth covered and is 23%. It reports and **cannot become a gate**, on
+`voids.js`'s own reason inverted: a floor on coverage is satisfied by widening
+every measure until the page is a wall of type.
+
+**And its first version reported the photograph as the largest hole on the
+page** — 850 pixels at 1% covered inside the one plate that IS a full-bleed
+photograph. A `position: fixed` rectangle is viewport-relative, so `+ scrollY`
+files it in whatever slice the page happened to be scrolled to; a screenshot
+at y=1500 showing London filling the frame is what disproved it. What such a
+box paints is the whole of its CLIPPING ancestor. **The first correction read
+`position` on the child alone and changed nothing**, because the fixed element
+is the parent — the walk goes up the whole chain. *The eye finds a defect and
+it does not confirm one*, applied to an instrument rather than to a page.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -6821,6 +6858,16 @@ over 90px with nothing painted in them, per family, at 1280 or (`--phone`) at
 390. It reports and cannot fail: the fault it looks for is an outlier — a
 296px column beside a picture, a standfirst alone in the right half — and the
 section rhythm it would otherwise punish is what says two bands are separate.
+
+**And a fourth, which is the other half of that question.** `node
+tools/density.js` measures how much of each 50px slice is painted AT ALL, as
+a share of the page's own width, and prints every run of 200px or more under
+a fifth covered. `voids.js` finds a band with NOTHING in it; this finds a
+band with ALMOST nothing, which is what a reader means by "this part of the
+page is empty" and what `voids.js` reported as zero on the homepage while 558
+pixels of wall sat above the window. Same reason it cannot be a gate: a floor
+on coverage is satisfied by widening every measure until the page is a wall
+of type. It takes a path (`node tools/density.js /`) or the whole list.
 
 **And one that is deliberately not a gate.** `node tools/contact-sheet.js`
 puts one page per family in a single image. `--dark` shoots the dark

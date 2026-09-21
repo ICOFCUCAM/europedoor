@@ -1610,3 +1610,61 @@ was not run.** It is on the list in `CLAUDE.md`, it takes about five minutes,
 and Home 20 to Home 24 each shipped without it. A gate people skip is a gate
 that finds things six commits late, which is the same sentence this repository
 already writes about a gate that cannot fail.
+
+## Home 26 — the empty part of the homepage was a margin that escaped its box
+
+The owner sent a screenshot of the deployed page with a vast blank region on
+it and the instruction *this empty part of the home page need to be design
+with information*. The honest answer is that there was nothing to design
+there: the band was not a composition waiting for content, it was 558 pixels
+of wall that a margin had pushed open, and filling it would have been
+designing around a bug.
+
+**`voids.js` reported zero voids on this page**, correctly. That instrument
+finds a band over 90px with **nothing** painted in it; every 50-pixel slice
+of this run carried the plate mark, a hairline or the top edge of the window,
+so not one of them was empty, and the band still read as a hole. A band with
+*almost* nothing in it is a different measurement and nothing here had ever
+taken it. `tools/density.js` does: the horizontal union of everything that
+paints, per 50px slice, as a share of the page's own width.
+
+**And its first version reported the photograph as the largest hole on the
+page.** It read an 850-pixel run at 1% covered inside plate 03 — the window,
+which is a full-bleed photograph of London. A `position: fixed` rectangle is
+viewport-relative, so adding `scrollY` to it files the picture in whatever
+slice the page happened to be scrolled to; a screenshot at y=1500 showing
+London filling the frame is what disproved it. What such a box paints is the
+whole of its **clipping ancestor**, which is what a reader sees. The first
+correction read `position` on the child alone and changed nothing, because the
+fixed element is the parent — the walk goes up the whole chain. 31% → 27%.
+
+| | |
+|---|---|
+| `clip-path: inset(0)` clips a fixed descendant | which is the whole reason the window uses it, and is recorded |
+| `clip-path: inset(0)` establishes a block formatting context | **false**, and that half was assumed |
+
+`.shotsay` is the window's first child and takes `margin-top: 62svh` to set
+the type two-thirds down the picture. With no BFC that margin collapses
+*through* the window and moves the window itself down the page instead: the
+plate mark ended at y=964 and the window opened at y=1523, which is 62svh of
+900 to the pixel, and 523 at 390 against 62svh of 844. `display: flow-root`
+contains it, and — unlike `transform`, `filter`, `contain` and the four
+others this stylesheet already records — it does **not** make the box a
+containing block for a fixed descendant, so the picture still stands still
+while the wall moves past it. Proved the only way that can be proved: the
+page was scrolled 300 pixels and the photograph moved 0.
+
+| | before | after |
+|---|---|---|
+| the gap above the window | 558px | 16px |
+| plate 03's own height | 1,653px | 1,111px |
+| the document | 12,244px | 11,702px |
+| slices under 20% covered | 27% | 23% |
+| the largest run | 700px at 1% | 250px at 2% |
+
+**`density.js` is a reporter and must not become a gate**, on `voids.js`'s own
+reason turned round: a floor on coverage is satisfied by widening every
+measure until the page is a wall of type, which is the opposite of this
+product, and a 200-pixel run at 8% is right where the thing above it is a
+closing statement. What the number is for is the outlier, and for the
+before-and-after of a composition change.

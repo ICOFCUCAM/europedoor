@@ -10884,7 +10884,33 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    measured, and below the 12% this repository refuses. Flooring the height
    at 45.45vw caps the box at 2.2 and leaves it filling the viewport at
    every shape: 0.356-2.200, a guaranteed frame of 12.8%. */
+/* `clip-path` CLIPS, AND IT DOES NOT CONTAIN. The rule above this one is
+   the whole argument for `clip-path` over `overflow: hidden` — it is the one
+   property that clips a `position: fixed` descendant — and the assumption
+   that came free with it is that it also establishes a block formatting
+   context. It does not. `.shotsay` is the first child of this box and takes
+   `margin-top: 62svh` to sit the type two-thirds of the way down the window;
+   with no BFC that margin COLLAPSES THROUGH the window and pushes the window
+   itself down the page instead.
+
+   Measured in Chromium: the plate mark ended at y=964 and the window opened
+   at y=1523, so **558 pixels of blank wall at 1280 and 523 at 390** — which
+   is 62svh of 900 and of 844 to the pixel, between a box with `margin-bottom:
+   16px` and a box with no margin at all. Nothing could see it: every box was
+   the right size, `voids.js` finds a band with NOTHING painted and this band
+   was painted by the plate mark at its top, and the document simply carried
+   542px of the homepage that no reader had a reason to scroll through. It
+   was reported as *this part of the home page is empty*, from a screenshot,
+   which is the only instrument that had ever looked.
+
+   `display: flow-root` is the whole fix and it is the minimal one: it
+   contains the margin and — unlike `transform`, `filter`, `contain` and the
+   four others this stylesheet already records — it does NOT make this a
+   containing block for a fixed descendant, so the window still stands still
+   while the wall moves past it. 558 -> 16, act2 1653 -> 1111, and the page
+   is 542 pixels shorter. */
 .sheet-bleed .shotclip { position: relative; min-height: 110svh;
+                         display: flow-root;
                          clip-path: inset(0); z-index: 0;
                          background: var(--graphite); }
 .sheet-bleed .shotfull { position: fixed; z-index: 0;
