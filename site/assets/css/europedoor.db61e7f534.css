@@ -1300,6 +1300,40 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   background: var(--paper-2); border: 1px solid var(--rule);
   text-transform: none; letter-spacing: 0; font-size: var(--t-sm);
 }
+/* THREE OF THE SIX ROOMS OPEN A DIRECTORY AND NOTHING SAID WHICH THREE.
+   DISCOVER carries four links, ATLAS four and EUROPE five; JOURNEYS, PLAN
+   and STORIES carry none. At rest the six were the same word in the same
+   type at the same weight, so the only way to learn that thirteen of the
+   bar's nineteen destinations existed was to hover a word at random and
+   find out. A menu whose depth is invisible is a menu nobody opens — and
+   it is the same thirteen links the gap above this had just made reachable
+   with a pointer, which would have been a repair nobody could find.
+
+   THE MARK IS DRAWN RATHER THAN TYPED, which is this page's own rule: the
+   go-link is a circle and a rule rather than an arrow character, because a
+   mark that is drawn belongs to the drawing family the rest of the page is
+   made of. Two 1px borders on a rotated square is the same caret every
+   printed contents page has used for a century, at the weight of a
+   hairline rather than the weight of a glyph — 0.3em, which is five pixels
+   at this type size against the nine a `▾` would set.
+
+   IT INHERITS ITS COLOUR, so it is one thing with the word: it lifts on
+   hover and on the current room exactly as the label does, and there is no
+   second colour decision. `aria-hidden` by construction — a pseudo-element
+   is not in the accessibility tree — because "submenu" read aloud after
+   three of six words is the constraint explained back, and the field's own
+   head already names what the set is once it is open.
+
+   AND IT COMES OFF WHERE THE FIELD DOES. Below 60rem the two rules that
+   open a field are undone, so the mark would promise a directory that
+   cannot be opened: the block that suppresses the field suppresses this. */
+.navroom > .navtop::after {
+  content: ""; display: inline-block; width: .3em; height: .3em;
+  margin-left: .55em; vertical-align: .18em;
+  border-right: 1px solid currentColor; border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
 /* A TWELVE-PIXEL GAP BETWEEN A MENU AND THE WORD THAT OPENS IT IS A MENU
    NO POINTER CAN REACH. The field is revealed by `.navroom:hover`, and an
    absolutely positioned child is out of flow — so it contributes nothing to
@@ -2444,6 +2478,11 @@ a .kicker { color: var(--ink-3); }
      reported dead on the half that really was. */
   .masthead-in .nav .navroom:hover > .navfield,
   .masthead-in .nav .navroom:focus-within > .navfield { display: none; }
+  /* AND THE CARET GOES WITH THE FIELD IT PROMISES. A mark saying "this
+     word opens a directory" on a bar where no word opens one is a claim
+     the page cannot keep, which is the *removing a claim leaves surfaces
+     pointing at it* failure written in advance for once. */
+  .masthead-in .nav .navroom > .navtop::after { content: none; }
   /* ONE ROW, AND THE ROW IS WHAT THE MEASUREMENT BOUGHT. Five sections at
      the desk tracking measured 332px of content plus four 16px gaps in a
      366px box, so they wrapped to two rows and the masthead grew from 93px

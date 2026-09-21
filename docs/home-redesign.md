@@ -1712,3 +1712,50 @@ the room's own word is still the element under the pointer when it is hovered
 — because the obvious bridge is one that covers the link that opens the menu.
 Proved red both ways: 9 of 15 assertions with the bridge collapsed to zero
 height, 3 of 15 with it four times too tall.
+
+## Menu 02 — three of the six rooms open a directory and nothing said which
+
+DISCOVER carries four links, ATLAS four and EUROPE five; JOURNEYS, PLAN and
+STORIES carry none. At rest all six were the same word, in the same type, at
+the same weight — so the only way to learn that thirteen of the bar's
+nineteen destinations existed was to hover a word at random and find out.
+
+It is the same thirteen links Menu 01 had just made reachable with a pointer,
+which is the half that makes this worth a commit rather than a nicety: a
+repair nobody can find is not a repair.
+
+The mark is **drawn rather than typed**, which is this page's own rule — the
+go-link is a circle and a rule rather than an arrow character, because a mark
+that is drawn belongs to the drawing family the rest of the page is made of.
+Two 1px borders on a rotated square is the caret every printed contents page
+has used for a century, at 0.3em, which is five pixels at this type size
+against the nine a `▾` would set. It inherits `currentColor`, so it lifts on
+hover and on the current room exactly as the label does and there is no second
+colour decision, and a pseudo-element is not in the accessibility tree, so
+"submenu" is not read aloud after three of six words.
+
+**And it comes off where the field does.** Below 60rem the two rules that open
+a field are undone, so the mark would promise a directory that cannot be
+opened — *removing a claim leaves surfaces pointing at it*, written in advance
+for once.
+
+| | before | after |
+|---|---|---|
+| the nav row at 1280 | 456px | 490px |
+| slack at 961, the narrowest one-row width | 75px | 58px |
+| rows at every width down to 961 | 1 | 1 |
+
+**The assertion is the painted advance rather than the `content` property.**
+`getComputedStyle(e, "::after").content` computes to the SPECIFIED value —
+this repository already records a check defeated by exactly that, reading back
+`"0" counter(band)` and reporting nineteen families broken when none was. What
+is measurable is that the link's box is wider than its own text: a Range over
+the text node gives the glyphs, the element gives the box, and the difference
+is the mark. Proved red both ways — three failures with no mark anywhere,
+four with a mark on every room including the phone.
+
+**And the check's own first version asked the wrong element.**
+`a.parentElement.querySelector(".navfield")` is `.nav` for a room with no
+field, and `.nav` contains every other room's field, so it reported all six as
+carrying one and went red on the three that are correct. The question is about
+THIS room and is asked of this room.

@@ -6651,6 +6651,71 @@ async function main() {
     await hp.close();
   }
 
+  /* ── AND A WORD THAT OPENS A DIRECTORY HAS TO SAY SO BEFORE IT IS
+   * HOVERED ─────────────────────────────────────────────────────────────
+   * Three of the six rooms carry a field — DISCOVER's four links, ATLAS's
+   * four, EUROPE's five — and at rest all six were the same word in the
+   * same type at the same weight. Thirteen of the bar's destinations could
+   * only be found by hovering a word at random, which is the same thirteen
+   * the block above had just made reachable with a pointer.
+   *
+   * THE ASSERTION IS THE PAINTED ADVANCE RATHER THAN THE `content`
+   * PROPERTY. `getComputedStyle(e, "::after").content` computes to the
+   * SPECIFIED value — this repository already records a check defeated by
+   * exactly that, reading back `"0" counter(band)` and reporting nineteen
+   * families broken when none was. What is measurable is that the link's
+   * box is wider than its own text: a Range over the text node gives the
+   * glyphs, the element gives the box, and the difference is the mark.
+   *
+   * Both directions, because a mark on every room says nothing at all. */
+  {
+    const cp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    await cp.goto(base + "/", { waitUntil: "load" });
+    const marks = await cp.evaluate(() => [...document.querySelectorAll(".nav .navtop")].map((a) => {
+      const r = document.createRange(); r.selectNodeContents(a);
+      const cs = getComputedStyle(a);
+      const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      return { name: a.textContent.trim(),
+               // `a.parentElement` is `.nav` for a room with no field, and
+               // `.nav` contains every OTHER room's field — so the first
+               // version reported all six as carrying one and went red on
+               // the three that are correct. The question is about THIS
+               // room, so it is asked of this room.
+               field: !!(a.closest(".navroom") || a).querySelector(".navfield"),
+               extra: +(a.getBoundingClientRect().width - r.getBoundingClientRect().width - pad).toFixed(1) };
+    }));
+    checked++;
+    ok(marks.filter((m) => m.field).length >= 2 && marks.some((m) => !m.field),
+       `the bar carries ${marks.filter((m) => m.field).length} rooms with a ` +
+       `field and ${marks.filter((m) => !m.field).length} without — this ` +
+       `check cannot say anything unless both kinds are on the page`);
+    for (const m of marks) {
+      checked++;
+      ok(m.field ? m.extra >= 6 : m.extra < 3,
+         `${m.name}: the link's box is ${m.extra}px wider than its own ` +
+         `glyphs and it ${m.field ? "opens a directory of links" : "opens a page"} — ` +
+         (m.field ? "a word that opens a directory draws a mark saying so"
+                  : "a word that leads to one page must not"));
+    }
+    // AND THE MARK COMES OFF WHERE THE FIELD DOES, because a caret on a bar
+    // where no word opens a field is a claim the page cannot keep.
+    await cp.setViewportSize({ width: 390, height: 844 });
+    await cp.waitForTimeout(120);
+    const narrow = await cp.evaluate(() => [...document.querySelectorAll(".nav .navtop")]
+      .filter((a) => a.checkVisibility({ checkVisibilityCSS: true }))
+      .map((a) => {
+        const r = document.createRange(); r.selectNodeContents(a);
+        return { name: a.textContent.trim(),
+                 extra: +(a.getBoundingClientRect().width - r.getBoundingClientRect().width).toFixed(1) };
+      }));
+    checked++;
+    ok(narrow.length > 0 && narrow.every((m) => m.extra < 3),
+       `at 390 the fields cannot open and ` +
+       `${narrow.filter((m) => m.extra >= 3).map((m) => m.name).join(", ")} ` +
+       `still draws the mark that promises one`);
+    await cp.close();
+  }
+
   {
     const NAVPAGES = ["/", "/europe/austria/", "/journeys/", "/stories/", "/events/",
                       "/europe/france/alps-and-east/chamonix/"];

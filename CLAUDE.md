@@ -6786,7 +6786,8 @@ the first link in the panel:
 | 30 | gone |
 
 on all three rooms at 1280, 1440, 1152, 1024 and 960. **Thirteen links
-reachable with a keyboard and not with a mouse, on 1,032 pages** — and the
+reachable with a keyboard and not with a mouse, on every page on the site** —
+and the
 keyboard route works precisely BECAUSE `:focus-within` never crosses the gap:
 Tab moves focus straight from the room into the field. The suite already
 asserted that sequence and was right to; it could not see this, because it is
@@ -6803,6 +6804,31 @@ asserts the panel is still there and the point under the cursor is inside it.
 because the obvious bridge is one that covers the link that opens the menu —
 proved red both ways, 9 of 15 with the bridge collapsed and 3 of 15 with it
 four times too tall.
+
+
+**AND THREE OF THE SIX ROOMS OPEN A DIRECTORY WHILE NOTHING SAID WHICH
+THREE.** DISCOVER carries four links, ATLAS four, EUROPE five; JOURNEYS, PLAN
+and STORIES carry none, and at rest all six were the same word in the same
+type at the same weight. Thirteen of the bar's nineteen destinations could
+only be found by hovering a word at random — **the same thirteen the hover
+gap had just made reachable**, which is what makes it a repair rather than a
+nicety: a repair nobody can find is not one. The mark is DRAWN rather than
+typed, on this page's own rule that a go-link is a circle and a rule rather
+than an arrow character: two 1px borders on a rotated square, 0.3em, five
+pixels against the nine a `▾` would set, inheriting `currentColor` so it
+lifts with the word and adds no second colour decision. **And it comes off
+where the field does** — below 60rem the two rules that open a field are
+undone, so the mark would promise a directory that cannot be opened.
+
+**The assertion is the painted advance rather than the `content` property**,
+because `getComputedStyle(e, "::after").content` computes to the SPECIFIED
+value — the failure this file already records about `"0" counter(band)`,
+where a check read the model back and reported nineteen families broken when
+none was. A Range over the text node gives the glyphs, the element gives the
+box, and the difference is the mark. Proved red both ways. **And the check's
+own first version asked the wrong element**: `a.parentElement` is `.nav` for
+a room with no field, and `.nav` contains every other room's field, so it
+reported all six as carrying one and went red on the three that were correct.
 
 ## Gates
 
