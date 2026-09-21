@@ -1326,3 +1326,48 @@ the viewport.
 `weight.max_page_kb` 601 → 602, recorded: the masthead went 916 → 1,685 raw
 bytes, 683 compressed, for thirteen links that were previously reachable
 only from the foot of the page.
+
+### The eight the dead-rule scan named, and the one that was not a no-op
+
+The browser suite came back with one failure of 12,889 — the dead-rule
+scan, naming eight declarations, five of them new. **The three keyboard
+assertions passed**, which is what that run was for. Read rather than
+ceilinged, per the check's own rule:
+
+| | |
+|---|---|
+| `.staysay {color}` · `.footsay {color}` | `color: var(--ink)` on elements already inheriting it from `.footer { color: var(--ink) }` |
+| `.footlegal-nav a {color}` | `.footline` already sets `--ink-3` and `a { color: inherit }` carries it |
+| `.stayrow {display}` | a grid item is **blockified by the layout** — the fifth and sixth occurrence of that finding are already on this stylesheet's record, and this is the seventh |
+| `.masthead-in .nav .navfield, …:hover >, …:focus-within > {display}` | the first selector restated `.navfield { display: none }`, which is true at every width. Writing all three in one rule also **defeated the scan's own guard**: a `:hover` selector matches nothing when the pointer is nowhere and is skipped, but the base selector matched, so the rule was judged as a whole and reported dead on the half that really was |
+
+**`.masthead .wordmark {color}` IS THE SAME CLASS OF EXPIRY THIS FILE
+ALREADY RECORDS ABOUT A PHONE RULE WHOSE COMMENT DESCRIBED A 132px MARK.**
+The two rules under *the pine is spent on the mark and the current section*
+were right for a bar the colour of the page. The bar binds the graphite
+ladder now, and on graphite `--pine-ink` IS bone — #0F433E measures 1.74:1
+there, which is why the token is lifted at all. So the declaration set bone
+on an element already inheriting bone. **A rule's reason can stop being true
+when the ground moves under it.**
+
+**AND THE SECOND ONE WAS NOT A NO-OP, WHICH IS WHY IT WAS WORTH READING.**
+`.masthead .nav a[aria-current="page"]` was reported dead for a different
+reason — *two rules setting one value, so the scan names both*. It beat
+`.nav .navtop[aria-current="page"]` at (0,3,1) against (0,3,0) and set the
+same bone, so each changed nothing only because the other produced the same
+colour. What it also did, silently, was take the current room's **underline**
+from `--door` to `--pine-ink`: a bone rule under bone type, where hover draws
+a cobalt one — the marker and the hover state were two different colours for
+one relationship. Deleting it lets the nav block's own rule stand. Measured
+after: the current room's ink is bone at 13.56:1 and its underline is
+cobalt-air at **3.66:1 on the light-page band and 4.23 on the dark one**,
+clearing the 3:1 WCAG 1.4.11 asks of a non-text component, and matching
+hover exactly.
+
+**NOTHING WAS DELETED ON THE SCAN'S WORD ALONE.** The five redundant
+declarations were put back through the CSSOM and the footer and the masthead
+were shot at 1280 and 390 on two families: **six of six byte-identical**.
+`addStyleTag` could not do it — this site's CSP is `style-src 'self'` with
+no `'unsafe-inline'` and refused the injected `<style>`, which is the policy
+working; `insertRule` writes into the stylesheet already loaded from this
+origin and is not an inline style.

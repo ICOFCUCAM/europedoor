@@ -2243,9 +2243,9 @@ a .kicker { color: var(--ink-3); }
 /* THE LAST COLUMN IS A SENTENCE. It carries the one thing a footer can say
    that a list cannot: that the thing above it keeps changing. */
 .staysay { font-family: var(--display); font-size: var(--ed-display-3);
-           line-height: 1.12; color: var(--ink); max-width: 16em;
+           line-height: 1.12; max-width: 16em;
            margin: 0 0 var(--s4); text-wrap: balance; }
-.stayrow { display: block; padding: 2px 0; }
+.stayrow { padding: 2px 0; }
 @media (max-width: 62rem) {
   /* Two columns rather than one: five stacked lists is a very long footer on
      a phone, and the groups are short enough to sit side by side. The
@@ -2270,7 +2270,7 @@ a .kicker { color: var(--ink-3); }
 .footclose { display: grid; justify-items: center; gap: var(--s6);
              padding: var(--s9) 0; margin: 0 0 var(--s7);
              border-top: 1px solid var(--rule); text-align: center; }
-.footsay { font-family: var(--display); color: var(--ink);
+.footsay { font-family: var(--display);
            font-size: var(--ed-display-2); line-height: 1.12;
            letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 /* TWO PARAGRAPHS, NOT A `<br>`. The first sentence is what this atlas
@@ -2329,7 +2329,7 @@ a .kicker { color: var(--ink-3); }
 .footstrap { text-transform: uppercase; letter-spacing: .12em;
              color: var(--ink-2); margin: 0; }
 .footlegal-nav { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); }
-.footlegal-nav a { text-decoration: none; color: var(--ink-3); }
+.footlegal-nav a { text-decoration: none; }
 .footlegal-nav a:hover, .footlegal-nav a:focus-visible { color: var(--door); }
 .footcopy { margin: 0; }
 
@@ -2399,7 +2399,13 @@ a .kicker { color: var(--ink-3); }
      /europe-in have always been, because none of them was ever in this bar
      at all. What a phone loses from the masthead is Experiences and the
      year, and it gains a bar that is one row. */
-  .masthead-in .nav .navfield,
+  /* AND ONLY THE TWO OVERRIDES, BECAUSE THE THIRD SELECTOR RESTATED THE
+     BASE. `.navfield` is already `display: none` at every width; what this
+     block has to undo is the pair of rules that OPEN it. Writing all three
+     in one rule also defeated the dead-rule scan's own guard: a `:hover`
+     selector matches nothing when the pointer is nowhere and is skipped,
+     but the base selector matched, so the rule was judged as a whole and
+     reported dead on the half that really was. */
   .masthead-in .nav .navroom:hover > .navfield,
   .masthead-in .nav .navroom:focus-within > .navfield { display: none; }
   /* ONE ROW, AND THE ROW IS WHAT THE MEASUREMENT BOUGHT. Five sections at
@@ -9087,11 +9093,32 @@ body[data-family="journey"] .ed-journey-hero .ed-eyebrow,
    `body[data-hero]` still exists and still does its other jobs; what it no
    longer does is recolour a bar that is not over a picture. */
 
-/* AND THE PINE IS SPENT ON THE MARK AND THE CURRENT SECTION, which is where
-   an identity belongs: the two things a reader actually looks at in a
-   navigation, rather than the field behind all seven. */
-.masthead .wordmark { color: var(--pine-ink); }
-.masthead .nav a[aria-current="page"] { color: var(--pine-ink); border-bottom-color: var(--pine-ink); }
+/* AND THE PINE CAME OFF THE MARK AND THE CURRENT ROOM, BECAUSE ITS REASON
+   EXPIRED WITH THE GROUND UNDER IT.
+
+   The two rules above spent pine on the two things a reader looks at in a
+   navigation, rather than on the field behind them, and that was right for
+   a bar the colour of the page. The bar binds the graphite ladder now — the
+   same thirteen tokens the footer binds — and on graphite `--pine-ink` IS
+   bone, because #0F433E measures 1.74:1 there and this stylesheet already
+   records that as the reason the token is lifted. So `color: var(--pine-ink)`
+   on the wordmark set bone on an element already inheriting bone from
+   `.masthead { color: var(--ink) }`: a declaration that changes nothing.
+
+   THE SECOND ONE WAS NOT A NO-OP AND WAS REPORTED DEAD FOR A DIFFERENT
+   REASON — two rules setting one value, so the scan names both. It won its
+   fight against `.nav .navtop[aria-current="page"]` at (0,3,1) against
+   (0,3,0) and set the SAME bone, so each changed nothing only because the
+   other produced the same colour. What it also did, silently, was take the
+   current room's underline from `--door` to `--pine-ink`: a bone rule under
+   bone type, where hover draws a cobalt one. The marker and the hover state
+   were two different colours for the same relationship. Deleting it lets
+   the nav block's own rule stand, so the current room is marked in the
+   accent exactly as hover marks it.
+
+   *A rule's reason can stop being true when the drawing changes* — recorded
+   here about a phone rule whose comment described a 132px mark, and true of
+   an identity colour whose ground moved under it. */
 
 /* =========================================================
    PHOTOGRAPHY AS A CONTENT LAYER
