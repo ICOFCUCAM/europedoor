@@ -7958,6 +7958,200 @@ clip is the portrait's own logic, the same logic that draws neighbours without
 their destinations, their regions or their names.
 
 
+**FIVE PARAMETERS ADVERTISED A CAPABILITY THEIR BODIES DO NOT HAVE, AND ONE OF
+THEM IS THE WCAG TARGET-SIZE FUNCTION.** *An ignored argument is dead code
+that looks like a decision* is on this record four times — `kindfilters`
+computed and discarded on every build, `most` sliced past, `opts.geoTooNarrow`
+set and read nowhere, `data-rotate` written for a rotator nobody wrote — and
+an AST walk for a parameter no function body reads finds five more that are
+traps rather than uniformity:
+
+| | |
+|---|---|
+| `hit_radius(pts, vw, …)` | the second parameter is named for the frame width and is read by NOTHING, while the arithmetic that turns 34 units into this frame's own cap is typed at two of the three call sites |
+| `arch_rim(w, h, rise, x0, y0)` | an offset arch the body cannot draw: it returns `arch_path(w, h, rise)` twice and nothing else |
+| `render.page(…, trail=None, …)` | a breadcrumb trail on the ONE function that emits `<html>`, with one caller passing `trail=None` against a parameter nothing reads |
+| `pointsmap(…, extra="", …)` | extra markup on the map that draws a region, a story, a motion, a theme, a month and a journey |
+| `plate_sequence(plates, anchor=None)` | shadowed by the per-plate anchor its own docstring describes |
+
+**THE FIRST ONE IS THE ONE THAT MATTERS, because it is the function that
+exists because a dot on a map is a link and it was 3.9 pixels wide.** Its
+docstring states the cap correctly — *34 units, the radius that renders at
+24px at 390* — **in a 1,000-unit viewBox**, and two callers scale it
+themselves while the third relies on the default:
+
+    minimap      hit_radius(inframe, w, cap=34.0 * w / 1000.0)
+    countrymap   hit_radius(pts, w,    cap=34.0 * w / 1000.0)
+    pointsmap    hit_radius(pts, vw)          <- vw is always 1000.0
+
+Nothing a reader ever got was wrong, because the caller relying on the default
+draws in a 1,000-unit frame by construction. **The lie was in the interface**,
+which is `most` word for word — and the next caller with a 500-unit frame
+would have passed the parameter named for it and got a target sized for twice
+its picture. Derived in the one place that should own it, and the equality is the proof:
+the derived cap and the cap the two callers typed agree exactly at 1000, 900,
+508 and 242 units, and at the one-dot case that returns the cap itself. The
+third caller's frame is 1,000 units by construction, so its default is the
+same number it always was.
+
+
+**AND THE SAME SCAN OVER LOCALS FOUND THE ATLAS INDEX BAND STILL BEING BUILT
+AND THROWN AWAY, WITH ITS STYLESHEET AND ITS FUNCTION STANDING AND THE
+REGISTER STILL CITING IT.** `.doorindex` / `.dcorner` drew the fifty countries
+as fifty own-frame outlines beside their names, grouped by corner — the band
+`country_mark` was written for, with three ways costed and the cheapest
+chosen. Plate 05 then became the nine-corner stage, where scrolling to a
+corner lights that corner's countries **on the continent itself**: the shapes
+drawn at the scale the picture is at rather than at the size of a word, which
+is the better answer to the same question. The decision is not the fault. What
+was left behind is:
+
+| | |
+|---|---|
+| the builder | `home()` composed the whole string on every build and never interpolated it — `kindfilters` on the homepage |
+| the function | `country_mark` had exactly one caller and it was that one |
+| the stylesheet | eighteen rules for `.doorindex`, `.dcorner`, `.dccount`, `.dc`, `.dcshape` and `.dcpoint`, and `grep -rl dcorner site --include=index.html` finds nothing — `.qtile` again |
+| the register | `weight.home_kb`'s reason still reads *"148 → 151 THE ATLAS INDEX DRAWS THE FIFTY COUNTRIES IT LISTS … 8.4 KB of path data for the whole set"*, and those bytes are not in the document |
+
+**The register is the worst place for a stale reason**, because it is what a
+person reads to find out why a number moved. All four are corrected, the
+three findings in the comments above the removed rules are kept — the
+successor can make both of their mistakes — and the removal is a no-op by
+construction rather than by screenshot: nothing in the built site carries any
+of those classes, so no element matches.
+
+**AND A COMMENT-AWARE WALKER IS WHAT DID IT, after a line-wise one broke two
+things in a way this repository has already paid for.** The first pass cut
+into comment blocks and left two unterminated `/*` — *a stray `*/` swallows
+the rule after it*, arrived at from the other side — and it sliced a
+multi-line selector list, leaving `.dcorner > a.dc:hover .dcshape path, …,
+.sheet.sheet-atlas` as one rule. **And my own check for the first of those was
+wrong too**: it counted `/*` as nesting, so it reported two unterminated
+comments in the UNTOUCHED file. CSS comments do not nest. Removing a rule from
+a stylesheet is a parse, not a grep.
+
+
+**AND THE HERO'S GRATICULE WAS THE THIRD THING IN THAT SCAN: COMPUTED ON EVERY
+BUILD, THROWN AWAY, AND IT WOULD HAVE RENDERED BLACK.** `heroeurope()` calls
+`graticule_layer()`, assigns it to a local and never interpolates it — under a
+paragraph arguing for it at length: ten degrees, the interval the EU's own
+pan-European sheets use at this extent, and *not decoration here* because
+under a conic a parallel is a circular arc about the cone apex, so the grid is
+what SHOWS the projection this product draws on and no competitor does. `/map`
+has drawn the identical layer all along. That is `kindfilters` on the
+most-visited page.
+
+**AND THE ONLY RULE FOR IT IS SCOPED TO `/map`'s CONTAINER, so wiring it would
+have put fifteen filled black arcs across the Atlantic.** `.europemap
+.herograt path` carries the `fill: none` as well as the stroke, and the hero
+is `.heroeurope`: the paths would have taken the SVG default, which is the one
+colour this palette does not contain. `.constel path` and the ten unreached
+`<stop>` elements, a third time — and it would have shipped on the page that
+opens the site.
+
+**THE FRACTION IS 34% OF THE COAST INK RATHER THAN /map's 14, AND FOUR
+CANDIDATES WERE RENDERED AND LOOKED AT.** /map's ground is near-black and the
+hero's is the gallery's white wall, so the same fraction of the same ink is a
+different reading: 22% is present and does not resolve into a structure, 50%
+is the first thing the eye meets in the upper left, 0.7px is a drawn line
+rather than a hairline, and 34% is found when it is looked for. Under the
+land, where /map puts it — `{mapwater}{mapgrat}` there — so it shows on water
+and never crosses the parchment, because a grid over the land would be a
+second network of lines competing with the frontiers and the frontiers are the
+information.
+
+**AND THE PER-PIXEL RATIO IS THE WRONG INSTRUMENT FOR A HAIRLINE, WHICH THE
+MEASUREMENT SAYS PLAINLY: 252 on 255, 1.03:1 at 1280 and 1.05 at 1920, and
+the line is unmistakable in the render.** A ratio is a claim about a PATCH,
+and a continuous curve five hundred pixels long is integrated by the eye in a
+way a per-pixel figure cannot express. This is the other side of *the ratio a
+reader gets is the ratio of the pixel* — there the pixel was the honest
+instrument because the thing measured was a bar a reader must READ; here the
+layer carries no text, states nothing, is `aria-hidden`, and the projection is
+published in prose on /map. So no contrast floor applies, and the evidence is
+the pair of renders rather than a number. `weight.home_kb` 192 → 199, which
+is 6.3 KB and is recorded.
+
+**AND MY FIRST READING OF THE RENDER WAS WRONG IN BOTH DIRECTIONS.** At 1x the
+lines looked as though they crossed the land and I was ready to refuse the
+whole thing on my own comment's grounds; at 2x they plainly stop at every
+coast, because the layer is under the land exactly as intended. Then the
+comparison against the render with the layer removed reversed the conclusion
+again: without it the continent floats on white with nothing around it, and
+the hero's water is now 1.18 from its own land, so the grid is the only thing
+giving the sea any presence at all. *The eye finds a defect and it does not
+confirm one* — twice in one decision, and the render at the right scale is
+what settled it.
+
+
+**AND `photo-tests.py` WAS STARTED WHILE THREE GATES WERE READING `site/`,
+WHICH IS THE CONCURRENCY FAULT THIS FILE ALREADY RECORDS TWICE AND THE FIRST
+TIME IT PRODUCED FOUR PLAUSIBLE FALSE FINDINGS.** That suite wipes and
+rebuilds the site and swaps a stub register in, so `checks.py` came back with
+*"/europe-in is not built"* and two `FileNotFoundError`s, and both audits
+reported **3,272 images served by no register row** and `home-hero`'s
+derivatives as incomplete. Every one of those is a true report about a
+directory being rewritten underneath the reader and a false report about the
+repository. `CLAUDE.md`'s own line says *run the browser suite alone*; the
+rule is larger than the browser suite — **nothing may read `site/` while
+anything is writing it**, and `photo-tests.py` is a writer that does not look
+like one.
+
+**AND THE RIGHT RESPONSE TO CATCHING IT MID-RUN IS TO LET IT FINISH.** Killing
+it is what destroyed the library earlier in this same session: `cleanup()`
+restores the register and moves the originals back, and a killed run never
+reaches it. A gate that is dangerous to interrupt is a gate to start alone and
+wait for.
+
+
+**AND `pgrep -f` MATCHED MY OWN WAITER THREE TIMES IN ONE SESSION, ON A RULE
+THIS FILE ALREADY STATES.** *A liveness check that matches on a NAME is
+matching whoever says the name* was written about a poll that reported a
+finished run as still running for fifteen minutes. Every `until ! pgrep -f
+'browser-checks.js'` loop I armed carried that string on its own command line,
+so each waited on itself: the browser suite's elapsed time read 08:59, then
+01:22, then 01:43, and the suite had in fact finished green
+while three of my monitors were still counting. **Read the artefact,
+not the process table** — the run writes its verdict, and waiting on the
+output file is the form of the wait that cannot match itself.
+
+
+**AND A SCAN FOR A DATA ATTRIBUTE NOTHING READS FOUND 16 KB OF THEM ON THE
+LARGEST PAGE ON THE SITE.** `data-rotate` is on this record — 232 bytes of
+copy on the homepage for the life of a band, waiting for a rotator nobody
+wrote — so the general form of that question is worth asking of all 21 data
+attributes this build emits. `map.js` reads `data-bbox`, `data-wired`,
+`data-slug`, `data-tags` and `data-id` and no others:
+
+| | | |
+|---|---|---|
+| `data-country` | 319 on /map + 6 on the homepage | 7,540 bytes |
+| `data-name` | 369 on /map, written in FOUR places | 8,613 bytes |
+
+Nothing is lost. Every dot's `<title>` already reads *"Name, Country"*, every
+country shape's reads its country, and the popup prints both out of the baked
+`mapinfo` block rather than off the DOM — which is the recorded reason it is
+baked: *"Sent as data rather than read out of the DOM so the summary can be a
+sentence rather than a title attribute."*
+
+**AND MY OWN SCAN REPORTED `data-name` AS READ, because
+`setAttribute("data-name", …)` puts the string in the file a reader-scan
+greps.** An instrument that counts a WRITE as a read — the
+instrument-reads-its-own-documentation fault one verb over — and it took
+opening all four emission sites to see that not one of them is a
+`getAttribute`. `map.js` was writing it onto every shape it creates as well,
+so the attribute was being set by the only script that could have read it.
+
+**And the homepage's six are the refused rotator's own hook.** `.lzc
+data-country` is what the held-back photograph frames were to be fetched by,
+and that enhancement was costed and refused: the register holds destination
+photographs inside exactly one of the six featured countries, so a rotator
+would put the first JavaScript on the homepage to cross-fade one of them. The
+refusal keeps its trigger — several featured countries with photographed
+destinations, about forty lines — and *"two lines of markup"* is part of what
+the trigger restores rather than something to leave shipping in the meantime.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

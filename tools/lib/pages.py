@@ -1712,6 +1712,22 @@ def heroeurope(data, featured=(), beyond_ground=True):
         + f'<g class="herocoast" aria-hidden="true">'
         + (f'<use href="#heroctx"/>' if beyond_ground else "")
         + f'<use href="#heroland"/></g>'
+        # THE GRATICULE, WHICH WAS COMPUTED HERE AND THROWN AWAY. The
+        # paragraph above `graticule_layer()` argues for it at length — ten
+        # degrees, the interval the EU's own pan-European sheets use at this
+        # extent, a hairline in the water's own tone, and *not decoration
+        # here* because under a conic a parallel is a circular arc about the
+        # cone apex, so the grid is what SHOWS the projection this product
+        # draws on and no competitor does. It was assigned to a local and
+        # never interpolated: `kindfilters` on the most-visited page, and the
+        # /map twin has drawn the identical layer all along.
+        #
+        # UNDER THE LAND, which is where /map puts it and what a printed
+        # atlas does with a sea grid: `{mapwater}{mapgrat}` there, land over
+        # both. A graticule across the parchment would be a second network of
+        # lines competing with the frontiers, and the frontiers are the
+        # information.
+        + graticule
         + f'<g class="lyr lyr-land">'
         + (f'<g class="heroctxg" aria-hidden="true">{ctx}</g>' if beyond_ground else "")
         + f'<g class="herolandg">{land}</g></g>'
@@ -1754,7 +1770,19 @@ def heroeurope(data, featured=(), beyond_ground=True):
             f'<use href="#lz-{f["slug"]}"/></clipPath>' for f in featured)
            + '</defs>'
            + '<g class="herophoto" aria-hidden="true">' + "".join(
-               f'<g class="lzc" data-country="{f["slug"]}">' + "".join(
+               # AND THE ROTATOR'S OWN HOOK GOES WITH THEM. `data-country`
+               # here is what the held-back frames were to be fetched by,
+               # and the enhancement was costed and REFUSED: the register
+               # holds destination photographs inside exactly one of the six
+               # featured countries, so a rotator would put the first
+               # JavaScript on the homepage to cross-fade one of them. The
+               # refusal is recorded with its trigger — when several
+               # featured countries hold photographed destinations it is
+               # about forty lines — and "two lines of markup" is part of
+               # what that trigger restores. A hook for a refused
+               # enhancement is `data-rotate`, which shipped 232 bytes on
+               # this same page waiting for a rotator nobody wrote.
+               f'<g class="lzc">' + "".join(
                    f'<image class="lzf"'
                    f' clip-path="url(#lzc-{f["slug"]})"'
                    f' x="{f["box"][0]:.1f}" y="{f["box"][1]:.1f}"'
@@ -1835,7 +1863,7 @@ def heroeurope(data, featured=(), beyond_ground=True):
     )
 
 
-def plate_sequence(plates, anchor=None):
+def plate_sequence(plates):
     """The bands of a plate page, numbered by what is DRAWN.
 
     Five pages compose a plate sequence and each spelled this line itself —
@@ -1905,7 +1933,6 @@ def golink(href, label, cls=""):
     return (f'<a class="go{cls}" href="{href}">'
             f'<span class="gomark" aria-hidden="true"></span>'
             f'<span class="golabel">{esc(label)}</span></a>')
-
 
 
 def home(data):
@@ -2474,20 +2501,27 @@ def home(data):
     # countries are a ringed point, and no photograph, so it needs no
     # register row and costs 8.4 KB for the whole set.
     #
-    # AND EACH CORNER STATES ITS OWN EXTENT. The nine hold 2 to 9 countries
-    # and the headings read as nine equal claims, which is the /countries
-    # finding one page over — nine identical bands for regions that are not
-    # alike. The figure is derived from the grouping directly above, so it
-    # cannot disagree with the names under it.
-    corners = "".join(
-        f'<div class="dcorner">'
-        f'<h3><a href="{urls.macro(m)}">{esc(m["name"])}</a>'
-        f'<span class="dccount">{len(_by_macro.get(m["slug"], []))}</span></h3>'
-        + "".join(f'<a class="dc" href="{urls.country(c)}">'
-                  f'{country_mark(c)}<span class="dcname">{esc(c["name"])}</span></a>'
-                  for c in _by_macro.get(m["slug"], []))
-        + "</div>"
-        for m in data.get("macros", []))
+    # AND THE BAND THAT USED THIS IS GONE, WHICH IS WHY `_by_macro` IS STILL
+    # HERE AND THE COMPOSITION IS NOT. `.doorindex` drew the fifty countries
+    # as fifty own-frame outlines beside their names, grouped by corner —
+    # `country_mark`, argued for at length because a list of fifty names in
+    # the body serif is a sitemap on a page whose argument is that geography
+    # IS the design. Plate 05 then became the nine-corner stage, which
+    # answers the same question better: scrolling to a corner lights that
+    # corner's countries on the continent itself, so the shapes are drawn at
+    # the scale the picture is at rather than at the size of a word.
+    #
+    # What was left behind is the fault, not the decision. The string was
+    # still composed on every build and thrown away — `kindfilters` on the
+    # homepage — `country_mark` had exactly one caller and it was this one,
+    # about fourteen stylesheet rules stood for `.doorindex`, `.dcorner`,
+    # `.dccount`, `.dc`, `.dcshape` and `.dcpoint` with `grep -rl dcorner
+    # site --include=index.html` returning nothing, and the invariant
+    # register still recorded "148 -> 151 THE ATLAS INDEX DRAWS THE FIFTY
+    # COUNTRIES IT LISTS" as the reason for a weight move whose 8.4 KB is
+    # not in the page. That is `.qtile` — a class on zero pages and in no
+    # page builder, with its rules sitting in the file — and *a comment
+    # claiming evidence is read as evidence*, in the register this time.
 
     # AND THE TWO BANDS DIFFER BY NINE, WHICH NOTHING ON THE PAGE SAID.
     # Plate 01 draws a photograph clipped into the outline of every country
@@ -4152,7 +4186,6 @@ def countryportrait(data, c):
     boxed_ = []
 
 
-
     def _try_label(px, py, text, cls, metric="minilabel", off=10.0,
                    prefer="beside", wrap=None, fits=None):
         """Place a label if it fits the aperture and hits nothing already there.
@@ -5515,7 +5548,6 @@ def sectionnav(items):
         return ""
     links = "".join(f'<a href="#{esc(a)}">{esc(l)}</a>' for l, a in live)
     return (f'<nav class="sectionnav" aria-label="On this page">{links}</nav>')
-
 
 
 # ── interests ─────────────────────────────────────────────────────────
@@ -7671,7 +7703,7 @@ def countrymap(data, c):
         [proj.xy(t["lat"], t["lon"]) for r in c["regions"] for t in r["cities"]
          if -8 <= proj.xy(t["lat"], t["lon"])[0] <= w + 8
          and -8 <= proj.xy(t["lat"], t["lon"])[1] <= h + 8],
-        w, cap=34.0 * w / 1000.0)
+        w)
     for r in c["regions"]:
         rp = []
         for t in r["cities"]:
@@ -8732,45 +8764,6 @@ def atlas_register(data):
     return fig, "".join(blocks), drawn, cut_names, len(marks)
 
 
-def country_mark(c, w=100, h=70):
-    """One country, fitted to its own extent, at the size of a word.
-
-    NAMED `country_mark` BECAUSE `country_glyph` WAS ALREADY TAKEN, by the
-    country card's own picture eight hundred lines below — and Python
-    resolves the LATER definition, so the first build of this silently
-    called that one and stopped on its signature. *Grep before naming a
-    composition* is written in this repository about a CSS class; it is the
-    same rule about a module-level function, and here the collision was
-    loud rather than silent only by luck: the two signatures differ.
-    """
-    doc = geo.country(c["slug"])
-    ring = (f'<svg class="dcshape dcpoint" viewBox="0 0 {w} {h}" '
-            f'aria-hidden="true" focusable="false">'
-            f'<circle cx="{w / 2:g}" cy="{h / 2:g}" r="{h * 0.17:g}"/>'
-            f'<circle cx="{w / 2:g}" cy="{h / 2:g}" r="{h * 0.07:g}"/></svg>')
-    if not doc or not doc.get("bbox"):
-        return ring
-    bbox = geo.principal_frame(doc, c["slug"])[0] or list(doc["bbox"])
-    proj = geo.Projection(bbox, w, h, pad=0.04)
-    _ctx, full = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"])
-    here = re.findall(r'<path[^>]*class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]*)"',
-                      full)
-    if not here:
-        return ring
-    pts = re.findall(r"-?\d+(?:\.\d+)?", here[0])
-    if len(pts) // 2 < COUNTRY_DOOR_POINTS:
-        return ring
-    _ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"],
-                              thin_units=w / 24.0, min_units=w / 12.0)
-    thin = re.findall(r'<path[^>]*class="[^"]*\bhere\b[^"]*"[^>]*\sd="([^"]*)"',
-                      land)
-    if not thin:
-        return ring
-    return (f'<svg class="dcshape" viewBox="0 0 {w} {h}" '
-            f'aria-hidden="true" focusable="false">'
-            f'<path d="{thin[0]}"/></svg>')
-
-
 def country_door(data, images, c, w=900, h=560, brief=True):
     """A country with its own photograph inside its own frontier.
 
@@ -9307,7 +9300,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
             continue
         inframe.append((w / 2 + dx * span, h / 2 + dy * span))
     # The frame here is w wide rather than 1000, so the cap scales with it.
-    hitr = hit_radius(inframe, w, cap=34.0 * w / 1000.0)
+    hitr = hit_radius(inframe, w)
     # THE SUBJECT FIRST, THEN THE PHYSICAL GEOGRAPHY, THEN THE NEIGHBOURS.
     # Mont Blanc is ten kilometres from Chamonix and the Matterhorn is beside
     # Zermatt, so at this scale a summit sits almost on top of the town it
@@ -9691,7 +9684,7 @@ def place_label(px, py, name, vw, vh, cls="minilabel here", off=10.0,
     return got[0] if got else ""
 
 
-def hit_radius(pts, vw, cap=34.0, floor=6.0):
+def hit_radius(pts, frame_w, cap=None, floor=6.0):
     """The largest touch target these dots can carry without overlapping.
 
     A DOT ON A MAP IS A LINK, AND IT WAS 3.9 PIXELS WIDE.
@@ -9710,8 +9703,26 @@ def hit_radius(pts, vw, cap=34.0, floor=6.0):
     which is on every page that draws one of these maps, and which the
     caption points at.
 
-    `cap` is 34 units, the radius that renders at 24px at 390.
+    `cap` IS 34 UNITS IN A 1,000-UNIT viewBox, AND THE SECOND PARAMETER USED
+    TO ADVERTISE A SCALING IT DID NOT DO. The docstring above states the
+    figure against a 1,000-unit frame, correctly — and the parameter named
+    for the frame width was read by nothing, while the arithmetic that turns
+    34 into this frame's own cap was typed at two of the three call sites:
+
+        minimap      hit_radius(inframe, w, cap=34.0 * w / 1000.0)
+        countrymap   hit_radius(pts, w,    cap=34.0 * w / 1000.0)
+        pointsmap    hit_radius(pts, vw)          <- vw is always 1000.0
+
+    Nothing a reader ever got was wrong, because the one caller relying on
+    the default draws in a 1,000-unit frame by construction. **The lie was in
+    the interface**, which is `most` on the sea-name pass exactly: a
+    parameter nothing read, and the next caller with a 500-unit frame would
+    have passed it and got a target sized for twice its picture — on the
+    function that exists because a dot on a map is a link and it was 3.9
+    pixels wide. Derived here now, in the one place that should own it.
     """
+    if cap is None:
+        cap = 34.0 * frame_w / 1000.0
     if len(pts) < 2:
         return cap
     near = cap * 2
@@ -9834,7 +9845,7 @@ def dense_class(markup):
 
 
 def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
-              min_w=120.0, min_h=75.0, line=False, extra="", relief=False,
+              min_w=120.0, min_h=75.0, line=False, relief=False,
               note="", highlight=None):
     """A set of places on the continent, through the aperture.
 
@@ -13970,9 +13981,31 @@ def map_page(data):
         tags = " ".join(sorted(set(t["interests"]) | set(r["interests"])))
         adv = " advisory" if c.get("advisory") else ""
         dots.append(
+            # AND `data-country` AND `data-name` WERE 16,020 BYTES READ BY
+            # NOTHING, on the largest page on the site. `map.js` reads
+            # `data-bbox`, `data-wired`, `data-slug`, `data-tags` and
+            # `data-id` and no others; no script, no selector and no gate has
+            # ever read these two, and a scan for a data attribute nothing
+            # reads is what found them — `data-rotate` again, which shipped
+            # 232 bytes of copy on the homepage for the life of a band
+            # waiting for a rotator nobody wrote.
+            #
+            # `data-name` was written in FOUR places: here, on the fifty
+            # country shapes, on the six ringed points, and by `map.js`
+            # itself on every shape it creates. **And my own scan reported it
+            # as read**, because `setAttribute("data-name", …)` puts the
+            # string in the file a reader-scan greps — an instrument that
+            # counts a WRITE as a read, which is the
+            # instrument-reads-its-own-documentation fault one verb over. It
+            # took reading the four sites to see that not one of them is a
+            # `getAttribute`.
+            #
+            # Nothing is lost: every dot's `<title>` already reads "Name,
+            # Country", every shape's reads its country, and the popup prints
+            # both out of the baked `mapinfo` block rather than off the DOM.
             f'<a class="dot{adv}" id="dot-{esc(cid.replace("/", "-"))}" '
-            f'href="{urls.city(c, r, t)}" data-tags="{esc(tags)}" data-id="{esc(cid)}" '
-            f'data-name="{esc(t["name"])}" data-country="{esc(c["name"])}">'
+            f'href="{urls.city(c, r, t)}" data-tags="{esc(tags)}" '
+            f'data-id="{esc(cid)}">'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.2"></circle>'
             f'<title>{esc(t["name"])}, {esc(c["name"])}</title></a>'
         )
@@ -14084,7 +14117,6 @@ def map_page(data):
                 shapes.append(
                     f'<a class="cshape" href="{urls.country_by_slug(ent["slug"])}" '
                     f'id="cshape-{esc(ent["slug"])}" data-slug="{esc(ent["slug"])}" '
-                    f'data-name="{esc(ent["name"])}" '
                     f'data-bbox="{",".join(str(v) for v in ent["bbox"])}">'
                     f'<path d="{d}"></path>'
                     f'<title>{esc(ent["name"])}</title></a>'
@@ -14115,7 +14147,7 @@ def map_page(data):
             x, y = project(here["city"]["lat"], here["city"]["lon"])
             nogeo.append(
                 f'<a class="cpoint" href="{urls.country_by_slug(ent["slug"])}" '
-                f'data-slug="{esc(ent["slug"])}" data-name="{esc(ent["name"])}">'
+                f'data-slug="{esc(ent["slug"])}">'
                 f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5"></circle>'
                 f'<title>{esc(ent["name"])} — too small to draw at this scale'
                 f'</title></a>'
@@ -16160,8 +16192,7 @@ def api_page(data):
     return "/api-docs/index.html", page(
         "The public API", body, path="/api-docs",
         description="Four public, read-only, key-free JSON endpoints: the Atlas index, "
-                    "the search index, country facts and the curated journeys.",
-        trail=None)
+                    "the search index, country facts and the curated journeys.")
 
 
 def sources_page(data):

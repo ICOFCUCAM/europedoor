@@ -3338,6 +3338,42 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
 .europemap .herograt path { fill: none;
   stroke: color-mix(in srgb, var(--atlas-coast) 14%, transparent);
   stroke-width: calc(0.6px / var(--z)); }
+/* AND THE HERO NEEDED ITS OWN, BECAUSE THE RULE ABOVE IS SCOPED TO /map's
+   CONTAINER AND `fill: none` IS THE HALF THAT MATTERS. `graticule_layer()`
+   was written for the hero, argued for there, assigned to a local and never
+   interpolated — so the day it was wired the fifteen paths would have taken
+   the SVG default: BLACK FILL, no stroke, fifteen filled arcs across the
+   Atlantic. That is `.constel path` and the ten unreached `<stop>` elements
+   exactly — a selector that cannot reach the drawing, and the default is the
+   one colour this palette does not contain.
+
+   `--atlas-coast` is the ink the coastline is drawn in and this is a
+   fraction of it, the same construction as /map's, with the fraction
+   measured against THIS drawing's water rather than inherited from the
+   instrument's graphite: the hero sits 55% up the ocean ramp where /map is
+   near-black, so the same 14% would be a different reading. Measured on the
+   shipped pixels. */
+.heroeurope .herograt path { fill: none;
+  stroke: color-mix(in srgb, var(--atlas-coast) 34%, transparent);
+  stroke-width: .5; vector-effect: non-scaling-stroke; }
+/* 34% RATHER THAN /map's 14, AND THE FOUR CANDIDATES WERE RENDERED AND
+   LOOKED AT. /map's ground is near-black and this one's is the gallery's
+   white wall, so the same fraction of the same ink is a different reading.
+   At 22% the grid is present and does not resolve into a structure; at 50%
+   it is the first thing the eye meets in the upper left and competes with
+   the continent; at 34% it is found when it is looked for, which is what
+   the paragraph on /map's own rule asks for. 0.7px was rendered too and is
+   a drawn line rather than a hairline.
+
+   AND THE PER-PIXEL RATIO IS THE WRONG INSTRUMENT HERE, measured: a 0.5px
+   stroke at 34% over white samples 252 on 255 — **1.03:1 at 1280 and 1.05
+   at 1920** — and the line is plainly there in the render. A ratio is a
+   claim about a PATCH; a continuous curve five hundred pixels long is
+   integrated by the eye in a way a per-pixel figure cannot express. This
+   layer carries no text, states nothing a reader must read, and is
+   `aria-hidden`: the projection is stated in prose on /map, which is where
+   knowing it is the reader's business. So no contrast floor applies to it,
+   and the evidence is the two renders — with the grid and without. */
 .europemap .lyr-rivers .riv { fill: none; stroke: var(--ocean-shallow);
   stroke-width: calc(0.7px / var(--z)); stroke-linejoin: round; }
 .europemap .lyr-rivers .riv.major { stroke-width: calc(1.1px / var(--z)); }
@@ -8082,7 +8118,20 @@ body[data-hero] .masthead { position: sticky; }
    findings are not, because the successor can make both mistakes: a
    DECLARED COLOUR IS OVERRIDDEN, NEVER INHERITED AWAY, so `.dcorner a`
    setting its own ink is the thing to check against the plate's ground when
-   this plate's paper next moves. */
+   this plate's paper next moves.
+
+   AND THE SUCCESSOR IS GONE TOO, WHICH IS THE THIRD ANSWER TO ONE QUESTION
+   AND THE SECOND ORPHAN. `.doorindex` / `.dcorner` drew the fifty countries
+   as fifty own-frame outlines beside their names; plate 05 then became the
+   nine-corner stage, where scrolling to a corner lights that corner's
+   countries on the continent itself — the shapes drawn at the scale the
+   picture is at rather than at the size of a word. The band was replaced and
+   its predecessor was left standing: the builder composed the string on
+   every build and threw it away, `country_mark` had exactly one caller and
+   it was that one, and about eighteen rules here matched a class
+   `grep -rl dcorner site --include=index.html` could not find on any page.
+   That is `.qtile` again. All three findings above survive the removal and
+   are what this paragraph is for. */
 .sheet-atlas .goright { bottom: var(--s6); top: auto; }
 
 /* 06 · the message — a plate with almost nothing on it */
@@ -11591,9 +11640,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    what say "separate object, placed here by a system", and nine of them in
    one band is the card grid this page measured out. A corner is told from
    its neighbour by its heading and the space above it. */
-.doorindex { columns: 2; column-gap: var(--s6);
-  border-top: 1px solid var(--rule); padding-top: var(--s5);
-  margin-top: var(--s6); font-family: var(--display); }
 /* THREE COLUMNS FOR NINE CORNERS, AND THE COUNT IS THE DATA'S.
    `columns: auto 12rem` packed five at 1280 and left the fifth holding one
    group with two thirds of it empty — the corners are nine, so three
@@ -11610,11 +11656,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    which is the two-column-layout-collapsing-just-above-its-own-breakpoint
    fault that 834 is on the contact sheet to find. Three columns of 250px
    hold "Bosnia and Herzegovina" at this size. */
-@media (min-width: 52rem) { .doorindex { columns: 3; } }
-.dcorner { break-inside: avoid; margin-bottom: var(--s5); }
-.dcorner h3 { font-size: var(--t-xs); font-family: var(--text);
-  letter-spacing: .08em; text-transform: uppercase; color: var(--door-dark);
-  margin: 0 0 var(--s2); }
 /* NO `color: inherit`, which this file already says 637 lines up and this
    rule ignored: `a { color: inherit }` is the global rule at the top, so
    restating it is a declaration that matches its element and changes
@@ -11622,22 +11663,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    band shipped. `text-decoration: none` STAYS: the scan reported `{color}`
    alone, and deleting the whole rule is how the `.picstory` repair put an
    underline through seven story headlines. */
-.dcorner h3 a { text-decoration: none; }
-.dcorner h3 a:hover { text-decoration: underline;
-  text-underline-offset: .2em; }
-/* THE CHILD COMBINATOR IS LOAD-BEARING. `.dcorner a` also matches the
-   anchor inside the corner's own `<h3>`, so the heading's link became a
-   363-pixel block in a 363-pixel column: its hover and its focus ring spanned
-   the whole column rather than the words, and the browser suite reported the
-   heading as ending on a line under a third of its widest — a TRUE report of
-   a real defect naming the wrong cause, because what it measured as a second
-   line was the blockified anchor's own rect. `text-wrap: balance` was never
-   overridden. The country links are the direct children; the heading's is
-   not. */
-.dcorner > a { display: block; text-decoration: none; color: var(--ink-2);
-  line-height: 1.5; }
-.dcorner > a:hover { color: var(--ink); text-decoration: underline;
-  text-underline-offset: .2em; }
+
 /* ── AND EVERY ONE OF THE FIFTY CARRIES ITS OWN SHAPE ───────────────────
    The row is the country's outline, fitted to its own extent, and its name.
    A GRID RATHER THAN AN INLINE MARK, because the shapes have to line up: a
@@ -11665,34 +11691,16 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    2.4rem is 54 x 38, where every one of the forty-four with a polygon is
    its own country and not a grey mark. It costs the band about 300 pixels
    and the band is the page's index of the whole atlas. */
-.dcorner > a.dc { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr);
-  align-items: center; gap: .8rem; padding-block: .18rem; }
-.dcshape { width: 100%; height: 2.4rem; overflow: visible; }
-.dcshape path { fill: color-mix(in srgb, var(--ink) 34%, transparent);
-  stroke: none; }
 /* A COUNTRY THIS ATLAS DRAWS AS A POINT IS DRAWN AS A POINT HERE. Six have
    no polygon at 1:50m and `/map` already answers that with a ringed point;
    an outline invented for them would be the one claim the register exists
    to refuse. Two circles rather than a circle and a stroke, because a
    1-unit stroke in a 100-unit viewBox is a third of a device pixel at this
    size — the *eleven units is not eleven pixels* measurement, in a mark. */
-.dcpoint circle { fill: none; stroke: color-mix(in srgb, var(--ink) 34%, transparent);
-  stroke-width: 4; vector-effect: non-scaling-stroke; }
-.dcpoint circle + circle { fill: color-mix(in srgb, var(--ink) 34%, transparent);
-  stroke: none; }
-.dcorner > a.dc:hover .dcshape path,
-.dcorner > a.dc:focus-visible .dcshape path { fill: var(--door); }
-.dcorner > a.dc:hover .dcpoint circle,
-.dcorner > a.dc:focus-visible .dcpoint circle { stroke: var(--door); }
-.dcorner > a.dc:hover .dcpoint circle + circle,
-.dcorner > a.dc:focus-visible .dcpoint circle + circle { fill: var(--door); }
 /* THE COUNT IS THE CORNER'S OWN EXTENT, and it is the thing nine identical
    headings could not say: these hold two countries and nine. It sits ON the
    heading's line at the label step, tabular so nine numbers align down a
    column of three. */
-.dcorner h3 { display: flex; align-items: baseline; gap: .6em; }
-.dccount { margin-left: auto; font-variant-numeric: tabular-nums;
-  color: var(--ink-3); letter-spacing: .04em; }
 /* ══ 05 · THE ATLAS REGISTER ═══════════════════════════════════════════
    ONE CONTINENT, FIFTY DOORS, AND THE DRAWING STAYS WHERE IT IS.
 

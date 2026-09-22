@@ -155,7 +155,7 @@ def arch_clip(uid, w, h, rise=None, x0=0.0, y0=0.0):
             f'<path d="{arch_path(w, h, rise)}"{off}/></clipPath>')
 
 
-def arch_rim(w, h, rise=None, x0=0.0, y0=0.0):
+def arch_rim(w, h, rise=None):
     """The wall's own edge, outside the reveal.
 
     A printed plate has a reveal you can see the THICKNESS of. The aperture
@@ -1754,7 +1754,7 @@ def _curl_text(t):
     return re.sub(r"(?<=\w)(?:&#x27;|')(?=\w)", "&#8217;", t)
 
 
-def page(title, body, *, path, description, trail=None, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent="", hero=False):
+def page(title, body, *, path, description, area=None, head_extra="", scripts=(), wide=False, ld_blocks=(), og=None, world="discover", accent="", hero=False):
     if world not in WORLDS:
         raise ValueError(f"{path}: unknown world {world!r}; it is one of {WORLDS}")
     if accent not in ACCENTS:

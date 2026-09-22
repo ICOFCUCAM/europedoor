@@ -186,7 +186,6 @@
     a.setAttribute("href", "/europe/" + ent.slug);
     a.setAttribute("id", "cshape-" + ent.slug);
     a.setAttribute("data-slug", ent.slug);
-    a.setAttribute("data-name", ent.name);
     a.setAttribute("data-bbox", ent.bbox.join(","));
     a.appendChild(path);
     a.appendChild(title);
