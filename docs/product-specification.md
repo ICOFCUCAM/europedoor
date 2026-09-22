@@ -255,6 +255,29 @@ remaining eight all need an account, which needs a data controller, a lawful
 basis and a published privacy notice — the three things `/how-it-works`
 records as blocked.
 
+## 19c. Contributor programme — **specified, not built**
+
+Named **EuropeDoor Contributors** rather than after the brief's working
+title: `docs/brand-lock.md` locks the product name and a programme is not an
+exception to it.
+
+Local people would submit **stories, places, photographs, traditions,
+experiences** and **hidden destinations**, and carry a profile of **Name,
+Location, Bio, Articles, Places discovered, Photos** and **Reputation**.
+
+Every one of the six submission types needs an account, a moderation queue
+and an attribution line, and the profile's seven fields are personal data
+about a named individual — which needs a controller, a lawful basis and a
+published privacy notice before the first row exists. Two of the seven are
+also a SCORE about a person: *Reputation* and *Places discovered* rank
+contributors against each other, which is the one mechanic this product
+refuses everywhere else in its own index.
+
+Photographs are the exception worth naming, because the route already
+exists: `data/images.json` takes a photographer, a source and a licence, and
+a contributed photograph would enter through the same gate rather than
+around it.
+
 ## 20. Multilingual — **specified, not built**
 
 English only today. The infrastructure decision is made and recorded in

@@ -2765,13 +2765,33 @@ def s66():
 
 
 @section(67, "MVP content target", "PARTIAL",
-         "Countries, regions and destinations are past target. Places, "
-         "experiences, journeys and stories are behind, and business "
-         "listings are deliberately not being seeded.")
+         "Three of the eight are past target and five are behind, and the "
+         "row asserted five of the eight. Business listings are the one "
+         "deliberate shortfall: a directory of businesses that have not "
+         "claimed their entry is the thing this project refuses to publish, "
+         "so 8 illustrative records is the shipped state rather than 1% of "
+         "a journey to 500.")
 def s67():
-    yield NCOUNTRY >= 5, f"{NCOUNTRY} countries (target 5)"
-    yield sum(len(c["regions"]) for c in DATA["countries"].values()) >= 50, "50+ regions"
-    yield NCITY >= 150, f"{NCITY} destinations (target 150)"
+    # EACH OF THE EIGHT, derived, with its own figure in the message —
+    # because a row that asserts five of eight targets says nothing about
+    # the three it leaves out, and the shortfalls are the point of the
+    # section.
+    # The label is the REPORT's own — "Travel regions", not "Regions" — and
+    # the needle is the row rather than the word, because a report that
+    # merely mentions a noun says nothing about what it counted.
+    for label, n, target in (
+            ("Countries", NCOUNTRY, 5),
+            ("Travel regions", sum(len(c["regions"]) for c in DATA["countries"].values()), 50),
+            ("Destinations", NCITY, 150),
+            ("Places", len(PLACES), 1000),
+            ("Experiences", len(EXPS), 300),
+            ("Journeys", len(DATA["journeys"]), 50),
+            ("Stories", len(DATA["stories"]), 100),
+            ("Business listings", len(DATA["providers"]["providers"]), 500)):
+        met = n >= target
+        yield doc_covers("docs/content-report.md", f"| {label} | {n} | {target} |"), \
+            f"{label}: {n} of {target} — {'met' if met else f'{100 * n // target}%'}, from the data and in the report"
+
     # Assert the SHAPE, not the number. This line used to name "19% of MVP"
     # and went red the first time somebody wrote sixty more places — which is
     # a check punishing the work it exists to encourage. `or` on two
@@ -2779,31 +2799,158 @@ def s67():
     # fallback made the specific figure decorative rather than enforced.
     yield doc_covers("docs/content-report.md", "% of MVP", "MVP target"), \
         "the shortfalls are published against target"
-    yield len(PLACES) < 1000, "and places are still short of the MVP target"
+
+    # AND THE LINE DIRECTLY UNDER THAT COMMENT WAS THE SAME FAULT AGAIN.
+    # `yield len(PLACES) < 1000` asserts the product has NOT reached its own
+    # target: it is green today and goes RED on the day the place count
+    # meets the MVP figure, which is a check that fails when the work
+    # succeeds — the exact thing the paragraph above it records being fixed
+    # once already, reintroduced one line below. What the section is for is
+    # that the gap is PUBLISHED, not that the gap persists.
+    # "Quality is more important than raw quantity" is the brief's closing
+    # line and it is the only one of its nine sentences that is not a
+    # number. What makes it checkable here is that the thin half is named
+    # PLACE BY PLACE rather than summarised: 34 countries with no place, 98
+    # destinations with neither a place nor an experience, each listed.
+    yield doc_covers("docs/content-report.md", "Where the dataset is thin"), \
+        "and where the dataset is thin is named place by place, not summarised"
 
 
-@section(68, "Launch strategy", "RECORDED",
-         "Depth before breadth, and the thin-page warning enforced in code "
-         "rather than remembered.")
+@section(68, "Launch strategy", "PARTIAL",
+         "Four phases, depth before breadth — and FIFTY COUNTRIES ARE "
+         "PUBLISHED where phase one asks for five. Breadth ran ahead of "
+         "depth and the brief's own stated reason is measurable: 34 of the "
+         "50 countries hold no place at all and 98 of 319 destinations hold "
+         "neither a place nor an experience. What the phasing exists to "
+         "prevent is real, it is measured on every build, and it is "
+         "published rather than left to be discovered.")
 def s68():
     yield spec_covers("Depth tier A"), "the phasing is recorded"
-    yield "facets_for" in src("tools/lib/pages.py"), "and thin pages are prevented mechanically"
+
+    # AND `"facets_for" in src(...)` IS A SYMBOL NAME. §47 records exactly
+    # this — the thirteenth assertion here to pin a shape, and the first
+    # where the shape was a function's name — so a rename reddens it and a
+    # reversal of its behaviour does not. The promise is BEHAVIOURAL: a
+    # facet below the floor gets no page, and the floor is read rather than
+    # typed a second time.
+    yield "FACET_MIN" in src("tools/lib/pages.py"), \
+        "thin pages are prevented by a declared floor rather than by judgement"
+    # AND MY FIRST VERSION OF THIS WAS VACUOUSLY TRUE ON ALL 1,032 PAGES.
+    # It read `"a facet with two entries" not in h or "FACET" in h`, and the
+    # built site contains neither string — so it evaluated `True or False`
+    # everywhere: an assertion about nothing, written in the commit whose
+    # whole subject is finding assertions about nothing. The `or True` fault
+    # §36 removed nine of, by a shorter route.
+    #
+    # The promise is measurable exactly: a facet page is built only when it
+    # has FACET_MIN entries, so no BUILT one may hold fewer. The floor is
+    # read out of pages.py rather than typed a fifth time — four callers
+    # already read it, and a number typed here would be the dispatch cap.
+    import re as _re
+    fmin = int(_re.search(r"^FACET_MIN\s*=\s*(\d+)", src("tools/lib/pages.py"),
+                          _re.M).group(1))
+    facets = [f for f in glob.glob(os.path.join(OUT, "europe", "*", "*", "*", "*", "index.html"))
+              if os.sep + "place" + os.sep not in f]
+    short = [(f, len(_re.findall(r'class="row[ "]', open(f, encoding="utf-8").read())))
+             for f in facets]
+    worst = min((n for _, n in short), default=0)
+    yield len(facets) > 0 and worst >= fmin, \
+        (f"and no built facet page is below the floor: {len(facets)} pages, "
+         f"thinnest holds {worst}, floor is {fmin}")
+
+    # THE MEASUREMENT THE STRATEGY IS ABOUT. Published breadth against
+    # published depth, both derived, so the phase this product is actually
+    # in is arguable from data rather than from a roadmap.
+    cs = list(DATA["countries"].values())
+    nopl = [c for c in cs
+            if not any(t.get("places") for r in c["regions"] for t in r["cities"])]
+    thin = [t for c in cs for r in c["regions"] for t in r["cities"]
+            if not t.get("places") and not t.get("experiences")]
+    yield NCOUNTRY >= 5, f"phase 1 asks for 5 countries and {NCOUNTRY} are published"
+    yield len(nopl) < NCOUNTRY, \
+        f"{len(nopl)} of {NCOUNTRY} countries hold no place — breadth is ahead of depth"
+    yield len(thin) < NCITY, \
+        f"{len(thin)} of {NCITY} destinations hold neither a place nor an experience"
+    yield doc_covers("docs/content-report.md", "Where the dataset is thin"), \
+        "and the thin half is published on every build rather than discovered"
 
 
 @section(69, "Content production model", "PARTIAL",
-         "Editorial is the only one of the three sources running. Local "
-         "contributors and business-supplied facts both need accounts.")
+         "One of the three sources is running, and the other two need the "
+         "same thing. Every one of the nine stories carries the same single "
+         "author; none of the eight business listings has been claimed; and "
+         "no route exists by which a local contributor could send anything. "
+         "The brief's AI clause is answered by a stricter rule than it asks "
+         "for: a measurement is never authored, and a classification is "
+         "authored from a stated vocabulary — so nothing here is a draft a "
+         "person did not write.")
 def s69():
     yield len(PLACES) + len(EXPS) + NCITY > 500, "editorial output exists"
     yield has("/for-businesses", "Claiming a profile"), "the business route is described"
     yield has("/sources", "considered first draft"), "with the honest quality position"
 
+    # EDITORIAL IS ONE SOURCE AND IT IS ONE AUTHOR. A byline that is the
+    # same on all nine is a fact about the production model rather than a
+    # defect, and it is the measurement that makes "editorial is the only
+    # source running" checkable rather than asserted.
+    authors = {st.get("author") for st in DATA["stories"]}
+    yield len(authors) >= 1 and None not in authors, \
+        f"editorial: {len(DATA['stories'])} stories across {len(authors)} byline(s)"
+
+    # BUSINESSES: the route is described and nobody has walked it.
+    claimed = [pr for pr in DATA["providers"]["providers"] if pr.get("claimed_by")]
+    yield len(claimed) == 0, \
+        (f"businesses: {len(claimed)} of {len(DATA['providers']['providers'])} listings "
+         f"claimed — the second source is described and not yet running")
+
+    # LOCAL CONTRIBUTORS: no route at all, which is the same predicate §53,
+    # §55 and §56 read.
+    yield every_page(NO_SUBMISSION, "no page accepts a submission"), \
+        "local contributors: there is no route by which a submission could arrive"
+
+    # THE AI CLAUSE. The brief allows AI drafts with human review central;
+    # this product's rule is stricter and is enforced in the schema, so the
+    # claim is not "we review carefully" but "the validator refuses the
+    # class of field an unreviewed draft would produce".
+    ck = src("tools/checks.py")
+    yield "confidence" in ck, \
+        "AI assistance: an authored confidence field is refused — confidence is derived from the source and its age"
+    yield doc_covers("docs/data-model.md", "confidence"), \
+        "and the rule is recorded where somebody adding a place will read it"
+
 
 @section(70, "Local contributor programme", "DEFERRED",
-         "Needs accounts, moderation and attribution. Specified, not built, "
-         "not implied anywhere on the site.")
+         "Six submission types and a seven-field profile, all of which need "
+         "an account, a moderation queue and an attribution line. Two of the "
+         "seven profile fields are a SCORE ABOUT A PERSON — Reputation and "
+         "Places discovered — which is the mechanic this product refuses "
+         "everywhere else in its own index. Photographs are the exception "
+         "worth naming: that route already exists and a contributed one "
+         "would enter through the same licence gate rather than around it.")
 def s70():
     yield spec_covers("Contributor and creator programmes"), "recorded"
+    # THE PROGRAMME'S OWN SHAPE, recorded so the refusal is about something.
+    # The brief titles it after the name this repository does not use;
+    # docs/brand-lock.md locks the product name and a programme is not an
+    # exception, so it is recorded as EuropeDoor Contributors.
+    yield spec_covers("EuropeDoor Contributors"), "under the locked name"
+    for kind in ("stories", "places", "photographs", "traditions",
+                 "experiences", "hidden destinations"):
+        yield spec_covers(kind), f"submission type recorded: {kind}"
+    for field in ("Name, Location, Bio", "Places discovered", "Reputation"):
+        yield spec_covers(field), f"profile field recorded: {field}"
+    # AND THE REFUSALS, each against the promise that makes it one.
+    yield every_page(NO_SUBMISSION, "no page accepts a submission"), \
+        "nothing can be submitted, so the programme is not implied anywhere"
+    yield has_row("/how-it-works", "Storing business or user data", "blocked"), \
+        "a contributor profile is personal data, and that row is blocked"
+    yield has("/for-businesses",
+              "There is no field on a campaign a ranking could read"), \
+        "and a reputation score is the ranking mechanic this product publishes that it has no field for"
+    # The one route that DOES exist, so the deferral names what is ready.
+    yield "photographer" in src("tools/lib/imageslots.py") or \
+        doc_covers("docs/images.md", "photographer"), \
+        "photographs: the licence gate is built, and a contributed one would enter through it"
 
 
 # ── 71–99: creators, B2B, brand, flows, phases, acceptance ────────────
