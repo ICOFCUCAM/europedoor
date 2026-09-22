@@ -9747,5 +9747,54 @@ def c_svg_point_api():
     return n
 
 
+@check("no page collects a payment card")
+def c_no_card_collection():
+    """NEVER STORE RAW PAYMENT-CARD DATA UNLESS THE COMPLIANCE INFRASTRUCTURE
+    EXISTS — and there is none, so the honest form of that promise is that
+    nothing can be typed in.
+
+    Written while the count is still zero, which is the argument the captions
+    guard already makes one section over: a requirement satisfied by an
+    ABSENCE goes red on nothing, and the day somebody adds a checkout there
+    is no subject for a check to have been written against. The two other
+    guards this repository has for the same family — the Fund holding no
+    amount, and /how-it-works publishing "Taking a payment" as blocked — are
+    both about a DECISION. This one is about the markup: a card field on any
+    page fails the build.
+
+    The browser half is already stronger and is asserted beside it:
+    `Permissions-Policy: payment=()` on every response switches off the
+    Payment Request API site-wide, so even a page that shipped a field could
+    not reach the browser's own card flow.
+
+    It counts PAGES rather than hits, because a healthy run of this check
+    finds zero of the thing it looks for — and a check reporting `(0)` looks
+    exactly like the two this repository found examining nothing.
+    """
+    import re as _re
+    card = _re.compile(
+        r'autocomplete="[^"]*\bcc-'          # cc-number, cc-exp, cc-csc
+        r'|name="(?:cardnumber|card_number|card-number|cvc|cvv|securitycode)"'
+        r'|id="(?:cardnumber|card_number|card-number|cvc|cvv)"'
+        r'|<input[^>]+type="(?:card|payment)"', _re.I)
+    n = 0
+    for path in site_files():
+        n += 1
+        h = open(path, encoding="utf-8").read()
+        if card.search(h):
+            fail(f"{canonical_of(path)} carries a payment-card field. Nothing here may "
+                 f"collect one: there is no entity, no payment provider and "
+                 f"no compliance infrastructure, and /how-it-works publishes "
+                 f"'Taking a payment' as blocked")
+    hdr = open(os.path.join(OUT, "_headers"), encoding="utf-8").read()
+    if "payment=()" not in hdr:
+        fail("_headers no longer disables the Payment Request API. That is "
+             "the half of this promise a markup scan cannot make: a page "
+             "with no field can still call the browser's card flow")
+    if n < 900:
+        fail(f"examined {n} pages — this check has stopped reading the site")
+    return n
+
+
 if __name__ == "__main__":
     main()

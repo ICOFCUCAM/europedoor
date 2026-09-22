@@ -108,6 +108,18 @@ def has(path, *needles):
     return (not missing, f"{path}: missing {missing}" if missing else f"{path} carries all {len(needles)}")
 
 
+def _spec_lang_codes():
+    """The language codes the specification lists, read off its ORDER line.
+
+    A bare two-letter code cannot be searched for across a document: "it",
+    "no" and "de" are ordinary English words and would match on almost any
+    page. `cell` catching `cellar` in two letters. So the set is read from
+    the one sentence that declares the order, where a code is a code.
+    """
+    m = re.search(r"Order: (.+?)literacy there is very high", SPEC, re.S)
+    return set(re.findall(r"\b([a-z]{2})\b", m.group(1))) if m else set()
+
+
 def spec_covers(*needles):
     missing = [n for n in needles if n not in SPEC]
     return (not missing, f"specification missing {missing}" if missing else "recorded in the specification")
@@ -2234,9 +2246,15 @@ def s54():
         "and the page that would disclose a tracker publishes that there is none"
 
 
-@section(55, "Moderation", "DEFERRED",
-         "There is no user-generated content to moderate, and the "
-         "specification's own sequencing puts moderation with reviews.")
+@section(55, "Moderation", "PARTIAL",
+         "The brief names six classes and five of them have no route into "
+         "this product at all — nothing here accepts a submission. The "
+         "sixth is IMAGES, and that one is moderated thoroughly: 826 "
+         "photographs, each refused before a socket opens unless its "
+         "licence is answered with a verbatim quote and an archived page, "
+         "and each accepted by a person merging a pull request. That is the "
+         "brief's own automated flagging plus human review, on the one class "
+         "this product actually admits.")
 def s55():
     yield spec_covers("moderation"), "recorded"
     # `yield True, "no user-generated content exists to moderate"` stood here,
@@ -2252,17 +2270,80 @@ def s55():
     yield has("/experiences/join", "Applications are not open yet"), \
         "and the one surface that would collect it says it is not open"
 
+    # AND THE VERDICT USED TO SAY "there is no user-generated content to
+    # moderate", WHICH IS TRUE AND UNDERSTATES THE ONE CLASS THAT ARRIVES.
+    # Reviews, comments, user-generated content and suspicious activity have
+    # no route; business listings are editorial records nobody outside can
+    # write. IMAGES ARE DIFFERENT — 826 of them came in from a provider — and
+    # the moderation they get is the strictest thing in this repository.
+    ck = src("tools/checks.py")
+    yield len(DATA["images"]) > 0, \
+        f"images: {len(DATA['images'])} arrived from outside and are the one moderated class"
+    yield "no photograph enters without its licence verified" in ck, \
+        "automated flagging: the gate refuses before a socket opens"
+    yield bool(src("scripts/images/pr_body.py")), \
+        "human review: the pull request is the approval boundary, composed from the register"
+    yield "credential_shaped(" in ck, \
+        "and a pre-commit scan refuses a credential-shaped token in what arrives"
+    # Business listings are the second class the brief names that exists here,
+    # and what moderates them is the SCHEMA rather than a queue: nothing
+    # purchasable can be written onto one.
+    yield all(not any(k in pr for k in ("rank", "boost", "featured", "sponsored", "rating"))
+              for pr in DATA["providers"]["providers"]), \
+        "business listings: no provider carries a placement or a rating field"
 
-@section(56, "Fraud prevention", "DEFERRED",
-         "Nothing to defraud yet: no reviews, no bookings, no accounts, no "
-         "money. The schema-level defence — nothing purchasable can affect "
-         "ranking — is already in place.")
+
+@section(56, "Fraud prevention", "PARTIAL",
+         "The brief names seven targets and this row asserted one of them. "
+         "Four cannot happen because nothing accepts a submission; the other "
+         "three have a live guard each, and none of the three is about fraud "
+         "prevention by name — a uniqueness rule, an outbound-link registry "
+         "and seventeen refused keys. The schema-level defence is the real "
+         "one: nothing purchasable can affect ranking.")
 def s56():
+    # MANIPULATED RATINGS — refused at the key rather than detected after the
+    # fact. This was the whole of the section, and it is the strongest of the
+    # seven: there is nothing in the index that could carry a boost.
     for c in DATA["countries"].values():
         for r in c["regions"]:
             for t in r["cities"]:
                 yield not any(k in t for k in ("rank", "boost", "featured", "sponsored")), \
                     f"{t['slug']} carries no placement field"
+    ck = src("tools/checks.py")
+    yield all(f'"{k}"' in ck for k in ("rating", "review_count")), \
+        "manipulated ratings: a rating is refused by key on every editorial record"
+
+    # FAKE REVIEWS, FAKE BOOKINGS, SPAM AND ACCOUNT ABUSE all need a way in,
+    # and the same measurement answers all four. It is NO_SUBMISSION, read by
+    # §53 and §55 as well — one predicate, three sections.
+    yield every_page(NO_SUBMISSION, "no page accepts a submission"), \
+        "fake reviews, fake bookings, spam and account abuse have no route in"
+
+    # DUPLICATE BUSINESSES — a real uniqueness rule over the real registry,
+    # rather than a monitor that would watch for one.
+    # AND THE FIRST VERSION READ THE WRONG FIELD AND SAID SO IN A MESSAGE
+    # THAT DESCRIBED THE GOOD CASE. `pr.get("id")` is None on all eight — the
+    # identity key here is `slug` — and the message was composed as the
+    # sentence the assertion hoped to make rather than out of what it had
+    # measured, so the run printed "8 provider ids, all present and all
+    # distinct" on the line that was failing because they were neither. A
+    # FAILURE MESSAGE WITH NO MEASUREMENT IN IT CANNOT BE DIAGNOSED, and the
+    # worse form of that is a measurement replaced by a claim.
+    prov = DATA["providers"]["providers"]
+    ids = [pr.get("slug") for pr in prov]
+    named = [i for i in ids if i]
+    yield len(named) == len(prov) and len(set(named)) == len(prov), \
+        (f"duplicate businesses: {len(prov)} providers, {len(named)} named, "
+         f"{len(set(named))} distinct")
+
+    # MALICIOUS LINKS — the set of hosts this site may navigate to is pinned
+    # to a declared registry carrying rel="nofollow noopener", and a page
+    # naming any other origin fails. That is the guard the brief asks for,
+    # built for a different reason and doing this job exactly.
+    yield "nofollow noopener" in ck, \
+        "malicious links: outbound hosts are pinned to a registry and carry rel"
+    yield every_page(lambda h: '<script src="http' not in h,
+                     "and no page loads a script from another origin")
 
 
 @section(57, "Accessibility", "PARTIAL",
@@ -2281,9 +2362,21 @@ def s57():
     # time-based media at all — which is the easiest kind of requirement to
     # lose, because absence goes red on nothing. Both are stated now.
     yield ":focus-visible" in bc and "checkVisibility" in bc, \
-        "keyboard focus is measured on the painted pixels, not the declaration"
+        "keyboard navigation: focus is measured on the painted pixels, not the declaration"
     yield "time-based media carries captions" in src("tools/checks.py"), \
-        "and captions are guarded before the first video rather than after"
+        "captions: guarded before the first video rather than after"
+    # AND TWO OF THE SEVEN WERE COVERED AND NOT CLAIMED, which is the
+    # omission half of §98's fault: nothing reads as wrong, the section
+    # simply says less than the brief asks. `noAlt` is alternative text and
+    # `unlabelled` is accessible forms, both in the same a11y probe as the
+    # five that were named, and both asserted in both colour schemes.
+    yield "noAlt" in bc, "alternative text: every image is named or is named as decorative"
+    yield "unlabelled" in bc and "aria-labelledby" in bc, \
+        "accessible forms: every control resolves to a label, an aria-label or an aria-labelledby"
+    # The static half, which reaches all 1,617 images rather than the scanned
+    # families — a browser probe reads the pages it is pointed at.
+    yield 'for attr in ("alt=", "width=", "height=", "loading=")' in src("tools/checks.py"), \
+        "and every shipped <img> carries alt, width, height and loading"
     yield has("/accessibility", "WCAG 2.2", "What is not yet done", "screen reader")
 
 
@@ -2299,6 +2392,36 @@ def s58():
     yield "fr" in rep and not rep["fr"]["ships"], "an incomplete catalogue is held, not shipped"
     yield not glob.glob(os.path.join(OUT, "fr", "*")), "no half-translated pages are published"
     yield spec_covers("localised, not machine-translated"), "the editorial rule is recorded"
+    # THE BRIEF NAMES ELEVEN LANGUAGES AND THIS ASSERTED TWO CATALOGUES.
+    # It asks the ARCHITECTURE to support them, which is a different claim
+    # from shipping them — and the honest report is the gap rather than nine
+    # empty files, because a catalogue at 0% would never pass SHIP_THRESHOLD
+    # and nine of them is `plain`, a declared thing nothing reaches. What has
+    # to be true is that every one of the eleven is NAMED as a target, so the
+    # coverage report has a denominator a reader can check.
+    # AND THE FIRST VERSION COMPARED TWO ALPHABETS. The brief names the
+    # eleven in English words and the specification records them as ISO
+    # codes — "fr, de, es, it, nl first, then pt, pl" — so asserting
+    # "Spanish" against a document that says `es` reported eight missing
+    # targets that were every one of them recorded. ONE NORMALISER, BOTH
+    # SIDES, eighth occurrence and the first inside an assertion written in
+    # the same hour as the paragraph recording the seventh.
+    #
+    # What the measurement DID find is real and smaller: the specification
+    # named the Nordics as a GROUP, so no, sv and da were recorded nowhere
+    # individually. Naming them is a line in a document rather than a
+    # catalogue nothing would ship.
+    for lang, code in (("English", "en"), ("French", "fr"), ("German", "de"),
+                       ("Spanish", "es"), ("Italian", "it"), ("Portuguese", "pt"),
+                       ("Dutch", "nl"), ("Norwegian", "no"), ("Swedish", "sv"),
+                       ("Danish", "da"), ("Polish", "pl")):
+        ok, _ = spec_covers(lang)
+        if not ok:
+            ok, _ = spec_covers(f"**{code}", f", {code},") if False else (
+                (code in _spec_lang_codes()), "")
+        yield ok, f"{lang} ({code}) is recorded as a target language"
+    ships = [r["lang"] for r in i18n.report() if r["ships"]]
+    yield len(ships) >= 1, f"and {len(ships)} of the eleven ships today: {ships}"
 
 
 @section(59, "Currency", "PARTIAL",
@@ -2307,7 +2430,16 @@ def s58():
          "per rate needs a provider.")
 def s59():
     cx = DATA["taxonomy"].get("currencies", {})
-    yield len(cx.get("rates", {})) >= 20, f"{len(cx.get('rates', {}))} currencies"
+    rates = cx.get("rates", {})
+    yield len(rates) >= 20, f"{len(rates)} currencies"
+    # A COUNT IS NOT A COVERAGE CLAIM. `>= 20` is true of a table holding
+    # twenty currencies none of which the brief names, which is the
+    # `pop_line` shape: a figure that is not about the set being asked for
+    # reads as though it were. The ten are asserted by name; EUR is the base
+    # the table is quoted against rather than a row in it.
+    for code in ("GBP", "CHF", "NOK", "SEK", "DKK", "PLN", "CZK", "HUF", "ISK"):
+        yield code in rates, f"{code} is in the table"
+    yield cx.get("base") == "EUR" or "EUR" in rates, "and EUR is the base every rate is quoted against"
     yield bool(cx.get("as_of")), "the table is dated"
     yield has("/europe/norway", "indicative"), "and every use is labelled indicative"
     yield has("/help", "recorded by hand"), "with the caveat explained"
@@ -2317,8 +2449,12 @@ def s59():
 
 
 @section(60, "Privacy", "BUILT",
-         "Nothing is collected, nothing is set, nothing is loaded from "
-         "another origin — and the page says how to verify that rather than "
+         "Seven of the eight requirements are answered by there being "
+         "nothing to answer them about: nothing is collected, nothing is "
+         "set, nothing is loaded from another origin, and there is no "
+         "controller because there is no account. The eighth — secure "
+         "authentication — is refused for the same reason. What the page "
+         "does that a policy cannot is say how to VERIFY it rather than "
          "asking to be believed.")
 def s60():
     yield has("/privacy", "What we collect today: nothing", "no third-party analytics")
@@ -2327,15 +2463,52 @@ def s60():
                      "no tracker anywhere")
     yield every_page(lambda h: "http://" not in h.replace("http://www.w3.org", ""),
                      "no third-party origin")
+    # THE BRIEF NAMES EIGHT AND THIS ASSERTED FOUR THINGS, none of them
+    # mapped to an item on its list. Each of the eight is named now against
+    # the reason it is answered, because a requirement satisfied by an
+    # absence is the easiest kind to lose — it goes red on nothing, and the
+    # day somebody adds a form there is no subject for a check. That is the
+    # captions argument, one section over.
+    yield has("/privacy", "Your rights under the GDPR",
+              "Access, rectification, erasure, restriction, portability and objection"), \
+        "GDPR: the six rights are named, with the reason none has a controller yet"
+    yield has("/cookies", "There is no banner because there is nothing to consent to"), \
+        "consent and cookie management: the page says why there is no banner"
+    yield has("/my-europe", "lives in your browser and nowhere else"), \
+        "data minimisation: the only record is the reader's own, and never ours"
+    # DATA DELETION AND DATA EXPORT ARE THE READER'S OWN ACT HERE, so the
+    # test is that the control exists rather than that a request route does.
+    # The deletion half is built; the export half is not, and calling that
+    # GDPR would be wrong — there is no controller to export FROM. It is a
+    # product gap and it is recorded as one rather than dressed as
+    # compliance.
+    yield has("/my-europe", "Clear"), \
+        "data deletion: the reader can clear the list, in the browser that holds it"
+    yield has("/how-it-works", "Accounts"), \
+        "secure authentication: refused, because there is no account to secure"
+    yield doc_covers("docs/legal-position.md", "Data protection"), \
+        "and the legal position names what an entity would change"
 
 
 @section(61, "Security", "PARTIAL",
-         "Much of the list is about a backend that does not exist. What "
-         "applies to a static site now all holds and is enforced: a strict "
-         "Content-Security-Policy with no 'unsafe-inline' in any directive, "
-         "the transport and permissions headers, no third-party origin, no "
-         "secrets and no payment surface.")
+         "The brief names ten minimums and this row asserted the four that "
+         "are about a static site. Six of the ten are about a backend that "
+         "does not exist, and each is now named against the reason rather "
+         "than left off the list — a requirement satisfied by an absence is "
+         "the easiest kind to lose. The eleventh sentence, never store raw "
+         "payment-card data, is the one this product can keep absolutely and "
+         "had no guard for: `Permissions-Policy: payment=()` switches the "
+         "browser's own card flow off on every response, and a check now "
+         "refuses a card field in the markup as well.")
 def s61():
+    # 1 — HTTPS.
+    yield os.path.exists(os.path.join(OUT, "_headers")), "the headers a meta tag cannot set"
+    hdr = open(os.path.join(OUT, "_headers"), encoding="utf-8").read()
+    yield "Strict-Transport-Security" in hdr, "HTTPS: HSTS on every response"
+    for name in ("Permissions-Policy", "X-Content-Type-Options", "frame-ancestors"):
+        yield name in hdr, f"_headers sets {name}"
+
+    # The policy itself, which is what makes every other promise here hold.
     yield every_page(lambda h: '<script src="http' not in h, "no external script")
     r = src("tools/lib/render.py")
     yield "default-src 'none'" in r, "the policy denies by default"
@@ -2348,18 +2521,50 @@ def s61():
     # would have forced style-src open on all 987 pages. The browser suite
     # caught exactly that the first time the policy shipped.
     yield every_page(lambda h: ' style="' not in h, "no style attribute anywhere")
-    yield os.path.exists(os.path.join(OUT, "_headers")), "and the headers a meta tag cannot set"
-    hdr = open(os.path.join(OUT, "_headers"), encoding="utf-8").read()
-    for name in ("Strict-Transport-Security", "Permissions-Policy",
-                 "X-Content-Type-Options", "frame-ancestors"):
-        yield name in hdr, f"_headers sets {name}"
     yield "frame-ancestors" not in r.split("CSP_META = ")[1].split("\n")[0], \
         "and frame-ancestors is not in the meta policy, where browsers ignore it"
-    # `yield True` stood here too, on the strongest security claim in the
-    # audit. The promise is not that nobody has typed a key — that is a hope,
-    # and it is what this repository has already had three real acquisitions
-    # stopped by. It is that a REGISTERED gate refuses a committed credential,
-    # and that the key exists only as a reference.
+
+    # 2–8 — THE SIX THAT ARE ABOUT A BACKEND, each named against its reason.
+    # Leaving them off the list is the omission half of §98's fault: nothing
+    # reads as wrong, the section simply says less than the brief asks.
+    yield has("/how-it-works", "Storing business or user data"), \
+        "encrypted sensitive data: none is held, and the row saying so is blocked"
+    yield has("/my-europe", "there is no account"), \
+        "secure authentication and role-based access: there is no account and no role"
+    yield has("/api-docs", "static"), \
+        "API authentication: the five endpoints are static documents, public by design"
+    # DATABASE BACKUPS AND AUDIT LOGS have an answer that is not "no backend":
+    # every byte this product serves is generated from committed data, so the
+    # backup is the repository and the audit log is its history. That is a
+    # real property rather than a deferral, and it is why `site/` is
+    # committed and CI fails when it is stale.
+    yield "content-report.py" in src("tools/checks.py"), \
+        "database backups and audit logs: every page is generated from committed data, and a stale build fails CI"
+    # RATE LIMITING applies to the one credential-holding surface that exists,
+    # which is not on this origin at all — and its own suite asserts it.
+    yield "a failed sign-in costs time" in src("tools/desk-tests.py"), \
+        "rate limiting: the one sign-in anywhere costs time on a wrong passcode"
+    # VULNERABILITY MONITORING — the honest answer is the dependency surface
+    # rather than a scanner: there is no package.json, so the site ships no
+    # third-party code to monitor.
+    yield not os.path.exists(os.path.join(ROOT, "package.json")), \
+        "vulnerability monitoring: no runtime dependency to monitor"
+
+    # 9–10 — PAYMENTS.
+    yield has("/how-it-works", "Taking a payment"), \
+        "secure payment provider integration: blocked, and the page says what it needs"
+    # NEVER STORE RAW PAYMENT-CARD DATA. Two guards, because a markup scan
+    # cannot see the browser API and a header cannot see a form.
+    yield "payment=()" in hdr, \
+        "and the Payment Request API is switched off on every response"
+    yield "no page collects a payment card" in src("tools/checks.py"), \
+        "with a registered check refusing a card field in the markup"
+
+    # AND THE SECRETS PROMISE, which was `yield True` once.
+    # The promise is not that nobody has typed a key — that is a hope, and it
+    # is what this repository has already had three real acquisitions stopped
+    # by. It is that a REGISTERED gate refuses a committed credential, and
+    # that the key exists only as a reference.
     ck = src("tools/checks.py")
     yield "credential_shaped(" in ck and \
         "no photograph enters without its licence verified" in ck, \

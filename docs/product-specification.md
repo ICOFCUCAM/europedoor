@@ -844,8 +844,11 @@ per language. A missing key falls back to English and the page marks that
 section as untranslated rather than pretending.
 
 Order: **fr, de, es, it, nl** first (largest intra-European travel markets),
-then pt, pl, and the Nordics — which is a smaller win because English
-literacy there is very high.
+then **pt, pl**, and the Nordics — **no, sv, da** — which is a smaller win
+because English literacy there is very high. That is eleven with **en**,
+which is the set the architecture is required to support; naming the
+Nordics as a group left three of them recorded nowhere, and a target
+list that omits part of its own set reads as a policy.
 
 ## 2.9 What is deliberately blocked, and by what
 
