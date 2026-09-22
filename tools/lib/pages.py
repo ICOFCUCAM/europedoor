@@ -479,6 +479,107 @@ def cut_fade(idprefix, w, h, reach=None, cls="mapcut", top=1.0):
     )
 
 
+def drawn_extent_clip():
+    """The half-plane west of the meridian the DRAWING ends on.
+
+    THERE ARE TWO EASTERN EDGES IN THIS PRODUCT AND EVERY INSTRUMENT WAS
+    AIMED AT THE WRONG ONE.
+
+    `data/geo/` is cut at 52 degrees east, which is what `cut_band`,
+    `dusk_reach`, `c_cut_reach` and the atlas register's own land clip are
+    all built around, and it is written into this file in a dozen comments.
+    It is not where the continent ends. `Projection.path()` clips every ring
+    to the PROJECTION's extent before projecting it — a conic rotates about
+    its apex, so a vertex past the extent swings back INSIDE the canvas
+    instead of falling off it, and that clip is the only thing stopping a
+    grey wedge over the north-east. `MAPPROJ`'s extent stops at 45.
+
+    So the drawn edge is seven degrees west of the dataset's. Measured on
+    /map at 1440, with the browser's own pixels: the land ends at x=731 at
+    y=100, x=792 at y=220 and x=884 at y=400, which is the 45 degree
+    meridian to within one unit on every row. The fade written to hide that
+    edge runs x=684 to 783, x=761 to 859 and x=876 to 974 — a band lying
+    almost entirely EAST of the thing it exists to cover, so it washed the
+    open sea and left the cut showing raw underneath it. **The ramp and the
+    ruled line a reader sees are the same fault**, and one of them is the
+    repair for the other, missing its target by seven degrees.
+
+    The clip is derived from `MAPPROJ.x1` rather than from a document bbox,
+    because the number belongs to the projection that draws the line. Two
+    projected points describe the whole half-plane: a meridian is a straight
+    line under a conic, which is also why the cut read as ruled.
+    """
+    # BOTH CUTS, BECAUSE THERE ARE TWO AND ONLY ONE WAS EVER TALKED ABOUT.
+    # The eastern one is a meridian and straight; the SOUTHERN one is a
+    # parallel, which under a conic is a circular arc about the cone apex —
+    # the fade already learned that and the clip had not, so a half-plane
+    # test would have cut Anatolia or the Maghreb depending which end it was
+    # fitted at. Sampled in lon/lat at one degree and projected, which is
+    # exact at every longitude by construction and costs 71 vertices.
+    #
+    # The inset is DERIVED rather than typed: two projection units, converted
+    # to degrees at the extent's own middle, so it stays two units if the
+    # frame or the angles ever move.
+    lon0, lon1 = MAPPROJ.x0, MAPPROJ.x1
+    lat0, lat1 = MAPPROJ.y0, MAPPROJ.y1
+    mlat, mlon = (lat0 + lat1) / 2.0, (lon0 + lon1) / 2.0
+    ax, ay = MAPPROJ.xy(mlat, mlon)
+    ex, ey = MAPPROJ.xy(mlat, mlon + 1.0)
+    nx_, ny_ = MAPPROJ.xy(mlat + 1.0, mlon)
+    dlon = 2.0 / (math.hypot(ex - ax, ey - ay) or 1.0)
+    dlat = 2.0 / (math.hypot(nx_ - ax, ny_ - ay) or 1.0)
+    east, south, north = lon1 - dlon, lat0 + dlat, lat1
+    span = east - lon0
+    steps = max(8, int(span))
+    REACH = 4000.0
+    # East to west along the southern parallel, then out to open ocean.
+    arc = [MAPPROJ.xy(south, east - span * i / steps) for i in range(steps + 1)]
+    tx, ty = MAPPROJ.xy(north, east)
+    bx, by = arc[0]
+    ux, uy = tx - bx, ty - by
+    ln = math.hypot(ux, uy) or 1.0
+    ux, uy = ux / ln, uy / ln            # north along the meridian
+    ring = [(tx + ux * REACH, ty + uy * REACH)] + arc
+    ring.append((arc[-1][0] - REACH, arc[-1][1]))
+    ring.append((arc[-1][0] - REACH, min(p[1] for p in ring) - REACH))
+    ident = f"excut{next(_CUT_N)}"
+    return ident, ('<defs><clipPath id="' + ident + '"><path d="M'
+                   + "L".join(f"{px:.1f} {py:.1f}" for px, py in ring)
+                   + 'Z"/></clipPath></defs>')
+
+
+def beyond_ground(view, cls="lyr lyr-beyond", thin_units=6.0, min_units=200.0):
+    """The land outside the atlas, so the continent has somewhere to carry on to.
+
+    THE ONLY TREATMENT THAT REMOVES THE LINE RATHER THAN COVERING IT. A
+    drawing that ends on a meridian ends on a straight line whatever the
+    meridian is, so moving the clip east only moves the fault. What the
+    atlas register already proves on the homepage is the other answer: draw
+    the anonymous ground beyond in the SAME tone as the atlas in front of
+    it, and there is no seam to hide — the continent simply continues to the
+    frame edge and the fade comes off entirely. Measured on plate 05's own
+    pixels, rows 150 and 300 of the right-hand third are one flat
+    rgb(216,212,199) with no transition anywhere.
+
+    `beyondmass` is the one geometry here NOT subject to the extent clip:
+    it projects each vertex directly and clips in PROJECTED space to the
+    view, so it reaches x=1000 where the atlas stops at 45 degrees. That is
+    what makes it able to fill the gap at all.
+
+    Thinned hard and nothing small, because it carries no name, no link and
+    no frontier. Stroked in its own fill for the reason `#heroland` is: two
+    datasets simplified independently do not share an edge, and a tenth of a
+    unit of paper along a 700-unit cut is a bright hairline exactly where
+    the picture must not have one.
+    """
+    strips = [b for b in geo.beyondmass(MAPPROJ, view, thin_units=thin_units,
+                                        min_units=min_units, pad=0.0) if b]
+    if not strips:
+        return ""
+    return (f'<g class="{cls}" aria-hidden="true">'
+            + "".join(f'<path d="{d}"/>' for d in strips) + "</g>")
+
+
 # ONE PATTERN FOR THE LAND MARKUP, AND THERE WERE TWO.
 #
 # `geo.landmass()` emits a country as `<path … d="…"><title>Name</title>`,
@@ -6150,10 +6251,21 @@ def journeys_index(data):
         '<polyline class="constel-route" points="'
         + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) + '"/>'
         for pts in routepts)
+    # THE GROUND CARRIES ON, AND THE FADE COMES OFF. This drawing ended
+    # Europe on a ruled diagonal and then painted a sea-coloured ramp over
+    # the open water east of it — the two faults a reader sees are one
+    # fault, and `drawn_extent_clip`'s own note has the measurement. The
+    # ground beyond is already on the page: `constel_defs()` emits
+    # `#constel-beyond` once per document for every glyph on it, in the
+    # atlas's own stone, so this costs one `<use>` and no geometry at all.
+    # `.constel .glyph-beyond`'s own comment has said what it is for since
+    # it was written: *the two abut along the cut, so one colour means there
+    # is no seam to fade and the continent carries on to the frame edge.*
     allmap = (f'<svg class="constel allroutes" viewBox="0 0 {MAP_W} {MAP_H}" '
               f'preserveAspectRatio="xMidYMid meet" '
-              f'aria-hidden="true" focusable="false"><use href="#constel-eu"/>'
-              f'{cut_fade("ih", MAP_W, MAP_H, dusk_reach(), cls="datacut")}'
+              f'aria-hidden="true" focusable="false">'
+              f'<use class="glyph-beyond" href="#constel-beyond"/>'
+              f'<use href="#constel-eu"/>'
               f'{allroutes}</svg>')
     stops_all = {l["city"] for j in js for l in j["legs"]}
     # AN INDEX STATES ITS EXTENT, AND THE HONEST EXTENT OF A JOURNEY SYSTEM
@@ -14431,6 +14543,30 @@ def map_page(data):
     _mapreliefsay = (" " + cartography.RELIEF_CREDIT.replace(
         "Relief from",
         "The height of the ground is drawn from") if mapterr else "")
+    # THE CONTINENT CARRIES ON, AND THE RAMP COMES OFF. Measured in Chromium
+    # at 1440 with the browser's own pixels, this map ended Europe on the 45
+    # degree meridian to within one unit on every row, and the fade written
+    # to hide that edge ran from 47 units WEST of it to 52 units EAST of it
+    # — anchored on the dataset's 52 degree cut, which is not where anything
+    # is drawn. So a reader got both faults at once: a ruled diagonal
+    # through Russia, and a sea-coloured wash over the open water beside it.
+    # `drawn_extent_clip` carries the arithmetic.
+    #
+    # THE INK NEEDS THE CLIP AND THE FILL DOES NOT. `.europemap .countries
+    # path` strokes every edge a ring has, and Russia's easternmost edge is
+    # not a frontier — it is the meridian this projection stops at. The
+    # ground beyond removes the fill step; only the ink still spoke, which
+    # is the atlas register's own finding, whose clip was aimed at 52 and so
+    # has been clipping nothing.
+    #
+    # The clip wraps the land groups alone. `#detail` is filled by map.js on
+    # zoom and inherits it; the dots, the places, the route and the names
+    # sit outside it, so nothing a reader can click is cropped — and the
+    # two-unit sliver it takes off Russia shows the beyond ground under it,
+    # which is the identical fill.
+    mapbeyond = beyond_ground((0, 0, float(MAP_W), float(MAP_H)),
+                              cls="lyr lyr-beyond beyond-atlas")
+    mapclip, mapclipdef = drawn_extent_clip()
     mapopen = f"""
   <div class="pagehead instrument">
     <p class="kicker">The map</p>
@@ -14453,11 +14589,12 @@ def map_page(data):
   <div class="mapwrap">
   <svg viewBox="0 0 {MAP_W} {MAP_H}" id="europemap" class="europemap atlas" data-role="instrument" role="img" aria-describedby="maplist" aria-label="Map of Europe showing every country, destination and place in the Atlas">
   <rect class="lyr lyr-ocean" width="{MAP_W}" height="{MAP_H}"/>
+  {mapbeyond}{mapclipdef}<g clip-path="url(#{mapclip})">
   <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
   <g id="countries" class="countries">{''.join(shapes)}</g>
   <g id="detail" class="countries"></g>
+  </g>
   {mapterr}{mapwater}{mapgrat}
-  {cut_fade('map', MAP_W, MAP_H, dusk_reach())}
   <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
   <g id="route"></g>
   <g id="regions" hidden display="none"></g>
@@ -18437,10 +18574,22 @@ def discover_page(data):
     # claim to make here is the one that goes: this drawing's subject is 313
     # destinations and the six it refuses, and nothing outside the atlas is
     # part of that sentence.
+    # AND THE RAMP CAME OFF WITH IT, BECAUSE IT WAS PAINTING THE WRONG
+    # COLOUR IN THE WRONG PLACE. `.mapcut stop` is `--atlas-sea`, which on
+    # this graphite plate is the LIGHT atlas's pale water, so the fade over
+    # the data cut rendered as a bright wedge across the north-east of a
+    # near-black instrument — and it was anchored on 52 degrees east while
+    # the drawing ends at 45, so it lay beside the edge rather than over it.
+    # Both halves are `drawn_extent_clip`'s finding. The ground beyond, in
+    # this drawing's own land tone, means the continent has somewhere to
+    # carry on to and there is no seam to wash.
+    _dbeyond = beyond_ground((0, 0, float(MAP_W), float(MAP_H)),
+                             cls="lyr lyr-beyond beyond-atlas")
+    _dclip, _dclipdef = drawn_extent_clip()
     dctx, dland = geo.landmass(MAPPROJ, (0, 0, MAP_W, MAP_H))
     mapsvg = (f'<svg viewBox="0 0 {MAP_W} {MAP_H}" aria-hidden="true">'
               f'<rect x="0" y="0" width="{MAP_W}" height="{MAP_H}" class="archground"/>'
-              f'{dctx}{dland}{cut_fade("disc", MAP_W, MAP_H, dusk_reach())}'
+              f'{_dbeyond}{_dclipdef}<g clip-path="url(#{_dclip})">{dctx}{dland}</g>'
               f'{"".join(dots)}</svg>')
 
     # ── THE PHOTOGRAPHIC RESPONSE ────────────────────────────────────

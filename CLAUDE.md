@@ -8393,6 +8393,70 @@ punctuation.** The premise the first version of this work was built on — that
 the portraits name no water at all — was that miscount, and the measurement
 that corrected it also refuted a whole commit's worth of intended change.
 
+
+**THERE ARE TWO EASTERN EDGES IN THIS PRODUCT AND EVERY INSTRUMENT WAS AIMED
+AT THE WRONG ONE.** `data/geo/` is cut at 52°E — the number written into a
+dozen comments in this file, into `cut_band`, `dusk_reach`, `c_cut_reach` and
+the atlas register's own land clip. It is not where the continent ends.
+`Projection.path()` clips every ring to the PROJECTION's extent before
+projecting it, because a conic rotates about its apex and a vertex past the
+extent swings back INSIDE the canvas instead of falling off it — its own
+comment records the grey wedge that produced. **`MAPPROJ`'s extent stops at
+45.** So the drawn edge is seven degrees west of the dataset's, and nothing
+anywhere had ever compared the two numbers.
+
+Measured in Chromium at 1440, on /map's own pixels:
+
+| | the land ends at | the fade runs |
+|---|---|---|
+| y=100 | x=731 (45°E to within one unit) | x=684 → 783 |
+| y=220 | x=792 | x=761 → 859 |
+| y=400 | x=884 | x=876 → 974 |
+
+**The ramp lies almost entirely EAST of the thing it exists to cover**, so it
+washed the open sea and left the cut showing raw underneath it. The ruled
+diagonal through Russia and the grey wedge beside it are not two faults: they
+are one repair missing its target by seven degrees. And `c_cut_reach` passed
+throughout, because it asserts the gradient's WIDTH and never whether the
+gradient is over the cut.
+
+**A DRAWING THAT ENDS ON A MERIDIAN ENDS ON A STRAIGHT LINE WHATEVER THE
+MERIDIAN IS**, so moving the clip east only moves the fault. The atlas
+register already proved the other answer on the homepage: draw the anonymous
+ground beyond in the SAME tone as the atlas in front of it and there is no
+seam to hide — measured on plate 05's own pixels, rows 150 and 300 of the
+right-hand third are one flat rgb(216,212,199) with no transition anywhere.
+`beyondmass` is the one geometry here not subject to the extent clip, because
+it projects each vertex directly and clips in PROJECTED space to the view, so
+it reaches x=1000 where the atlas stops at 45°E. That is what makes it able to
+fill the gap at all.
+
+So /map, /discover and the seventeen-route drawing on /journeys take the
+ground beyond, and **the fade comes off all three**. /journeys costs one
+`<use>` and no geometry: `constel_defs()` has emitted `#constel-beyond` once
+per document since the glyph family was built, and `.constel .glyph-beyond`'s
+own comment has said what it is for ever since — *the two abut along the cut,
+so one colour means there is no seam to fade.* It was never used by the one
+drawing on that page.
+
+**THE INK NEEDS THE CLIP AND THE FILL DOES NOT.** `.europemap .countries path`
+strokes every edge a ring has, and Russia's easternmost edge is not a frontier
+— it is the meridian this projection stops at. The ground beyond removes the
+fill step; only the ink still spoke, which is the atlas register's own finding
+one drawing over, **whose clip was aimed at 52°E and so has been clipping
+nothing since it was written**. `drawn_extent_clip()` derives the half-plane
+from `MAPPROJ.x1` rather than from a document bbox, because the number belongs
+to the projection that draws the line, and it is one implementation for all
+three. The clip wraps the land groups alone: the dots, the places, the route
+and the names sit outside it, so nothing a reader can click is cropped, and
+the two-unit sliver it takes off Russia shows the beyond ground under it,
+which is the identical fill.
+
+**And on /discover the ramp was painting the wrong colour as well as in the
+wrong place.** `.mapcut stop` is `--atlas-sea`, which on that graphite plate
+resolves to the LIGHT atlas's pale water — so the fade over the data cut
+rendered as a bright wedge across the north-east of a near-black instrument.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

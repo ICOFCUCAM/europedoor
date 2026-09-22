@@ -12164,6 +12164,64 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    drawing must not have one. */
 .atplate .lyr-beyond path { fill: var(--map-land); stroke: var(--map-land);
                             stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+/* THE SAME GROUND ON THE TWO INSTRUMENTS, FOR THE SAME REASON AND AT A
+   DIFFERENT TONE. `--atlas-land` rather than `--map-land`, because the
+   cartography roles are what /map and /discover bind — a second name for
+   one colour is two colours waiting to disagree, and these two bands
+   resolve the role differently: /map is the light atlas, /discover is the
+   graphite instrument with a bone continent on it.
+
+   A drawing that ends on a meridian ends on a straight line whatever the
+   meridian is, so moving the clip east only moves the fault. The ground
+   beyond in the land's own tone is the one treatment that removes the line
+   rather than covering it, and it is what lets the fade come off both of
+   these entirely. Stroked in its own fill, because two datasets simplified
+   independently do not share an edge. */
+/* AND IT TAKES THE TONE THAT DRAWING ALREADY GIVES LAND OUTSIDE THE ATLAS,
+   WHICH IS NOT THE SAME TONE ON BOTH. The ground beyond IS context land —
+   anonymous, unnamed, not clickable — so painting it anything else would be
+   a third material on a drawing that has two. /map paints its context in
+   `--atlas-land` for a recorded reason (the stroke is a seam weld rather
+   than a frontier, because stroking it in ink drew every internal border of
+   the Maghreb); /discover paints its context in `--atlas-far`, and the
+   first version of this rule gave it `--atlas-land` instead — so Asia, the
+   Middle East and North Africa all came out in the atlas's own bone and
+   there was no Europe left on the page whose subject is 313 European
+   destinations. *Europe is what the light falls on*, undone by the commit
+   that removed the fade. */
+.europemap .lyr-beyond path { fill: var(--atlas-land); stroke: var(--atlas-land);
+                              stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.instrmap .lyr-beyond path { fill: var(--atlas-far); stroke: var(--atlas-far);
+                             stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+/* AND ON /discover THE GROUND IS ONE TONE, WHICH IS THE THIRD ANSWER AND THE
+   ONLY ONE THAT REMOVES THE LINE.
+
+   A drawing that LIGHTS the atlas and leaves everything else quiet has a
+   boundary between the two, and on every frontier in Europe that boundary
+   is a real one — Finland against Russia, Ukraine against Russia, Greece
+   against Türkiye. It is real everywhere except where the extent cuts a
+   country in half, and the extent is a meridian, so Russia's eastern side
+   came out as the ruled diagonal again: bone against grey instead of bone
+   against black, which is the same fault in a nicer colour. Rendered and
+   looked at rather than argued.
+
+   The atlas register answers that by making a cut country CONTEXT, which
+   works there and costs five countries here — Georgia, Azerbaijan and
+   Armenia are destinations this page exists to light, and unlighting them
+   is the `dusk_reach` finding arrived at from the other side.
+
+   So the ground is ground. This plate's subject is 313 dots and the six it
+   refuses; the land is what they sit on, and /map — the same instrument
+   one page over — has painted its own context in the land tone since the
+   cartography split, for the recorded reason that stroking it in ink drew
+   every internal border of the Maghreb. One tone, no boundary to rule, and
+   the argument the plate makes is carried by the thing it is about. */
+.instrstage .instrmap .lyr-beyond path,
+.instrstage .instrmap .context path { fill: var(--atlas-land);
+                                      stroke: var(--atlas-land);
+                                      stroke-width: 1.4;
+                                      vector-effect: non-scaling-stroke; }
+.europemap .lyr-beyond, .instrmap .lyr-beyond { pointer-events: none; }
 .atplate .atname { font-family: var(--display); font-size: var(--t-md);
                    letter-spacing: .10em; text-transform: uppercase;
                    fill: color-mix(in srgb, var(--ink) 62%, transparent);
