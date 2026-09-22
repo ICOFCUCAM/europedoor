@@ -50,6 +50,70 @@ FAILURES = []
 CHECKS = []
 
 
+def bare_py(code):
+    """Python with its comments and docstrings removed.
+
+    THE THIRD MEMBER OF A FAMILY THAT HAD TWO, AND ITS ABSENCE COST A
+    CHECK IN THE RUN THAT WROTE IT. `bare_css` exists because a comment
+    naming a font size was counted as a font size; `bare_js` exists
+    because a paragraph explaining that a flag was read nowhere satisfied
+    a grep for that flag. The advertising audit then asserted that
+    `render.py` does not read `data/advertising.json` and failed on a
+    DOCSTRING saying the disclosure vocabulary is closed there — so it
+    reached for `bare_js`, which strips // and slash-star and knows
+    nothing about a triple-quoted string.
+
+    An instrument that reads its own documentation as code is wrong, and
+    this repository has now recorded it seven times. The answer each time
+    is the same: one implementation, here, rather than a fourth stripper
+    in whatever file needs it next.
+    """
+    import ast
+    import io
+    import tokenize
+    try:
+        tree = ast.parse(code)
+        toks = list(tokenize.generate_tokens(io.StringIO(code).readline))
+    except (SyntaxError, tokenize.TokenError, IndentationError):
+        return code
+    lines = code.splitlines(keepends=True)
+    starts, off = [0], 0
+    for ln in lines:
+        off += len(ln)
+        starts.append(off)
+
+    def at(row, col):
+        return starts[row - 1] + col
+
+    spans = [(t.start, t.end) for t in toks if t.type == tokenize.COMMENT]
+    # A DOCSTRING IS THE FIRST STATEMENT OF A MODULE, CLASS OR FUNCTION, AND
+    # ONLY `ast` KNOWS THAT. The first version decided it from token types —
+    # a STRING after a NEWLINE or NL — which is also true of a dict key on
+    # its own line, so `"plain": ...` in a motif table was blanked and the
+    # output stopped parsing. A rule that is nearly right about a shape is
+    # the shape-check fault inside a stripper.
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef,
+                                 ast.AsyncFunctionDef)):
+            continue
+        first = (node.body or [None])[0]
+        if (isinstance(first, ast.Expr)
+                and isinstance(first.value, ast.Constant)
+                and isinstance(first.value.value, str)):
+            spans.append(((first.lineno, first.col_offset),
+                          (first.end_lineno, first.end_col_offset)))
+    out = list(code)
+    for (r0, c0), (r1, c1) in spans:
+        # Blanked in place rather than cut out, so every offset, every
+        # indent and every surviving token keeps its position: joining the
+        # survivors with spaces answers a one-token question and silently
+        # breaks a two-token one, because `json.load` becomes `json . load`.
+        for i in range(at(r0, c0), min(at(r1, c1), len(out))):
+            if out[i] != "\n":
+                out[i] = " "
+    return "".join(out)
+
+
 def bare_js(js):
     """A script with its comments removed.
 
@@ -9558,6 +9622,43 @@ def c_use_resolves():
              f"glyph families alone are more than that, so the pattern has "
              f"stopped matching")
     return n
+
+
+@check("the advertising audit's document is not stale")
+def c_ad_audit_fresh():
+    """§1-33 IS A GENERATED TABLE NOW, AND A GENERATED DOCUMENT GOES STALE.
+
+    `docs/advertising.md` mapped all thirty-three sections of the
+    advertising specification in a table nobody asserted, and reading it
+    against the code found four rows that were not true — a declared
+    placement field none of the nine carried, a form shape the document said
+    was in the registry and was not, a sixth inventory product declared
+    nowhere, and a sentence the document said was on a page that did not
+    carry it. `tools/ad-audit.py` asserts every row now.
+
+    Which moves the failure one step along rather than removing it: a
+    generated document whose generator has moved on is `site/` and
+    `docs/invariants.json` exactly, and both are already guarded this way.
+    The audit runs itself and CI runs the audit; this asserts the committed
+    prose still equals what the audit produces, so a verdict cannot change
+    in code and stay the old word on the page.
+    """
+    import subprocess
+    doc = os.path.join(ROOT, "docs", "advertising.md")
+    if not os.path.exists(doc):
+        return 0
+    before = open(doc, encoding="utf-8").read()
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "ad-audit.py"),
+                        "--write"], cwd=ROOT, capture_output=True, text=True)
+    after = open(doc, encoding="utf-8").read()
+    if after != before:
+        open(doc, "w", encoding="utf-8").write(before)
+        fail("docs/advertising.md is stale. Run "
+             "`python3 tools/ad-audit.py --write` and commit the result, "
+             "exactly as site/ and docs/invariants.json are committed")
+    if r.returncode != 0:
+        fail(f"tools/ad-audit.py --write failed: {(r.stderr or '')[-200:]}")
+    return 2
 
 
 if __name__ == "__main__":

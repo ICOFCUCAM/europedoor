@@ -8654,6 +8654,71 @@ by leaking `public_editorial_surface` into the decision, and red four more
 ways on the fields themselves. The visitor decision is unchanged: Pexels'
 scope is still `unresolved` and unresolved SHOWS.
 
+**THE ADVERTISING SPECIFICATION'S THIRTY-THREE SECTIONS WERE MAPPED IN A
+HAND-WRITTEN TABLE AND NOTHING ASSERTED A ROW OF IT.** That is *a verdict can
+contradict a live check and the audit stay green* for the third time —
+§47 published *"distance and mode are computed and stated for every hop"*
+while `MODE_CLAIMS` failed any page claiming a mode, and §36 carried nine
+assertions reading `x in SPEC or True`. Reading this table against the code
+found **four claims that were not true**, every one of them *a comment
+claiming evidence is read as evidence*, in the document whose subject is
+disclosure:
+
+| § | the table said | what was there |
+|---|---|---|
+| 5 | the nine placements carry the brief's fields | `position` is one of them and **none of the nine had one** |
+| 13 | *the shape it would submit is in the registry* | there was no such shape anywhere |
+| 19 | *all five are among the nine placements* | §19 names **six** products |
+| 15 | *the sentence … is on /for-businesses* | the page did not carry it |
+
+**AND THE FOUR ARE ONE FAULT, WHICH IS WHY THEY WERE ALL IN THE SAME
+PLACE.** `serving.slot_position` answered §5 once, GLOBALLY, and that answer
+is true of the seven editorial bands and false of the two with an objection
+attached — a sponsored search result below the organic ones is not "before
+the footer" and a sponsored map marker is on the drawing or it is not a map
+placement. `campaign_type` was a declared field with **no vocabulary behind
+it**, and a field nothing constrains is how §19's sixth product went
+missing: a seasonal campaign is a WINDOW rather than a slot and spans
+several placements, so declaring it as a tenth placement would have been the
+shape of the data deciding the taxonomy. **Nothing was rebuilt to close
+them** — the module, the registry, the service, the nine conditions, the
+transition table and the creative rules were already there and are
+untouched. What was missing was four declarations and one published
+sentence.
+
+**`tools/ad-audit.py` IS THE 33 SECTIONS AS A GATE**, on `section-audit.py`'s
+own machinery: 185 assertions, `--write` regenerating the table AND the
+evaluation's counts, and `c_ad_audit_fresh` failing when the committed prose
+stops equalling what the audit produces — a generated document whose
+generator has moved on is `site/` and `docs/invariants.json` exactly.
+
+**AND ITS OWN FIRST RUN FAILED ON FIVE THINGS THAT WERE NOT ABOUT THE
+PRODUCT.** `advertising.json` in a **docstring** in `render.py`,
+*advertisement* in a comment in `discover.js`, *analytics* in the prose on
+/cookies, **`striped` caught by a search for `stripe`** — which is `cell`
+catching `cellar`, in the audit of the specification about buying an
+ordering — and a campaign's refused keys asked for an editorial record's,
+which are two different lists because they are two different attacks.
+
+**THE FIX WAS THE MISSING THIRD MEMBER OF A FAMILY THAT HAD TWO.**
+`bare_css` strips comments from the stylesheet because a comment naming a
+font size was counted as a font size; `bare_js` strips them from a script
+because a paragraph saying a flag was read nowhere satisfied a grep for that
+flag; **`bare_py` did not exist**, so a Python docstring went straight
+through the one instrument written for this. It blanks comment and docstring
+spans **in place** rather than joining the surviving tokens — joining them
+answers a one-token question and silently breaks a two-token one, because
+`json.load` becomes `json . load`. And **a docstring is found with `ast`
+rather than from token types**: the first version called any string after a
+NEWLINE a docstring, which is also true of a dict key on its own line, so
+`"plain":` in a motif table was blanked and the output stopped parsing —
+the shape-check fault inside the stripper written to remove shape checks.
+
+**And a missing product CRASHED the audit instead of failing it**, found by
+proving it red: `[...][0]` on an empty list raised an IndexError, and *a
+suite that crashes has stopped counting* — it reports no failure and leaves
+every later section unrun.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -8672,6 +8737,7 @@ the rest.
     python3 tools/invariants.py --check       what a visual change may not move
     python3 tools/plate-variation.py --check  the plates have not got more alike
     node tools/monotony.js --check           no page is one component and little else
+    python3 tools/ad-audit.py --check         the advertising spec's 33 sections
     python3 tools/ad-tests.py                 the commercial layer: the OFF state,
                                               and a simulated ON in memory
     python3 tools/photo-tests.py              the acquisition pipeline

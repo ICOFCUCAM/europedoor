@@ -306,6 +306,67 @@ def _targets_match(targets, ctx):
 
 # ── the tables ────────────────────────────────────────────────────────────
 
+def positions():
+    """§5's `position` vocabulary, and the reason each value exists."""
+    return (load().get("positions") or {}).get("vocabulary") or {}
+
+
+def position_name(placement):
+    """Where this placement sits in its document.
+
+    §5 LISTS `position` AS A PLACEMENT FIELD AND THE NINE CARRIED NONE.
+    `serving.slot_position` answered it once for the whole registry — and
+    that answer is true of seven of the nine and false of the two with an
+    objection attached: a sponsored search result below the organic ones is
+    not "before the footer", and a sponsored map marker is on the drawing or
+    it is not a map placement. One global answer to a per-placement question
+    is how those two came to share a position with the seven that cannot
+    have it.
+    """
+    return (placement or {}).get("position") or ""
+
+
+def inventory():
+    """§19's products. Six, and the map claimed five.
+
+    Five of them are a placement each; a SEASONAL CAMPAIGN is not a slot at
+    all — it is a campaign whose window is the product, bought against
+    several placements — so declaring it as a tenth placement would have
+    been the shape of the data deciding the taxonomy. It is a campaign type,
+    and `campaign_type` was a declared field with no vocabulary behind it,
+    which is exactly what let the sixth product go missing.
+    """
+    return (load().get("inventory") or {}).get("products") or []
+
+
+def campaign_types():
+    """The closed vocabulary for `campaigns.campaign_type`, derived.
+
+    From `inventory.products` rather than typed a second time: a second list
+    is a second chance for the two to disagree, which this repository has
+    paid for in a token name, a dispatch cap and a credential scan.
+    """
+    return [p["slug"] for p in inventory()]
+
+
+def campaign_form():
+    """§13's creation form, as a declaration rather than a UI.
+
+    `docs/advertising.md` claimed *the shape it would submit is in the
+    registry, so the form has something to be checked against* and there was
+    no such shape anywhere — a comment claiming evidence, in the file whose
+    subject is disclosure. Every field names where its value comes from, so
+    a form built later against an admin backend is checkable field by field
+    instead of believed.
+    """
+    return (load().get("admin") or {}).get("campaign_form") or []
+
+
+def admin_areas():
+    """§12's seven areas, declared and unbuilt. See `admin.gate`."""
+    return (load().get("admin") or {}).get("areas") or []
+
+
 def placements():
     return load()["placements"]
 

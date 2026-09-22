@@ -201,6 +201,7 @@
       "name": "Partner Spotlight",
       "placement_type": "band",
       "page_type": "homepage",
+      "position": "after_content_before_footer",
       "disclosure": "Sponsored",
       "max_items": 1,
       "enabled": false,
@@ -213,6 +214,7 @@
       "name": "Featured in this country",
       "placement_type": "rows",
       "page_type": "country",
+      "position": "after_content_before_footer",
       "disclosure": "Partner",
       "max_items": 3,
       "enabled": false,
@@ -225,6 +227,7 @@
       "name": "Featured in this region",
       "placement_type": "rows",
       "page_type": "region",
+      "position": "after_content_before_footer",
       "disclosure": "Partner",
       "max_items": 3,
       "enabled": false,
@@ -237,6 +240,7 @@
       "name": "Featured accommodation",
       "placement_type": "card",
       "page_type": "destination",
+      "position": "after_content_before_footer",
       "disclosure": "Sponsored",
       "max_items": 1,
       "enabled": false,
@@ -249,6 +253,7 @@
       "name": "Sponsored experience",
       "placement_type": "card",
       "page_type": "experience",
+      "position": "after_content_before_footer",
       "disclosure": "Sponsored",
       "max_items": 1,
       "enabled": false,
@@ -261,6 +266,7 @@
       "name": "Sponsored journey",
       "placement_type": "band",
       "page_type": "journey",
+      "position": "after_content_before_footer",
       "disclosure": "Sponsored",
       "max_items": 1,
       "enabled": false,
@@ -273,6 +279,7 @@
       "name": "Sponsored story",
       "placement_type": "band",
       "page_type": "stories",
+      "position": "after_content_before_footer",
       "disclosure": "Paid editorial",
       "max_items": 1,
       "enabled": false,
@@ -285,6 +292,7 @@
       "name": "Sponsored search result",
       "placement_type": "band",
       "page_type": "search",
+      "position": "below_the_organic_results",
       "disclosure": "Sponsored",
       "max_items": 1,
       "enabled": false,
@@ -298,6 +306,7 @@
       "name": "Sponsored map result",
       "placement_type": "marker",
       "page_type": "map",
+      "position": "on_the_drawing",
       "disclosure": "Sponsored",
       "max_items": 1,
       "enabled": false,
@@ -477,5 +486,168 @@
   },
   "advertisers": [],
   "campaigns": [],
-  "creatives": []
+  "creatives": [],
+  "positions": {
+    "$comment": "§5 LISTS `position` AS A PLACEMENT FIELD AND THE NINE INSTANCES DID NOT CARRY ONE. `serving.slot_position` answered it once, globally, with the argument for editorial bands written out — and that answer is only true of seven of the nine. A sponsored search result cannot sit before the footer without being a result that is not in the results; a sponsored map marker is ON the drawing or it is not a map placement at all. One global answer to a per-placement question is how the two surfaces with an objection attached ended up sharing a position with the seven that do not.",
+    "vocabulary": {
+      "after_content_before_footer": "Outside the editorial sequence and never numbered. This is `serving.slot_position`, and its reasoning is recorded there.",
+      "below_the_organic_results": "Under every organic result and under a rule, never interleaved with them — §24's own requirement, which is why it cannot take the default position.",
+      "on_the_drawing": "A marker in the map's own coordinate space, visually distinct from an organic dot — §23. It is the position the objection recorded on that placement is about: a mark on a map here is drawn only where the page can name it."
+    }
+  },
+  "inventory": {
+    "$comment": "§19 NAMES SIX PRODUCTS AND THE MAP CLAIMED FIVE. Featured destination, featured experience, partner spotlight, sponsored journey and sponsored story are each a placement; a SEASONAL CAMPAIGN is not — it is a campaign whose window is the product, and it can be bought against several placements at once. Declaring it as a tenth placement would have been the shape of the data deciding the taxonomy, so it is what it is: a campaign type. `campaign_type` was a declared field with no vocabulary behind it, which is what let the sixth product go missing.",
+    "products": [
+      {
+        "slug": "featured_destination",
+        "name": "Featured destination",
+        "placements": [
+          "destination_featured_partner",
+          "country_featured_partner",
+          "region_featured_partner"
+        ]
+      },
+      {
+        "slug": "featured_experience",
+        "name": "Featured experience",
+        "placements": [
+          "experience_featured_partner"
+        ]
+      },
+      {
+        "slug": "partner_spotlight",
+        "name": "Partner spotlight",
+        "placements": [
+          "homepage_partner_spotlight"
+        ]
+      },
+      {
+        "slug": "sponsored_journey",
+        "name": "Sponsored journey",
+        "placements": [
+          "journey_partner"
+        ]
+      },
+      {
+        "slug": "sponsored_story",
+        "name": "Sponsored story",
+        "placements": [
+          "story_partner"
+        ]
+      },
+      {
+        "slug": "seasonal_campaign",
+        "name": "Seasonal campaign",
+        "placements": [],
+        "spans_placements": true,
+        "examples": [
+          "Winter Europe",
+          "Summer Mediterranean",
+          "Christmas Markets",
+          "Northern Lights",
+          "Alpine Season"
+        ],
+        "window": "The advertiser's own `start_at` and `end_at`. This atlas holds 150 dated fixtures and a month-by-kind cross-tab, and NONE of it may set a campaign's dates: which months a partner buys is their decision and not a measurement this product can make for them. The five names above are the brief's, recorded as a vocabulary rather than derived — authoring a classification is the job and authoring a measurement is not."
+      }
+    ]
+  },
+  "campaign_types": {
+    "$comment": "The closed vocabulary `entities.campaigns.campaign_type` was declared against and never given. It is the inventory product a campaign buys, so it is derived from `inventory.products` rather than typed a second time — a second list is a second chance for the two to disagree, which this repository has paid for in a token name, a dispatch cap and a credential scan.",
+    "from": "inventory.products[].slug"
+  },
+  "admin": {
+    "$comment": "§12's seven areas and §13's creation form. NEITHER IS BUILT AND THE DOCUMENT CLAIMED THE SECOND WAS: *the shape it would submit is in the registry, so the form has something to be checked against* — and there was no such shape anywhere. That is a comment claiming evidence being read as evidence, in the file whose subject is disclosure. The shape is here now, and it is a DECLARATION rather than a UI: every field names where its value comes from, so a form built later against an admin backend can be checked field by field instead of being believed.",
+    "areas": [
+      "Advertisers",
+      "Campaigns",
+      "Creatives",
+      "Placements",
+      "Targeting",
+      "Reviews",
+      "Analytics"
+    ],
+    "gate": "Authentication and a backend. Every account feature in this product sits behind the same gate, and the Media Desk is the recorded precedent for how it would be built: a second Vercel project, never on europedoor.com, because a credential-holding authenticated service on that origin changes the security posture of all 1,032 pages to serve one internal tool.",
+    "campaign_form": [
+      {
+        "label": "Advertiser",
+        "field": "advertiser_id",
+        "source": "entities.advertisers",
+        "required": true
+      },
+      {
+        "label": "Campaign name",
+        "field": "name",
+        "source": "free text",
+        "required": true
+      },
+      {
+        "label": "Campaign type",
+        "field": "campaign_type",
+        "source": "inventory.products",
+        "required": true
+      },
+      {
+        "label": "Start",
+        "field": "start_at",
+        "source": "date",
+        "required": true
+      },
+      {
+        "label": "End",
+        "field": "end_at",
+        "source": "date",
+        "required": true
+      },
+      {
+        "label": "Budget",
+        "field": "budget",
+        "source": "amount + currency",
+        "required": true
+      },
+      {
+        "label": "Target country",
+        "field": "targets.country",
+        "source": "targeting.dimensions",
+        "required": false
+      },
+      {
+        "label": "Target destinations",
+        "field": "targets.destination",
+        "source": "targeting.dimensions",
+        "required": false
+      },
+      {
+        "label": "Creative",
+        "field": "creative_id",
+        "source": "entities.creatives",
+        "required": true
+      },
+      {
+        "label": "Headline",
+        "field": "headline",
+        "source": "entities.creatives",
+        "required": true
+      },
+      {
+        "label": "CTA",
+        "field": "cta_label",
+        "source": "entities.creatives",
+        "required": true
+      },
+      {
+        "label": "Disclosure",
+        "field": "disclosure_label",
+        "source": "disclosures",
+        "required": true
+      }
+    ],
+    "save_draft_lands_in": "draft",
+    "may_never": "Publish. §14 is not skippable and `may_transition()` is what enforces it: a form that wrote `active` would be the instant-publish this specification forbids, so SAVE DRAFT is the only terminal the form has and the four write methods in ads.py raise until there is an entity."
+  },
+  "business_dashboard": {
+    "$comment": "§15. The dashboard needs claimable business profiles, which need accounts. What is publishable TODAY is the sentence the brief asks for when advertising is off, and it is on /for-businesses, which is the page a business actually reads — a dashboard nobody can sign in to would be the empty ad container §2 refuses, one level up.",
+    "off_sentence": "Advertising is not currently available.",
+    "published_on": "/for-businesses",
+    "gate": "Claimable business profiles, which need accounts."
+  }
 }

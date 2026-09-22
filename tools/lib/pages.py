@@ -12056,8 +12056,21 @@ def business_page(data):
         f'{rowsub(pl["brief"])}'
         f'<p class="small">Never: {esc(pl["may_never"])}</p></div>'
         f'<p class="rowmeta">{esc(pl["page_type"])}<br>'
+        f'<span class="small">{esc(ADS.position_name(pl))}</span><br>'
         f'<span class="small">{"running" if pl.get("enabled") else "off"}</span></p></div>'
         for pl in ADS.placements()
+    )
+    # §19 NAMES SIX PRODUCTS AND THIS PAGE LISTED NINE PLACEMENTS, WHICH IS
+    # NOT THE SAME QUESTION. A placement is a slot on a surface; a product
+    # is what an advertiser buys, and one of the six — the seasonal
+    # campaign — is a window rather than a slot and spans several. Printing
+    # the placements alone let the sixth go unmentioned on the one page an
+    # advertiser reads.
+    adinv = "".join(
+        f'<div class="row"><div><h3>{esc(pr["name"])}</h3>'
+        f'{rowsub(", ".join(ADS.placement(x)["name"] for x in pr["placements"]) if pr["placements"] else "Any of them, inside its own window")}</div>'
+        f'<p class="rowmeta">{esc(pr["slug"])}</p></div>'
+        for pr in ADS.inventory()
     )
     adobject = "".join(
         f'<div class="row"><div><h3>{esc(pl["name"])}</h3>'
@@ -12081,6 +12094,18 @@ def business_page(data):
     adband = section(
         "The commercial layer, and why none of it is running",
         '<div class="rows">' + adstatus + "</div>"
+        # §15 ASKS FOR ONE SENTENCE WHEN ADVERTISING IS OFF AND THIS PAGE
+        # DID NOT CARRY IT. `docs/advertising.md` said it did — *the
+        # sentence is publishable today and is on /for-businesses* — and a
+        # comment claiming evidence is read as evidence, which is a rule
+        # this repository has recorded five times and had just broken in
+        # the document whose whole subject is disclosure. It is derived
+        # from the same `may_serve()` every slot reads, so it cannot
+        # outlive the state it describes.
+        + ('<p>' + esc(ADS.load()["business_dashboard"]["off_sentence"])
+           + '</p>' if not ADS.may_serve() else "")
+        + '<h3 class="mini">What an advertiser could buy</h3>'
+        + '<div class="rows">' + adinv + "</div>"
         + '<h3 class="mini">The nine declared placements</h3>'
         + '<div class="rows">' + adrows + "</div>"
         + '<h3 class="mini">Every condition between a campaign and a reader</h3>'
