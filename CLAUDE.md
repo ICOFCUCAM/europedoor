@@ -8786,6 +8786,46 @@ check.
 journeys or their legs goes red in §9, §16 and §17, so the vacuous-truth risk
 is real only where nothing else counts the set.
 
+
+**AND THE COMMIT THAT FIXED TWO CI FAILURES UNCOVERED A THIRD, WHICH IS THE
+BROWSER SPLIT ARRIVING THROUGH A DIFFERENT API.** With `checks.py` green and
+the generated document current, the run reached the browser suite for the
+first time in six commits — and **crashed**:
+
+    page.evaluate: TypeError: Failed to execute 'isPointInFill' on
+    'SVGGeometryElement': parameter 1 is not of type 'SVGPoint'.
+
+`SVGGeometryElement.isPointInFill()` takes an `SVGPoint`. **Chromium 141 —
+what this sandbox has at `/opt/pw-browsers` — also accepts a `DOMPoint`, and
+Chromium 131, which CI downloads because it has no such directory, does
+not.** So the call site was green on every local run and died on every CI
+run, which is the eighty-nine-red-run split this file already records,
+through an API rather than through `isHidden()`.
+
+**AND A CRASH IS WORSE THAN A FAILURE, WHICH IS WHY IT COST THE WHOLE
+SUITE.** `page.evaluate` rejected, `main()` threw, and the run reported ONE
+TypeError for a suite of thousands with every later check unrun — *a suite
+that crashes has stopped counting, and it takes the rest of the suite with
+it*, arriving through a browser version rather than through a null selector.
+The log ends in one error and looks like one problem.
+
+**FOUR OF THE FIVE `isPointInFill` CALL SITES IN THAT FILE BUILD THEIR POINT
+WITH `svg.createSVGPoint()`, WHICH BOTH BROWSERS ACCEPT.** The fifth was the
+newest — the country-portrait relief measurement — and the only one that did
+not: *a second implementation of a thing is a second chance to make its
+mistake*, and this is the first occurrence here that **no local run could
+ever have caught**, because the two browsers disagree and only one of them
+is in this sandbox. Proved on the repaired path rather than argued: a probe
+against the real Switzerland portrait in Chromium 141 reports the
+constructor is `SVGPoint` and finds 517 sampled points inside the subject.
+
+`c_svg_point_api` refuses `new DOMPoint` in any `tools/*.js` and requires a
+file that calls `isPointInFill` to call `createSVGPoint`, proved red both
+ways — and it reads through `bare_js`, because the paragraph recording the
+fix names the construct it refuses, which is the instrument-reads-its-own-
+documentation fault this file records seven times and the whole reason that
+stripper exists.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

@@ -9696,5 +9696,56 @@ def c_generated_docs_fresh():
     return n
 
 
+@check("no browser instrument builds an SVG point the CI browser refuses")
+def c_svg_point_api():
+    """THE SUITE CRASHED IN CI AND PASSED HERE, ON ONE WORD.
+
+    `SVGGeometryElement.isPointInFill()` takes an `SVGPoint`. Chromium 141 —
+    what this sandbox has at /opt/pw-browsers — also accepts a `DOMPoint`,
+    and Chromium 131 — what CI downloads, because it has no such directory —
+    does not: it throws `parameter 1 is not of type 'SVGPoint'`. So a call
+    site written with `new DOMPoint` is green on every local run and dies on
+    every CI run, which is the eighty-nine-red-run browser split this file
+    already records, arriving through a different API.
+
+    AND A CRASH IS WORSE THAN A FAILURE, which is the reason this is a check
+    rather than a note. `page.evaluate` rejects, `main()` throws, and the run
+    reports ONE TypeError for a suite of thousands with every later check
+    unrun — *a suite that crashes has stopped counting, and it takes the rest
+    of the suite with it*. The log ends in one error and looks like one
+    problem.
+
+    Four of the five `isPointInFill` call sites in `browser-checks.js` build
+    their point with `svg.createSVGPoint()`, which both browsers accept. The
+    fifth was the newest and is the one that broke: *a second implementation
+    of a thing is a second chance to make its mistake*, and this one could
+    not be caught by anything that runs here.
+
+    Read through `bare_js`, because the paragraph recording the fix names the
+    construct it refuses — the instrument-reads-its-own-documentation fault
+    this repository has now recorded seven times, and the reason that stripper
+    exists.
+    """
+    n = 0
+    for p in sorted(glob.glob(os.path.join(ROOT, "tools", "*.js"))):
+        code = bare_js(open(p, encoding="utf-8").read())
+        n += 1
+        if "new DOMPoint" in code:
+            fail(f"{os.path.relpath(p, ROOT)} builds a point with `new DOMPoint`. "
+                 f"Chromium 131, which CI downloads, refuses one where an "
+                 f"SVGPoint is required — use `svg.createSVGPoint()`, as the "
+                 f"other call sites in that file do")
+        # The converse: a file that tests SVG geometry must build its point
+        # the portable way, so a future call site cannot quietly use the
+        # literal the CI browser rejects under another spelling.
+        if "isPointInFill" in code and "createSVGPoint" not in code:
+            fail(f"{os.path.relpath(p, ROOT)} calls isPointInFill and never "
+                 f"calls createSVGPoint — its point comes from somewhere this "
+                 f"check cannot vouch for against Chromium 131")
+    if n == 0:
+        fail("examined no tools/*.js — this check has stopped reading them")
+    return n
+
+
 if __name__ == "__main__":
     main()

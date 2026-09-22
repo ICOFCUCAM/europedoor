@@ -5584,9 +5584,25 @@ async function main() {
           const sx = b.width / vb.width, sy = b.height / vb.height;
           const at = (x, y) => [Math.round(b.left + x * sx), Math.round(b.top + y * sy)];
           const subj = [], other = [];
+          /* `svg.createSVGPoint()` RATHER THAN `new DOMPoint`, WHICH IS THE
+             BROWSER SPLIT THIS SUITE ALREADY PAID EIGHTY-NINE RED RUNS FOR.
+             Chromium 141 — this sandbox — accepts a DOMPoint here; Chromium
+             131, which CI downloads because it has no /opt/pw-browsers,
+             requires an SVGPoint and throws `parameter 1 is not of type
+             'SVGPoint'`. So the check passed locally and CRASHED in CI, which
+             is worse than failing there: a suite that crashes has stopped
+             counting and takes every later check with it — the run died here
+             and reported one TypeError for a suite of thousands.
+
+             The other four `isPointInFill` call sites in this file all use
+             `createSVGPoint`. This was the newest and the only one that did
+             not, which is a second implementation of one thing being a second
+             chance to make its mistake — and the mistake is invisible to
+             every local run by construction. */
+          const pt = svg.createSVGPoint();
           for (let gx = 0; gx < 44; gx++) for (let gy = 0; gy < 44; gy++) {
             const x = (gx + 0.5) * vb.width / 44, y = (gy + 0.5) * vb.height / 44;
-            const pt = new DOMPoint(x, y);
+            pt.x = x; pt.y = y;
             if (here.isPointInFill(pt)) { subj.push(at(x, y)); continue; }
             for (const o of others) if (o.isPointInFill(pt)) { other.push(at(x, y)); break; }
           }
