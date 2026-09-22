@@ -35,6 +35,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import data as D
 from lib import i18n
 
+# `bare_js` strips comments and string-stepping from a script, because a
+# paragraph naming a vendor is documentation and a call to one is a beacon.
+# checks.py owns it; importing rather than re-implementing is the rule three
+# real acquisitions were stopped by.
+import importlib.util as _ilu
+_spec = _ilu.spec_from_file_location(
+    "_checks_for_audit", os.path.join(os.path.dirname(os.path.abspath(__file__)), "checks.py"))
+_C = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_C)
+bare_js = _C.bare_js
+
 ROOT = D.ROOT
 OUT = os.path.join(ROOT, "site")
 DATA = D.load()
@@ -1783,28 +1794,121 @@ def s47():
         "and no transport provider is declared in it"
 
 
-@section(48, "Booking architecture", "DEFERRED",
-         "Affiliate first, then API, then marketplace — in that order and "
-         "none of them yet, because there is no entity to contract.")
+@section(48, "Booking architecture", "PARTIAL",
+         "STAGE ONE IS BUILT AND EARNING NOTHING; STAGES TWO AND THREE ARE A "
+         "DECLARED SEAM AND A DEFERRAL. The verdict here used to read "
+         "\u201cnone of them yet\u201d, which was false of the first rung: the Stay "
+         "layer is outbound affiliate linking, with three providers, a "
+         "credential field that is null on every one of them, and two honest "
+         "states \u2014 without a credential the link is plain, `rel` is "
+         "nofollow noopener and the page says we earn nothing; with one it "
+         "gains `sponsored` and the disclosure becomes the commission "
+         "sentence. Of the five booking categories only hotels has a "
+         "mechanism: an experience, a tour, an attraction and a transport "
+         "node each carry no operator, no price and no availability, so a "
+         "booking surface for them would have nothing honest to fill it.")
 def s48():
-    yield spec_covers("Affiliate", "Experience commission"), "the sequencing is recorded"
-    yield every_page(lambda h: "book now" not in h.lower(), "nothing offers a booking")
+    stay = json.load(open(os.path.join(ROOT, "data/stay.json"), encoding="utf-8"))
+    provs = stay["providers"]
+
+    # STAGE 1 — outbound affiliate links. Built, and off.
+    yield len(provs) >= 3, f"stage one is built: {len(provs)} providers declared"
+    yield all("search_url" in pv and "place_param" in pv for pv in provs), \
+        "each is a link mechanism — a search URL and the parameter that names a place"
+    yield all(pv.get("partner_id") is None for pv in provs), \
+        "and not one carries a credential, so nothing here earns anything today"
+    # The disclosure exists in BOTH states, which is the whole promise: one
+    # that only appears once we are paid is an advertisement with a conscience.
+    yield "sponsored" in src("tools/lib/stay.py"), \
+        "the sponsored rel is composed where the credential is read"
+    # ONE NEEDLE, NOT `has(A) or has(B)`. `has()` returns (bool, message) and
+    # a non-empty tuple is truthy, so the `or` never chose — this file
+    # already records that guard-on-a-tuple fault about a conditional in the
+    # homepage's own assertions, and the first version of this line repeated
+    # it. The unpaid state is the one a reader gets today.
+    yield has("/europe/france/alps-and-east/chamonix",
+              "earns nothing if you book"), \
+        "and the destination carrying the layer discloses the unpaid state"
+
+    # STAGE 2 — API-based booking. A seam that returns nothing, with the
+    # trigger named per provider rather than as one global "later".
+    yield "def inventory" in src("tools/lib/stay.py"), "stage two is a declared seam"
+    yield "return []" in src("tools/lib/stay.py"), "which returns nothing today"
+    yield all(len(pv.get("inventory_api", "")) >= 40 for pv in provs), \
+        "and every provider states what its API can and cannot supply"
+
+    # STAGE 3 — a native marketplace needs an entity, and nothing on the site
+    # offers a booking.
+    yield every_page(lambda h: "book now" not in h.lower()), "nothing offers a booking"
+
+    # THE FIVE CATEGORIES. Hotels has the mechanism; the other four have no
+    # field a booking could be built on, which is a sourcing fact rather than
+    # a backlog item.
+    # `all_places` yields {place, city, region, country} and
+    # `all_experiences` yields {exp, ...}, so the record is one level in. The
+    # first version tested the WRAPPER, where "operator" is trivially absent
+    # — an assertion that cannot fail, which is the fault this audit removed
+    # nine of in §36.
+    recs_e = [w["exp"] for w in EXPS]
+    recs_p = [w["place"] for w in PLACES]
+    yield not any("operator" in e or "price" in e for e in recs_e), \
+        f"none of the {len(recs_e)} experiences carries an operator or a price"
+    yield not any("operator" in pl or "price" in pl for pl in recs_p), \
+        f"and none of the {len(recs_p)} places does either"
 
 
 @section(49, "Payment system", "DEFERRED",
-         "Blocked on three named conditions, and enforced: no page carries a "
-         "payment surface and no page names a company.")
+         "SIX THINGS A PAYMENT ARCHITECTURE MUST SUPPORT, AND THE ONLY ONE "
+         "THIS PRODUCT HAS IS THE ONE THAT IS NOT ABOUT MONEY MOVING. "
+         "Refunds, cancellations, disputes, taxes and payouts all need an "
+         "entity, a payment provider and a ledger, and none of the three "
+         "exists \u2014 no page carries a payment surface and no page names an "
+         "operating company. Multi-currency is built and is DISPLAY rather "
+         "than settlement: 24 rates against a euro base, rounded, recorded "
+         "by hand on a stated date, with the page saying a bank's rate will "
+         "be worse and the date will get older. Calling that support for "
+         "multi-currency payment would be the same conflation as calling a "
+         "straight-line distance a journey.")
 def s49():
     yield every_page(lambda h: "<form" not in h.lower() or "planner" in h or "search" in h
                      or "newcoll" in h or "askform" in h,
                      "no form other than the planner, the ask box, search and collections")
-    yield "no page names an operating company" in src("tools/checks.py"), "and a check enforces it"
+    yield "no page names an operating company" in src("tools/checks.py"), \
+        "and a check enforces it"
     yield spec_covers("named payee"), "the gate is written down"
+
+    # Nothing that moves money exists, stated per requirement rather than as
+    # one word, because a list that omits part of its own set reads as a
+    # policy.
+    # NOT "settlement". It is a payment term and it is also what this atlas
+    # calls a populated place, so the first version of this loop reported 28
+    # pages offering one — `cell` catching `cellar`, in a check written in
+    # the same session as the paragraph recording that fault. A word that is
+    # ordinary English in the subject matter cannot carry a refusal.
+    for word in ("refund", "chargeback", "payout"):
+        yield every_page(lambda h, w=word: w not in h.lower()), \
+            f"no page offers {word}s"
+
+    # MULTI-CURRENCY IS THE ONE THAT IS BUILT, and it is display.
+    tax = json.load(open(os.path.join(ROOT, "data/taxonomy.json"), encoding="utf-8"))
+    cur = tax["currencies"]
+    yield cur["base"] == "EUR" and len(cur["rates"]) >= 20, \
+        f"{len(cur['rates'])} currencies against a euro base"
+    yield bool(cur.get("as_of")), f"dated {cur['as_of']}, because a rate with no date is a claim about nothing"
+    yield "bank" in cur.get("note", "").lower(), \
+        "and the note says a bank's rate will be worse"
 
 
 @section(50, "Revenue model", "RECORDED",
-         "Eight streams sequenced, with display advertising refused rather "
-         "than deferred.")
+         "EIGHT STREAMS, AND NOT ONE IS SERVING. Three have a built "
+         "mechanism that is switched off \u2014 booking and affiliate revenue "
+         "share the Stay referral, and sponsored content and tourism "
+         "campaigns share the advertising registry, which holds nine "
+         "placements, zero campaigns and nine conditions between a campaign "
+         "and a reader. Business subscriptions have a published position "
+         "rather than a product. Experience commissions, premium membership "
+         "and B2B intelligence have nothing behind them at all. Display "
+         "advertising is refused in writing rather than deferred.")
 def s50():
     yield spec_covers("Affiliate", "Directory subscriptions", "Experience commission",
                       "Sponsored destination", "Premium membership", "Display advertising")
@@ -1812,23 +1916,96 @@ def s50():
     yield every_page(lambda h: not re.search(r"doubleclick|googlesyndication|adsbygoogle", h),
                      "no advertising code anywhere")
 
+    # THE MECHANISMS THAT EXIST, asserted against the registries rather than
+    # against prose — a page can describe a mechanism that has changed.
+    ads = json.load(open(os.path.join(ROOT, "data/advertising.json"), encoding="utf-8"))
+    yield len(ads.get("placements", [])) >= 9, \
+        f"{len(ads.get('placements', []))} placements are declared"
+    yield not ads.get("campaigns"), "and no campaign is declared, so nothing can serve"
+    stay = json.load(open(os.path.join(ROOT, "data/stay.json"), encoding="utf-8"))
+    yield all(pv.get("partner_id") is None for pv in stay["providers"]), \
+        "the referral carries no credential, so booking and affiliate revenue are both zero"
+    yield has("/for-businesses", "boost") or has("/for-businesses", "ranking"), \
+        "business subscriptions have a published position on what cannot be bought"
+
 
 @section(51, "Premium membership", "DEFERRED",
-         "The specification says not to launch it until the free product "
-         "shows engagement. There is no engagement to show.")
+         "THE LAUNCH CONDITION IS THE FINDING: the specification says not to "
+         "launch until the free product demonstrates strong engagement, and "
+         "this product measures no engagement anywhere. There is no "
+         "analytics vendor on any page, no event is collected, and "
+         "discoverability is published as explicitly not a crowd "
+         "measurement \u2014 so the gate cannot be evaluated here at all "
+         "rather than being evaluated and failed. Deciding it needs a "
+         "measurement this product has deliberately refused to take, which "
+         "is a decision for the owner and not a build step. Nothing on the "
+         "site sells a membership, and the name in the brief is not the "
+         "name of this product.")
 def s51():
     yield spec_covers("Premium membership"), "recorded"
     yield every_page(lambda h: "€49/year" not in h and "Europe Atlas Plus" not in h,
                      "nothing on the site sells a membership")
 
+    # NO ENGAGEMENT IS MEASURED, which is what makes the launch condition
+    # unevaluable. Asserted on the scripts, because a vendor named in the
+    # prose of /cookies is a refusal and a vendor in a script is a beacon.
+    js = " ".join(bare_js(src(os.path.join("assets/js", os.path.basename(f))))
+                  for f in glob.glob(os.path.join(ROOT, "assets/js/*.js")))
+    yield not re.search(r"gtag|plausible|matomo|fathom|umami|segment\.", js, re.I), \
+        "no script loads an analytics vendor"
+    yield every_page(lambda h: "googletagmanager" not in h.lower()), \
+        "and no page embeds a tag manager"
+    yield has("/method", "not a crowd measurement"), \
+        "and the one number that looks like popularity publishes that it is not one"
+
 
 # ── 52–70: pass, admin, safety, i18n, privacy, MVP ────────────────────
 
-@section(52, "Europe Atlas Pass", "DEFERRED",
-         "Needs partner coverage that does not exist. Nothing implies it.")
+@section(52, "Membership pass", "DEFERRED",
+         "THE LAUNCH CONDITION IS A NUMBER AND THE NUMBER IS ZERO. The brief "
+         "gates this on substantial partner coverage, which is the one "
+         "deferral in this block that can be measured rather than argued: "
+         "three accommodation providers are declared and none carries a "
+         "credential, and no other counterparty exists anywhere in the data. "
+         "All six benefits need one. The atlas holds 45 museums among its "
+         "255 places and 197 experiences, so the SUBJECTS of a museum offer "
+         "and an experience benefit are written — and a place carries "
+         "duration, kind, coordinates, name, season, slug and summary while "
+         "an experience carries a band and a summary, so there is no field "
+         "on either that an offer, a discount or a partner could attach to. "
+         "Premium content and member-only journeys are the opposite "
+         "problem: everything here is published in full, so the pass would "
+         "have to take something away before it could give it back. The "
+         "name in the brief is not this product's name.")
 def s52():
     yield every_page(lambda h: "Europe Atlas Pass" not in h and "membership pass" not in h.lower()
                      and "EuropeDoor Pass" not in h, "no membership pass is offered")
+
+    # THE GATE, MEASURED. A deferral whose condition is checkable should be
+    # checked, because "not yet" and "not ever" read identically otherwise.
+    stay = json.load(open(os.path.join(ROOT, "data/stay.json"), encoding="utf-8"))
+    withcred = [pv for pv in stay["providers"] if pv.get("partner_id")]
+    yield not withcred, \
+        f"partner coverage is {len(withcred)} of {len(stay['providers'])} declared providers"
+
+    # THE SUBJECTS EXIST AND THE FIELDS DO NOT, which is what makes this a
+    # sourcing position rather than a backlog item.
+    recs_p = [w["place"] for w in PLACES]
+    recs_e = [w["exp"] for w in EXPS]
+    museums = [pl for pl in recs_p if pl.get("kind") == "museum"]
+    yield len(museums) > 20, f"{len(museums)} museums are written about"
+    for field in ("operator", "offer", "discount", "partner", "price"):
+        yield not any(field in pl for pl in recs_p), \
+            f"and no place carries {field}"
+        yield not any(field in e for e in recs_e), \
+            f"nor does any experience carry {field}"
+
+    # PREMIUM CONTENT IS THE INVERSE PROBLEM: nothing is gated, so there is
+    # nothing to put behind a membership without removing it first.
+    yield not any("paywall" in pl or "members_only" in pl for pl in recs_p), \
+        "nothing in the atlas is gated"
+    yield not any(j.get("members_only") for j in DATA["journeys"]), \
+        f"and all {len(DATA['journeys'])} journeys are public"
 
 
 @section(53, "Admin dashboard", "PARTIAL",
