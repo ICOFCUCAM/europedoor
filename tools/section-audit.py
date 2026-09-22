@@ -778,6 +778,19 @@ def s17():
     yield _h1 > 0 and _say > _h1 and _say < _facts, \
         "the strapline is the hero, not an 11px kicker, and it precedes the numbers"
     yield 'class="legs route"' in h, "the legs are drawn as a route, not listed"
+    # AND THE COMMENT ABOVE SAID *the drawn route follows immediately* WITH
+    # NOTHING ASSERTING IT, so it stopped being true and nothing said so. A
+    # photographic bleed and a strip of the stops were added between the hero
+    # and the drawing, which put the one picture that IS the journey at
+    # y=1,918 at 1280 and y=1,996 on a phone — and the strip's head was "The
+    # route", so the page carried two bands named for the route and the
+    # drawing was not either of them. The promise is about ORDER rather than
+    # about a heading: the route is drawn before the reader is shown
+    # photographs of the places on it.
+    _rmap = h.find('class="routewrap"')
+    _strip = h.find('class="ed-strip"')
+    yield _rmap > 0 and (_strip < 0 or _rmap < _strip), \
+        "the drawn route comes before the photographs of its stops"
     # Assert the FACT TABLE's position, not the heading order. The first
     # version of this compared two headings, and moving the facts above the
     # route left both headings where they were — it passed a deliberate

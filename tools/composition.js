@@ -109,12 +109,25 @@ const PROBE = () => {
           && !e.querySelector('svg,img,picture') && e.tagName !== 'svg') continue;
       if (r.right > far) far = r.right;
     }
-    const h1 = document.querySelector('.pagehead h1');
+    /* THE HEAD'S TITLE IS NOT ALWAYS AN h1, AND READING ONLY h1 REPORTED A
+     * ZERO THAT LOOKS EXACTLY LIKE A MISSING HEADLINE. A page built as a
+     * plate sequence puts its <h1> in the opening plate, so the index head
+     * further down carries an <h2> — correct, and the reason `.row` moved
+     * from h3 to h2 is the same one. This selector was `.pagehead h1`, so
+     * /experiences, /stories, /interests and /events each printed `0` at
+     * top `0`, the summary line advertised a size of `0` that no rule
+     * declares, and the top range read 0–873 when the real floor is 136.
+     * Four of forty-seven families, in the instrument the mandate's Finding
+     * 2 is stated from. It reads the head's own title now and prints which
+     * level it is, because a page whose head is an h2 is a fact worth
+     * seeing rather than a zero to explain away. */
+    const t = h.querySelector('h1, h2');
     head = {
       role: ['overture', 'index', 'instrument'].find((r) =>
         (h.className || '').toString().split(' ').includes(r)) || '—',
-      h1: h1 ? Math.round(parseFloat(getComputedStyle(h1).fontSize)) : 0,
-      h1top: h1 ? Math.round(h1.getBoundingClientRect().top + scrollY) : 0,
+      lvl: t ? t.tagName.toLowerCase() : '—',
+      h1: t ? Math.round(parseFloat(getComputedStyle(t).fontSize)) : 0,
+      h1top: t ? Math.round(t.getBoundingClientRect().top + scrollY) : 0,
       height: Math.round(H.height),
       used: Math.round(100 * (far - H.left) / H.width),
     };
@@ -155,16 +168,23 @@ const PROBE = () => {
   }
 
   console.log(`\n  HEADS at ${W}\n`);
-  console.log('      role        h1   top   height  width used   family');
+  console.log('      role        lvl  size   top   height  width used   family');
   for (const r of rows.filter((x) => x.head).sort(
       (a, b) => a.head.used - b.head.used || a.head.height - b.head.height)) {
     const h = r.head;
-    console.log('      ' + h.role.padEnd(11) + String(h.h1).padStart(2) +
-                String(h.h1top).padStart(6) + String(h.height).padStart(8) +
+    console.log('      ' + h.role.padEnd(11) + String(h.lvl).padStart(3) +
+                String(h.h1).padStart(6) + String(h.h1top).padStart(6) +
+                String(h.height).padStart(8) +
                 String(h.used + '%').padStart(12) + '   ' + r.name);
   }
-  const sizes = new Set(rows.filter((x) => x.head).map((x) => x.head.h1));
-  const tops = rows.filter((x) => x.head).map((x) => x.head.h1top);
-  console.log(`\n  h1 sizes in use: ${[...sizes].sort((a, b) => a - b).join(', ')}` +
-              `   h1 top ranges ${Math.min(...tops)}–${Math.max(...tops)}\n`);
+  /* Counted over the heads that HAVE a title. A head with none would have
+   * contributed a 0 to both, which is the zero this instrument used to print
+   * for every plate-sequence index. */
+  const titled = rows.filter((x) => x.head && x.head.lvl !== '—');
+  const sizes = new Set(titled.map((x) => x.head.h1));
+  const tops = titled.map((x) => x.head.h1top);
+  const lv = titled.reduce((a, x) => (a[x.head.lvl] = (a[x.head.lvl] || 0) + 1, a), {});
+  console.log(`\n  head title sizes in use: ${[...sizes].sort((a, b) => a - b).join(', ')}` +
+              `   tops ${Math.min(...tops)}–${Math.max(...tops)}` +
+              `   levels ${Object.entries(lv).map(([k, v]) => `${v}x${k}`).join(', ')}\n`);
 })();

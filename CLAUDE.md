@@ -8302,6 +8302,59 @@ takes `pointer-events: none` — every layer above this land swallows the click
 in turn, which the hero paid for with a picture whose one job was to be the way
 in and which led nowhere — and turns it off again.
 
+**THE BAND THAT DRAWS THE ROUTE HAD NO HEAD, AND ITS NAME WAS TAKEN BY THE
+BAND OF PHOTOGRAPHS ABOVE IT.** A journey page's one picture of the journey —
+the route on the continent, with the relief, the stops named and the aperture
+cut — shipped as a bare `<div class="routewrap">` between the interest chips
+and the legs. So the page's headings read **"The route"** (six photographs of
+the stops), then nothing, then **"The route, in order"** (the distances): two
+bands named for the route, and the drawing was neither of them. Measured on
+the Alpine Grand Tour, the map sat at **y=1,918 at 1280 and y=1,996 at 390**,
+behind a full-bleed photograph and a strip.
+
+**And `section-audit.py`'s own comment on this page says what the composition
+is meant to be** — *the strapline is the hero, the drawn route follows
+immediately, and the eleven-item fact table moved BELOW the legs*. The first
+and third are asserted. The second is prose, and it stopped being true when
+the bleed and the strip were added, with nothing able to say so: §17 compares
+the strapline against the facts and the legs against the fact table, and
+neither test moves when a photograph is inserted between the hero and the
+drawing. **A comment describing a composition is not an assertion about it**,
+which is this repository's own rule about a comment claiming evidence, one
+step earlier — here the claim was true when written and decayed.
+
+The drawing takes the name and the position, the strip takes the name of what
+it actually shows, and the order is now asserted as an order rather than as a
+heading: `class="routewrap"` must precede `class="ed-strip"`, so a photograph
+band inserted above the route fails in the commit that inserts it. The mandate
+asked for this one by name — `docs/first-class-audit.md` reads *"the journey
+page's route map is at y=541 on a phone — the one drawing that IS the subject,
+below the fold. RAISE IT"* — and it had moved further away rather than closer.
+
+**THE HEAD'S TITLE IS NOT ALWAYS AN h1, AND THE INSTRUMENT THAT MEASURES
+HEADS REPORTED A ZERO THAT LOOKS EXACTLY LIKE A MISSING HEADLINE.**
+`tools/composition.js` read `.pagehead h1`, and a page built as a plate
+sequence puts its `<h1>` in the OPENING plate — so the index head further down
+carries an `<h2>`, which is correct and is the same reasoning that moved `.row`
+from h3 to h2. Four of forty-seven families printed **size 0 at top 0**
+(/experiences, /stories, /interests, /events), the summary line advertised an
+h1 size of **0** that no rule in the stylesheet declares, and the top range
+read **0–873** when the real floor is 164. This is the instrument the
+mandate's Finding 2 is stated from, so the published numbers carried the
+zeroes.
+
+It reads the head's own title now, whatever its level, and prints which level
+it is — because a page whose head is an h2 is a fact worth seeing rather than
+a zero to explain away. Re-measured: **head title sizes 30, 60, 76 and 87,
+tops 164–4,156, levels 7×h2 and 32×h1**, and the body half reads **41 distinct
+shapes over 47 families** against the 29 recorded when that half was first
+measured. The new top range is the interesting half: seven families' index
+head sits up to four thousand pixels down the page, because the page's h1 is
+the opening plate's and the index head is a section head that happens to carry
+a display-size title. A summary that averages an h1 at y=164 with an h2 at
+y=4,156 is measuring two different things, and it can only say so once it
+knows which is which.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

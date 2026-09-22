@@ -3548,7 +3548,11 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    `HYPSOMETRIC` moves here and cannot be restated wrongly. Wider than a
    square swatch and no taller, so the row keeps the legend's own rhythm. */
 .legend .sw.relief { display: flex; width: 2.4rem; padding: 0; overflow: hidden; }
-.legend .sw.relief .tb { flex: 1 1 0; display: block; }
+/* AND `display: block` ON A FLEX ITEM IS BLOCKIFIED BY THE LAYOUT, so the
+   dead-rule scan named it in the first run after this row was written — the
+   sixth of that finding on this stylesheet's record, and the second time the
+   widened scan has earned itself in a single session. */
+.legend .sw.relief .tb { flex: 1 1 0; }
 /* Land under the small maps. The country map is the middle rung of
  * Europe -> country -> region -> destination, and before there was geometry
  * it did not exist: a country page could list its regions and could not show

@@ -6616,9 +6616,30 @@ def journey_page(data, j):
     _jshots = ed_strip(data.get("images"), jstrip_items, limit=10)
     jbleed = ed_bleed(data.get("images"), f"journey:{j['slug']}",
                       alt=j["name"], caption=j["name"], shape="tall")
+    # THE BAND THAT DRAWS THE ROUTE HAD NO HEAD, AND ITS NAME WAS TAKEN BY
+    # THE BAND OF PHOTOGRAPHS ABOVE IT. The drawing of the journey shipped as
+    # a bare `<div class="routewrap">` between the interest chips and the
+    # legs, so the page's headings read "The route" (six photographs), then
+    # nothing, then "The route, in order" (the distances) — two bands named
+    # for the route and neither of them the route. Measured on the Alpine
+    # Grand Tour: the map sat at y=1,918 at 1280 and y=1,996 at 390, behind a
+    # full-bleed photograph and a strip, while `section-audit.py`'s own
+    # comment on this page says *the strapline is the hero, the drawn route
+    # follows immediately* — which stopped being true when the strip and the
+    # bleed were added, and no assertion covered it, so nothing said so.
+    #
+    # The drawing takes the name and the position; the strip takes the name
+    # of what it actually shows. `.routewrap` keeps its own class because
+    # the stylesheet sizes the drawing through it.
+    jmapband = (f'<section class="ed-section">'
+                + ed_section_head("The route",
+                                  "What the journey passes through",
+                                  f"{total_km:,} km in a straight line, "
+                                  f"{n_of(len(countries), 'country')}.")
+                + f'<div class="routewrap">{routemap(data, j)}</div></section>')
     jstrip = (f'<section class="ed-section">'
-              + ed_section_head("The route",
-                                "What the journey passes through",
+              + ed_section_head("The stops",
+                                "What each one looks like",
                                 f"{n_of(len(j['legs']), 'stop')}, in order.")
               + _jshots + "</section>") if _jshots else ""
     # THE ONE THING THAT MAKES A JOURNEY A JOURNEY WAS NOT IN ITS HERO.
@@ -6658,10 +6679,9 @@ def journey_page(data, j):
   </div>
 </section>
 {jbleed}
+{jmapband}
 {jstrip}
 <div class="headmeta ed-section">{chips(j["interests"], data["interests"])}</div>
-
-<div class="routewrap">{routemap(data, j)}</div>
 
 <div class="split mt7">
   <div>
