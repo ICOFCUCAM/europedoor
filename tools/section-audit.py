@@ -121,7 +121,22 @@ def _spec_lang_codes():
 
 
 def spec_covers(*needles):
-    missing = [n for n in needles if n not in SPEC]
+    """The third member of the family, and the third to be found without the
+    repair the first one has.
+
+    `has()` collapses whitespace because an instrument a line break can
+    defeat is reading the file rather than the claim; `doc_covers` was given
+    the same thing one commit ago, after §53 failed on "An admin / dashboard
+    needs authentication"; and this one failed on "AI planner completion and
+    business / lead generation" in the run that added it. THREE HELPERS
+    ASKING ONE QUESTION AND ONE OF THEM KNEW THE ANSWER — a rule stated once
+    and applied to one of its call sites, now applied to all three.
+
+    Collapsing can only ever WIDEN a match, so nothing that passed before
+    can fail because of it.
+    """
+    flat = " ".join(SPEC.split())
+    missing = [n for n in needles if " ".join(n.split()) not in flat]
     return (not missing, f"specification missing {missing}" if missing else "recorded in the specification")
 
 
@@ -2577,32 +2592,104 @@ def s61():
     yield doc_covers("docs/legal-position.md", "Data protection"), "the position is recorded"
 
 
-@section(62, "User roles", "DEFERRED",
-         "Eleven roles, all of which need authentication. Two exist in "
-         "practice today: a visitor, and a committer.")
+@section(62, "User roles", "PARTIAL",
+         "Eleven roles, and the row asserted two dashboard names. Two of the "
+         "eleven EXIST today and neither is on europedoor.com: Editor is the "
+         "Media Desk's passcode sign-in, Content Reviewer is whoever merges "
+         "the pull request it dispatches. Visitor is the only role the site "
+         "itself has and it needs nothing. The other eight need an account.")
 def s62():
-    yield spec_covers("Operator dashboard", "Admin dashboard"), "the roles are specified"
+    # EACH OF THE ELEVEN, rather than two dashboard names. The old assertion
+    # was `spec_covers("Operator dashboard", "Admin dashboard")`, which is a
+    # claim about two headings in a document and says nothing about a role.
+    for role in ("Visitor", "Registered User", "Premium User", "Business User",
+                 "Business Admin", "Editor", "Content Reviewer", "Tourism Board",
+                 "Moderator", "Administrator", "Super Administrator"):
+        yield spec_covers(role), f"{role} is recorded"
+    # THE TWO THAT EXIST, asserted against the thing that implements them
+    # rather than against a sentence. This is §55's finding one section over:
+    # a verdict saying "all of them need authentication" is true of nine and
+    # understates the two that are built, authenticated and tested.
+    yield bool(src("tools/hosted-desk-tests.js")) and \
+        "a failed sign-in costs time" in src("tools/desk-tests.py"), \
+        "Editor: a passcode sign-in exists, off-origin, with a suite asserting it"
+    # AND `bool(src(...))` WAS THE FILE-EXISTS FAULT FOR THE THIRD TIME IN
+    # ONE SESSION — §53's own repair reproduced it on robots.txt, and here it
+    # is again on the file that makes this role real. A mutation renaming
+    # every function in pr_body.py left it green, because the file was still
+    # there. What makes a reviewer a REVIEWER is that the thing they approve
+    # is composed from the register rather than typed, so the PR cannot
+    # describe a photograph other than the one committed.
+    pr = src("scripts/images/pr_body.py")
+    yield "no register row for purpose" in pr and "photographer" in pr, \
+        "Content Reviewer: the pull request is generated from the register, so it cannot describe another photograph"
+    # AND THE EIGHT THAT DO NOT, against the promise that refuses them.
+    yield has_row("/how-it-works", "Accounts", "designed, not built"), \
+        "the other eight need an account, and the row saying so is not built"
+    yield has_row("/how-it-works", "Storing business or user data", "blocked"), \
+        "which needs a controller, a lawful basis and a privacy notice first"
 
 
-@section(63, "Analytics", "DEFERRED",
-         "No analytics runs. The event schema is fixed in advance because "
-         "behaviour you did not record is gone, and the privacy rule is "
-         "fixed with it.")
+@section(63, "Analytics", "PARTIAL",
+         "No analytics runs, and the schema is fixed in advance because "
+         "behaviour you did not record is gone. The brief names twelve "
+         "behaviours and the schema had nine events: six mapped, three have "
+         "no feature to instrument — and THREE WERE LIVE SURFACES WITH NO "
+         "EVENT AT ALL. Search, the map's filters and sharing are built "
+         "today and would have produced nothing on the first day analytics "
+         "ran, which is exactly the loss this schema exists to prevent.")
 def s63():
     yield spec_covers("plan_requested", "city_viewed", "outbound_click", "unsupported_ask")
     yield spec_covers("rotating daily session id"), "with the privacy rule"
+    # THE TWELVE, each mapped to a declared event or to the feature that does
+    # not exist. A schema asserted by four of its own names says nothing
+    # about whether it covers what was asked for.
+    for behaviour, event in (
+            ("search", "search_performed"),
+            ("destination views", "city_viewed"),
+            ("map interactions", "map_interaction"),
+            ("AI queries", "plan_requested"),
+            ("itinerary creation", "plan_returned"),
+            ("journey customization", "journey_opened"),
+            ("affiliate clicks", "outbound_click"),
+            ("saves", "save_added"),
+            ("shares", "share_clicked")):
+        yield spec_covers(event), f"{behaviour} -> {event}"
+    # Booking starts, booking completions and reviews get NO event, and that
+    # is the right answer rather than an omission: an event for a surface
+    # nobody built records nothing and looks like coverage. Each is asserted
+    # against the row that says the feature is not there.
+    yield has_row("/how-it-works", "Bookings &amp; commission", "designed, not built"), \
+        "booking starts and completions: no feature, so no event"
+    yield every_page(NO_SUBMISSION, "no page accepts a submission"), \
+        "reviews: nothing can arrive, so there is nothing to count"
 
 
 @section(64, "North star metric", "RECORDED",
-         "Meaningfully planned journeys per active user, not page views.")
+         "Meaningfully planned journeys per active user, not page views — "
+         "and four of its six supporting metrics were named nowhere. A "
+         "supporting metric that is not written down is an intention.")
 def s64():
     yield spec_covers("North star metric"), "recorded"
     yield "plan_returned" in SPEC, "and the event that would measure it"
+    for m in ("itinerary creation rate", "return-user rate", "saved destinations",
+              "booking conversion", "AI planner completion", "business lead generation"):
+        yield spec_covers(m), f"supporting metric recorded: {m}"
+    # AND IT CANNOT BE COMPUTED HERE, which is the honest half. "Per active
+    # user" needs users, and this product measures none by construction —
+    # the same structural refusal §54 asserts, named here rather than left
+    # implied by a RECORDED verdict.
+    yield every_page(lambda h: csp_directive(h, "connect-src") == "'self'",
+                     "a page that could beacon a metric out"), \
+        "and nothing can be measured from here: no vendor, no beacon, no user"
 
 
-@section(65, "MVP scope", "BUILT",
-         "Every item on the specification's MVP list is live except user "
-         "accounts, which are browser-local by choice.")
+@section(65, "MVP scope", "PARTIAL",
+         "Thirteen of the sixteen are live. THE VERDICT SAID FIFTEEN — "
+         "\"every item except user accounts\" — and basic analytics and the "
+         "admin CMS are not live either, which is two more claims than the "
+         "build supports. All three have a published reason and none is a "
+         "thing nobody got round to.")
 def s65():
     for url, what in (("/", "homepage"), ("/europe/norway", "country pages"),
                       ("/europe/norway/fjord-norway/bergen", "destination pages"),
@@ -2612,19 +2699,69 @@ def s65():
                       ("/journeys", "journeys"), ("/stories", "stories"),
                       ("/my-europe", "bookmarks"), ("/for-businesses", "business listings")):
         yield exists(url), f"{what} at {url}"
-    yield bool(src("docs/content-report.md")), "basic analytics of the content itself"
+    # THE FOUR THE LIST NAMED AND THE ROW NEVER ASSERTED.
+    yield NCOUNTRY >= 5, f"5 initial countries: {NCOUNTRY} are published"
+    yield has("/my-europe", "there is no account"), \
+        "user accounts: browser-local by choice, and the page says so"
+    yield has("/cookies", "sets no cookies"), \
+        "basic analytics: NOT live, and the reason is published rather than pending"
+    yield doc_covers("docs/content-report.md", "An admin dashboard needs authentication"), \
+        "admin CMS: NOT live — the figures are generated and committed instead"
 
 
-@section(66, "Initial countries", "BUILT",
-         "All five of the specification's launch cluster are depth-tier A, "
-         "and all seven of its second cluster exist.")
+@section(66, "Initial countries", "PARTIAL",
+         "All five of the launch cluster are published and all seven of the "
+         "second cluster exist. What does not hold as stated is the brief's "
+         "own editorial claim: measured on this atlas's interest weights, "
+         "NORWAY IS THE ONLY ONE THAT IS DIFFERENT. Italy and Spain overlap "
+         "at 0.89, France and Spain at 0.87 — three variations of history, "
+         "food and architecture — where Norway's highest overlap with any of "
+         "the four is 0.55. That is as much a fact about seventeen interest "
+         "tags as about five countries, and /interests already publishes it: "
+         "the three largest tags barely narrow Europe.")
 def s66():
+    depth = {}
     for slug in ("norway", "france", "italy", "spain", "germany"):
         c = DATA["countries"][slug]
         n = sum(len(r["cities"]) for r in c["regions"])
+        depth[slug] = n
+        # The floor is 9 and Germany is 9, so the check has no headroom —
+        # which is a floor working rather than a floor that is wrong, and the
+        # numbers are in the message because a figure with no measurement
+        # beside it cannot be diagnosed.
         yield n >= 9, f"{c['name']}: {n} destinations"
-    for slug in ("sweden", "denmark", "portugal", "greece", "austria", "switzerland", "netherlands"):
-        yield slug in DATA["countries"], f"{slug} exists"
+    yield min(depth.values()) >= 9, \
+        f"the thinnest of the five is {min(depth, key=depth.get)} at {min(depth.values())}"
+
+    # THE SECOND CLUSTER WAS ASSERTED BY EXISTENCE ALONE, and existence says
+    # nothing a reader would care about: these run 4 destinations to 25. The
+    # count is in the message so the expansion order is arguable from data.
+    for slug in ("sweden", "denmark", "portugal", "greece", "austria",
+                 "switzerland", "netherlands"):
+        c = DATA["countries"].get(slug)
+        n = sum(len(r["cities"]) for r in c["regions"]) if c else 0
+        yield c is not None, f"{slug}: {n} destinations"
+
+    # THE BRIEF'S EDITORIAL CLAIM, MEASURED. "Very different travel
+    # propositions" is checkable against the interests each country's own
+    # destinations carry, and it holds for one of the five.
+    def profile(slug):
+        n = {}
+        for r in DATA["countries"][slug]["regions"]:
+            for t in r["cities"]:
+                for i in (t.get("interests") or []):
+                    n[i] = n.get(i, 0) + 1
+        tot = sum(n.values()) or 1
+        return {k: v / tot for k, v in n.items()}
+    P = {s_: profile(s_) for s_ in ("norway", "france", "italy", "spain", "germany")}
+    def overlap(a, b):
+        return sum(min(P[a].get(k, 0), P[b].get(k, 0)) for k in set(P[a]) | set(P[b]))
+    worst = max(overlap(a, b) for a in P for b in P if a < b)
+    nor = max(overlap("norway", b) for b in P if b != "norway")
+    yield nor < 0.6, f"Norway is the distinct one: highest overlap {nor:.2f}"
+    yield worst > 0.8, \
+        (f"and the claim does not hold for the rest: the closest pair overlaps "
+         f"{worst:.2f} — recorded rather than smoothed over")
 
 
 @section(67, "MVP content target", "PARTIAL",

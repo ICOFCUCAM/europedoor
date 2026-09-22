@@ -237,6 +237,24 @@ profiles are a different company. Specified in Part 2 at the level of "what
 would have to be true first" — which includes moderation capacity, and
 moderation capacity means people.
 
+## 19b. User roles — **two exist, nine need an account**
+
+The eleven roles are **Visitor, Registered User, Premium User, Business User,
+Business Admin, Editor, Content Reviewer, Tourism Board, Moderator,
+Administrator** and **Super Administrator**.
+
+Two of them exist today and neither is on europedoor.com. **Editor** is the
+Media Desk's passcode sign-in, which approves a photograph and dispatches an
+acquisition; **Content Reviewer** is whoever merges the pull request that
+acquisition opens. Both are deliberately off-origin, because a
+credential-holding authenticated service on the production origin would
+change the posture of every page to serve one internal tool.
+
+**Visitor** is the only role the site itself has, and it needs nothing. The
+remaining eight all need an account, which needs a data controller, a lawful
+basis and a published privacy notice — the three things `/how-it-works`
+records as blocked.
+
 ## 20. Multilingual — **specified, not built**
 
 English only today. The infrastructure decision is made and recorded in
@@ -822,12 +840,29 @@ theme_viewed     { themeSlug }
 journey_opened   { journeySlug, inPlanner }
 save_added       { kind, ref }
 outbound_click   { target, context }
+search_performed { q, kind, results }    -- /search is live and recorded nothing
+map_interaction  { action, layer, zoom } -- /map's filters, layers and overlays
+share_clicked    { kind, ref, surface }
 unsupported_ask  { text }                -- from the AI intent extractor
 ```
+
+Twelve behaviours are asked for and nine had an event. Six of the twelve map
+onto one of these directly; three — booking starts, booking completions and
+reviews — have no feature to instrument and get no event until they exist,
+because an event for a surface nobody built records nothing and looks like
+coverage. The last three are the correction: **search, map interactions and
+sharing are all live today** and would have produced nothing on the first day
+analytics ran, which is exactly the loss this schema exists to prevent.
 
 Rules: a rotating daily session id, no cross-site identifiers, no third-party
 analytics, and `unsupported_ask` reviewed weekly by a person because it is the
 product roadmap arriving for free.
+
+The north star is **meaningfully planned journeys per active user**, and its
+six supporting metrics are the itinerary creation rate, the return-user rate,
+saved destinations, booking conversion, AI planner completion and business
+lead generation. Four of those six were named nowhere; a supporting metric
+that is not written down is not a metric, it is an intention.
 
 ## 2.8 Internationalisation
 
