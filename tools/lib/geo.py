@@ -694,6 +694,7 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
     x, y, w, h = view
     box = (x - pad, y - pad, x + w + pad, y + h + pad)
     ctx, ours = [], []
+    anchored = False
     for ident, ent in sorted(doc["countries"].items()):
         if only is not None and ent.get("slug") not in only:
             continue
@@ -773,9 +774,42 @@ def landmass(proj, view, doc=None, highlight=None, pad=40.0, bands=None,
             href = link(ent)
             if href:
                 el = f'<a href="{href}">{el}</a>'
+                anchored = True
         (ours if ent["atlas"] else ctx).append(el)
+    # `aria-hidden` ON A SUBTREE THAT HOLDS FOCUSABLE CONTENT IS A CONFORMANCE
+    # ERROR, AND THE HOMEPAGE HERO SHIPPED 43 OF THEM UNDER AN ARIA-LABEL
+    # PROMISING THEM. The label on that svg reads "Europe, drawn: every
+    # country is a link to its own page" and the group holding those links
+    # carried `aria-hidden="true"` unconditionally — the label claiming a
+    # subtree the markup removes, which is `a comment claiming evidence is
+    # read as evidence` arriving as an accessible name.
+    #
+    # AND THE BROWSER REFUSED TO CONFIRM IT, WHICH IS WHY THIS PARAGRAPH SAYS
+    # WHAT IT SAYS. Measured with Chromium's own accessibility tree: the hero
+    # svg reports 54 children and all ten sampled country links come back as
+    # `link` with the country's name on them. Chromium does not propagate
+    # aria-hidden over focusable descendants — it recovers and logs. So the
+    # honest claim is not "43 links are hidden from assistive technology";
+    # it is that the markup is invalid, its behaviour is the recovery
+    # strategy of one engine, and every other engine gets to choose its own.
+    # `ONE BROWSER RECOVERING IS NOT A DESIGN` — the same reasoning that put
+    # the map-layer assertion on the computed display after two browsers
+    # disagreed about an empty box.
+    #
+    # The context group stays hidden always: it holds no links, and a
+    # country outside the Atlas is ground rather than a way out.
+    #
+    # AND THE TITLES ARE NOT DEAD, WHICH WAS THE OTHER READING AND IT IS
+    # REFUSED. 19,913 titled country paths sit inside a hidden group on 916
+    # pages — 481 KB, and the obvious conclusion is that a name nothing can
+    # reach is weight. It is wrong: an SVG `<title>` is the native tooltip, a
+    # rendering feature rather than an accessibility-tree one, so hovering any
+    # country on any map here says what it is. `aria-hidden` does not take
+    # that away. Removing them would buy 481 KB by deleting the one
+    # affordance a sighted reader has on 824 plates that name nothing else.
+    hid = "" if anchored else ' aria-hidden="true"'
     return (f'<g class="context" aria-hidden="true">{"".join(ctx)}</g>',
-            f'<g class="countries" aria-hidden="true">{"".join(ours)}</g>')
+            f'<g class="countries"{hid}>{"".join(ours)}</g>')
 
 
 def beyondmass(proj, view, thin_units=0.0, min_units=0.0, pad=40.0):

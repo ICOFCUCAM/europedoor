@@ -7716,6 +7716,56 @@ the photograph (164–705, middle 434) at 496 and 475 on the two pages the check
 reads — **the thing it is actually beside.**
 
 
+**`aria-hidden` ON A SUBTREE THAT HOLDS FOCUSABLE CONTENT IS A CONFORMANCE
+ERROR, AND THE HOMEPAGE HERO SHIPPED 43 OF THEM UNDER AN ARIA-LABEL PROMISING
+THEM.** `geo.landmass()` set `aria-hidden="true"` on the countries group
+unconditionally — right on every other page that draws one, where the group
+is ground and holds nothing to leave through, and wrong on the one page where
+the caller passes
+`link=` and every country becomes an SVG `<a>`. That svg's own accessible
+name reads *"Europe, drawn: every country is a link to its own page"*, so the
+label claimed exactly the subtree the markup removes. It is the fourth thing
+in the hero's *three things had to be undone before a click could reach one*
+family, and it survived all three, because `aria-hidden` takes nothing away
+from a mouse, a keyboard, `checkVisibility` or a contrast sweep.
+
+**AND THE BROWSER REFUSED TO CONFIRM IT.** Read out of Chromium's own
+accessibility tree, the hero svg reports 54 children and all ten sampled
+country links come back as `link` with the country's name on them: Chromium
+does not propagate `aria-hidden` over focusable descendants — it recovers and
+logs. So the claim is not *43 links are hidden from assistive technology*; it
+is that the markup is invalid and its behaviour is the recovery strategy of
+one engine, where every other engine gets to choose its own. **One browser
+recovering is not a design** — the same reasoning that moved the map-layer
+assertion onto the computed display after Chromium 131 and 141 disagreed about
+an empty box. `anchored` is set where a link is actually emitted, so the
+attribute follows what the group HOLDS rather than what the caller asked for.
+
+**AND THE 481 KB OF NAMES IN THOSE HIDDEN GROUPS ARE NOT DEAD, WHICH WAS THE
+OTHER READING AND IT IS REFUSED.** 19,913 titled country paths sit inside an
+`aria-hidden` group across the whole site — `grep -rl 'aria-hidden="true"' site
+--include=index.html` names the set — and *named and hidden, never both* is this
+repository's own rule — so the obvious conclusion is that every one of those
+names is weight. It is wrong: an SVG `<title>` is the native TOOLTIP, a
+rendering feature rather than an accessibility-tree one, so hovering any
+country on any drawing here says what it is, and `aria-hidden` does not touch
+that. Deleting them would buy 481 KB by removing the only affordance a sighted
+reader has on 824 plates that name nothing else.
+
+**AND THREE SUSPICIONS ABOUT THE MAPS WERE MEASURED AND CHANGED NOTHING**,
+which is the same number as the commit that recorded them. The country
+portraits and macro maps carry no scale bar and should not — *a country is a
+shape; a destination is a position*, recorded in `docs/signature-moments.md`
+before either was drawn. The 40 `pointsmap` pages with no bar are the
+continental frames plus Finnish Lapland and Nord-Norge, every one of them a
+latitude span the conic cannot hold inside 2%, which is the tolerance test
+doing its job. And the atlas register's names ALREADY come off below 44rem
+(`.atplate .lyr-labels { display: none }`), so the 6.5-pixel type the hero's
+own rule exists to prevent was never on plate 05.
+
+
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
