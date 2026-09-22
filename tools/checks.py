@@ -9283,5 +9283,141 @@ def main():
     print(f"all {len(CHECKS)} checks passed, {total} things examined")
 
 
+@check("visitor attribution is one decision off separated facts")
+def c_attribution_layers():
+    """FOUR FACTS, ONE DECISION POINT, AND NEITHER IS A COMMENT.
+
+    The licence gate answered *what credit do the terms require* with one
+    field whose stated value came from the API documentation's Guidelines
+    while its name read like a licence obligation — so the register said
+    attribution was required, the archived licence said *"Attribution is not
+    required"*, and both were quoting real text. Six bands rendered a
+    photographer roll-call on the strength of that, and the homepage read
+    like an asset-management system.
+
+    Centralising an ambiguous boolean centralises the ambiguity, so the
+    facts are separated and this asserts the separation holds:
+
+      1. every cleared provider carries the four facts, with the API scope
+         and the limit tier drawn from a closed vocabulary, so a fifth value
+         cannot be typed in;
+      2. the ordinary licence's answer and the API guideline's answer are
+         DIFFERENT fields, because they are different documents;
+      3. the editorial renderer consults the decision point BEHAVIOURALLY —
+         driven to HIDE, `photo_credits` must emit nothing. A check that
+         greps for the symbol passes the day the call goes dead, which is
+         `opts.geoTooNarrow` computed and read nowhere, and the paragraph
+         explaining that failure would itself satisfy a grep;
+      4. nothing else on the site composes a visitor-facing photograph
+         credit, because a second producer is a second decision.
+
+    It does NOT assert what the decision currently is. Pexels' API scope is
+    unresolved and unresolved shows, so the pages are unchanged; pinning
+    today's answer would make this the shape-check this repository has now
+    recorded thirteen times.
+    """
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lib import attribution as A
+    from lib import render as R
+
+    gate_path = os.path.join(ROOT, "docs", "data-licenses",
+                             "photo-providers.json")
+    if not os.path.exists(gate_path):
+        return 0
+    gate = json.load(open(gate_path, encoding="utf-8"))
+    SCOPES = {"requesting_application", "any_display_surface", "unresolved",
+              "not_applicable"}
+    TIERS = {"default", "increased", "unlimited", "unknown", "not_applicable"}
+    n = 0
+
+    for slug, row in gate.items():
+        if slug.startswith("$"):
+            continue
+        lay = row.get("attribution_layers")
+        n += 1
+        if not lay:
+            fail(f"{slug} has no `attribution_layers`. One `attribution` "
+                 f"field cannot answer both what the ordinary licence "
+                 f"requires and what the API guideline asks for, and this "
+                 f"provider's is doing it")
+            continue
+        for key in ("license_attribution_required", "api",
+                    "internal_provenance_required"):
+            n += 1
+            if key not in lay:
+                fail(f"{slug}.attribution_layers is missing {key!r} — the "
+                     f"facts are separate because their answers are")
+        api = lay.get("api") or {}
+        n += 2
+        if api.get("scope") not in SCOPES:
+            fail(f"{slug}.attribution_layers.api.scope is "
+                 f"{api.get('scope')!r}; it must be one of "
+                 f"{sorted(SCOPES)}. A scope outside the vocabulary is a "
+                 f"value the decision point falls through")
+        if api.get("limit_tier") not in TIERS:
+            fail(f"{slug}.attribution_layers.api.limit_tier is "
+                 f"{api.get('limit_tier')!r}; it must be one of "
+                 f"{sorted(TIERS)}. `unknown` is the honest answer where "
+                 f"nothing here records an application, and it is not "
+                 f"`default`")
+        # The licence answer may not be borrowed from the API document.
+        lic = lay.get("license_attribution_required") or {}
+        n += 1
+        if isinstance(lic, dict) and lic.get("source") and api.get("source"):
+            if lic["source"] == api["source"]:
+                fail(f"{slug}: the licence answer and the API answer cite the "
+                     f"same page ({lic['source']}). They are different "
+                     f"documents and that is the whole reason these are two "
+                     f"fields")
+        # And the decision must have a reason that names a document.
+        decision, why = A.visitor_attribution(slug)
+        n += 1
+        if decision not in (A.SHOW, A.HIDE, A.UNRESOLVED):
+            fail(f"{slug}: the decision point returned {decision!r}")
+        if not why or len(why) < 20:
+            fail(f"{slug}: the decision carries no reason a person can audit")
+
+    # 3. BEHAVIOURAL. Drive the decision to HIDE and the band must go quiet.
+    row = {"photographer": "A. Photographer", "provider": "pexels",
+           "source": "https://www.pexels.com/photo/x-1/"}
+    images = {"k": row}
+    n += 1
+    if not R.photo_credits(images, ["k"]):
+        fail("render.photo_credits emits nothing for a registered photograph "
+             "even before the decision point is driven — this check can no "
+             "longer tell a suppressed credit from a broken one")
+    else:
+        real = A.show_visitor_credit
+        try:
+            # Rebinding the attribute on the shared module object is what
+            # makes this behavioural: `render` resolves
+            # `attribution.show_visitor_credit` at CALL time, so a dead call
+            # site cannot pass this the way it would pass a source grep.
+            A.show_visitor_credit = lambda _slugs: False
+            out = R.photo_credits(images, ["k"])
+        finally:
+            A.show_visitor_credit = real
+        n += 1
+        if out:
+            fail("render.photo_credits still emits a credit when "
+                 "attribution.show_visitor_credit says no. The decision "
+                 "point is not in the path, which is a symbol that exists "
+                 "and a call that does nothing")
+
+    # 4. ONE PRODUCER. A second place composing the sentence is a second
+    #    decision, and this repository has paid for that seven times.
+    src_dir = os.path.join(ROOT, "tools", "lib")
+    for name in sorted(os.listdir(src_dir)):
+        if not name.endswith(".py") or name == "render.py":
+            continue
+        body = open(os.path.join(src_dir, name), encoding="utf-8").read()
+        n += 1
+        if 'sheetcred rowcred' in body and "photo_credits" not in body:
+            fail(f"tools/lib/{name} composes a band credit of its own. "
+                 f"`render.photo_credits` is the one producer, because "
+                 f"whether a credit is owed is one decision")
+    return n
+
+
 if __name__ == "__main__":
     main()

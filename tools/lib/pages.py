@@ -6312,7 +6312,16 @@ def journeys_index(data):
         segs = "".join(
             f'<span class="w{max(1, int(round(km / total * 100)))}"></span>'
             for km in hops) if total else ""
-        route = constellation(pts_of(j), route=True, frame=True, mark=19)
+        # A MARK IS SIZED AGAINST THE LINE BESIDE IT, and the line just
+        # lost two thirds of its weight. `mark` is frame-independent by
+        # construction — the rendered radius is `mark * drawn_width / 1000`,
+        # because `rattr` scales by `z = vw / MAP_W` and the frame's own
+        # units cancel — so 19 was 4.56px of radius on a 240px drawing, a
+        # 9.1px blob beside a 2.4px route. Halved, and the terminals take a
+        # size of their own so the ends of the trip read first, which is
+        # what the `term` ring is for and what this call site never passed.
+        route = constellation(pts_of(j), route=True, frame=True,
+                              mark=10.5, term=17)
         rows.append(
             f'<a class="row journeyrow" href="{urls.journey(j)}">'
             f'<div><p class="kicker"><span class="jno">{i:02d}</span>'

@@ -8457,6 +8457,109 @@ wrong place.** `.mapcut stop` is `--atlas-sea`, which on that graphite plate
 resolves to the LIGHT atlas's pale water — so the fade over the data cut
 rendered as a bright wedge across the north-east of a near-black instrument.
 
+
+**A STROKE OF CONSTANT WEIGHT IS NOT A STROKE OF THE RIGHT WEIGHT, AND ONE
+DECLARATION WAS SETTING THE CORE AND ITS CASING TOGETHER.**
+`vector-effect: non-scaling-stroke` was added to the framed glyphs for a real
+fault — 4.5 user units is 3 pixels on a 1000-unit frame and 9 on a 340-unit
+one, so the Hanseatic Arc's route was three times the Arctic one's in the same
+band — and it fixed the CONSISTENCY while nobody asked about the MAGNITUDE.
+The stroke then became CSS pixels, the drawing is 240 CSS pixels wide, and the
+ratio was never computed. Measured in Chromium at 1280, on one page, in two
+bands drawing the same seventeen routes:
+
+| | drawn | core | casing | heaviest, as a share of the drawing |
+|---|---|---|---|---|
+| the seventeen-route opening | 642px | 2.57 | 5.78 | **0.90%** |
+| the seventeen rows | 240px | 8 | 8 | **3.33%** |
+
+**3.7 times heavier than the page's own good value**, and `8 = 8` means there
+is no casing at all: `route_line`'s whole argument is a wider stroke in the
+ground's tone UNDER a narrower one in the route's, because no colour clears
+3:1 on both cream land and deep water. Both at one width composites to a
+single fat rope, and at 3x the drawn Scandinavia was buried under its own
+route. Four weights were **rendered and looked at** rather than picked — 8/8,
+3.2/6, 2.4/5 and 1.8/4 — and 1.8 loses the route to a hairline while 2.4 keeps
+it as the subject with Norway, Sweden, Finland and the Baltic legible under
+it. 3.33% → **2.08%**. The stop marks came down with it: `mark` is
+frame-independent by construction, because the rendered radius is
+`mark * drawn_width / 1000` and the frame's own units cancel, so 19 was a
+9.1-pixel blob beside a 2.4-pixel line.
+
+**AND THE JOURNEY PAGES' OWN ROUTE MAPS WERE MEASURED AND ARE FINE**, which is
+worth recording because the eye said otherwise. All seventeen render their
+route at 3.08 device pixels and their dots at 13.55, identically, because
+`pointsmap` draws at post-transform coordinates — *the eye finds a defect and
+it does not confirm one*, and the defect was one band over.
+
+**`.jrowart` MATCHES NOTHING ON THE BUILT SITE.** Eight rules for the
+homepage's three journey rows, which became the plate sequence; `grep -c
+jrowart site` is zero. A rule that matches no element is invisible to the
+dead-rule scan by construction, because its question is whether a rule that
+MATCHES elements changes any of them — the `.qtile` finding, third occurrence.
+
+**PROVENANCE IS INFRASTRUCTURE AND A CREDIT IS EDITORIAL COPY, AND ONE FIELD
+WAS ANSWERING BOTH QUESTIONS.** `docs/data-licenses/photo-providers.json` held
+a single `attribution` field whose stated VALUE was taken from the API
+documentation's Guidelines while its NAME read like a licence obligation. So
+the register said attribution was required, the archived licence said
+*"Attribution is not required. Giving credit to the photographer or Pexels is
+not necessary but always appreciated"*, and **both were quoting real text.**
+Six bands rendered a photographer roll-call on the strength of it: section 01
+of the homepage ended in six names and the word Pexels, section 03 in nine,
+section 04 in four. That is an asset-management system wearing an atlas's
+clothes, and the same file gets the distinction right one provider over,
+recording Unsplash as *"None required by the licence. EuropeDoor credits
+anyway."*
+
+**CENTRALISING AN AMBIGUOUS BOOLEAN CENTRALISES THE AMBIGUITY.** The facts are
+separated because they have separate answers and separate evidence:
+`license_attribution_required` (the content licence), `api.used` and
+`api.attribution_guideline` (the API documentation), `api.scope` (who that
+guideline binds), `api.limit_tier`, and `internal_provenance_required` (this
+product's own rule, unaffected by any of it). `tools/lib/attribution.py` is the
+one decision point and `render.photo_credits` is its one consumer, so the six
+bands are six call sites and not six decisions.
+
+**THE ACQUISITION PATH IS ESTABLISHED AND THE SCOPE IS NOT.** Every one of the
+826 rows in `data/images.json` carries a `provider_photo_id` and an
+`images.pexels.com` original, both of which only the API returns, and
+`acquire.py` requests `api.pexels.com/v1` with an `Authorization` header from
+a repository secret: **100% API-acquired, no manual path in the repository.**
+The API documentation says *"Whenever you are doing an API request make sure
+to show a prominent link to Pexels."* EuropeDoor makes that request once,
+inside a workflow, where nothing is shown to anybody, and a reader's browser
+never contacts Pexels — `default-src 'none'`, `img-src 'self' data:`, every
+file on this origin. **Whether *doing an API request* binds the requesting
+application or any surface showing what it fetched is not settled by the
+archived text, and a renderer is not the place to decide it.** `scope` is
+`unresolved`, unresolved SHOWS, and every page is unchanged — the conservative
+answer, and deliberately the one that costs nothing to reverse.
+
+**AND `limit_tier` IS `unknown`, WHICH IS NOT `default`.** The higher-limit
+route carries its own attribution condition — *"please include examples … that
+clearly shows your use of the API with attribution"* — and nothing here
+records an application for one. **An absence of evidence in a repository is
+not evidence of absence** about an account-level arrangement held by the
+provider and the owner.
+
+**AND THE CHECK IS BEHAVIOURAL, BECAUSE A SYMBOL THAT EXISTS IS NOT A CALL
+THAT RUNS.** `c_attribution_layers` drives the decision point to HIDE by
+rebinding it on the shared module object — `render` resolves it at call time —
+and asserts the band goes quiet. A source grep would pass the day the call
+goes dead, which is `opts.geoTooNarrow` computed and read nowhere, and the
+paragraph recording that failure would itself satisfy the grep. Proved red
+five ways: the block removed, a scope invented, a tier invented, the licence
+answer citing the API page, and the decision point lifted out of the path.
+
+**A GATE ANSWER IS A BLOCK AND A BLOCK IS TRUTHY.** The first reader tested
+`lay.get("license_attribution_required")` directly, so
+`{"value": false, "quote": "No permission needed"}` came back TRUE and Unsplash
+was reported as requiring attribution by the licence whose quoted sentence sits
+inside the block being read. The shape is not incidental — answers are blocks
+so `c_gate_quotes` can assert each quote appears in the archived snapshot of
+the page it cites — so one reader knows both shapes and nothing else does.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

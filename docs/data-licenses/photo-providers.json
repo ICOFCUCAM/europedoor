@@ -38,6 +38,33 @@
       "quote": "The Pexels API enables programmatic access to the full Pexels content library, including photos, videos.",
       "source": "https://www.pexels.com/api/documentation/",
       "basis": "The API's stated purpose is programmatic access, and its Guidelines section — where Pexels states what a consumer must and must not do — names four things: a prominent link, photographer credit, no replicating Pexels' core functionality, and no abusing the rate limit. None is a delivery condition and none forbids automation. The limits are volume: \"Do not abuse the API. By default, the API is rate-limited to 200 requests per hour and 20,000 requests per month.\" Compare Unsplash, whose equivalent section states a hotlinking requirement outright — same kind of document, same structure, one says it and one does not, which is what makes the omission meaningful rather than merely unobserved."
+    },
+    "attribution_layers": {
+      "$why": "FOUR FACTS, BECAUSE THE FIELD ABOVE ANSWERS TWO QUESTIONS AT ONCE. `attribution.value` reads like a licence obligation and quotes the API documentation's Guidelines. Both documents are real and they say different things, so a renderer reading one boolean was reading an answer to a question nobody had asked. Nothing above is deleted: this separates it. See tools/lib/attribution.py for how the editorial renderer consumes it.",
+      "license_attribution_required": {
+        "value": false,
+        "question": "Does the ORDINARY content licence require the photographer or the provider to be credited on a page showing the photo?",
+        "quote": "Attribution is not required. Giving credit to the photographer or Pexels is not necessary but always appreciated.",
+        "source": "https://www.pexels.com/license/"
+      },
+      "api": {
+        "used": true,
+        "used_evidence": "Every row in data/images.json carries a `provider_photo_id` and an `images.pexels.com` original, both of which only the API returns; scripts/images/acquire.py requests api.pexels.com/v1 with an Authorization header from PEXELS_API_KEY. There is no manual-download path in this repository.",
+        "attribution_guideline": true,
+        "quote": "Whenever you are doing an API request make sure to show a prominent link to Pexels. You can use a text link (e.g. “Photos provided by Pexels”) or a link with our logo. Always credit our photographers when possible (e.g. “Photo by John Doe on Pexels” with a link to the photo page on Pexels).",
+        "source": "https://www.pexels.com/api/documentation/",
+        "scope": "unresolved",
+        "scope_question": "Does *whenever you are doing an API request* bind the application MAKING the request, or any surface DISPLAYING what it fetched? EuropeDoor requests once, inside a workflow, where nothing is shown to anybody; a reader's browser never contacts Pexels, because the CSP is default-src 'none' with img-src 'self' data: and every file is served from this origin. The archived text does not settle it and a renderer is not the place to decide it. Allowed values: requesting_application, any_display_surface, unresolved.",
+        "limit_tier": "unknown",
+        "limit_tier_question": "Ordinary/default limits, or an approved higher or unlimited arrangement? The higher-limit route carries its own attribution condition. Nothing in this repository records an application for one, and an absence of evidence in a repository is not evidence of absence: this is an account fact held by the provider and the owner. It is `unknown` rather than `false` for that reason.",
+        "limit_tier_quote": "Do not abuse the API. By default, the API is rate-limited to 200 requests per hour and 20,000 requests per month. You may contact us to request a higher limit, but please include examples, or be prepared to give a demo, that clearly shows your use of the API with attribution. If you meet our API terms, you can get unlimited requests for free.",
+        "limit_tier_source": "https://www.pexels.com/api/documentation/"
+      },
+      "internal_provenance_required": {
+        "value": true,
+        "question": "Must the register hold photographer, source, licence, hash and dates regardless of what a page shows?",
+        "why": "This one is EuropeDoor's own rule and not the provider's: *no external licence claim enters production from memory; every externally governed asset requires source, date and evidence*. It is what makes `this file is the file that was licensed` checkable rather than a sentence, and it is unaffected by any decision about what a visitor sees."
+      }
     }
   },
   "unsplash": {
@@ -94,6 +121,26 @@
       "quote": "All API uses must use the hotlinked image URLs returned by the API under the `photo.urls`  properties. This applies to all uses of the image and not just search results.",
       "source": "https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines",
       "basis": "The architecture required here is acquire through the API and then self-host. This sentence forbids the second half for anything the API returns, and \"all uses of the image and not just search results\" closes the reading that it covers previews only. The two halves are not separable, so the answer is no rather than yes-with-conditions. A second clause points the same way and is recorded although the outcome does not turn on it: \"The API is to be used for non-automated, high-quality, and authentic experiences.\" The article explaining that phrase is not archived and not read, which is why it is not the reason. Unsplash's LICENCE route — a photograph obtained without the API — is unaffected and is not this architecture."
+    },
+    "attribution_layers": {
+      "license_attribution_required": {
+        "value": false,
+        "question": "As above.",
+        "quote": "No permission needed (though attribution is appreciated!)",
+        "source": "https://unsplash.com/license"
+      },
+      "api": {
+        "used": false,
+        "used_evidence": "`api_route` is refused for this provider: the API guidelines require the hotlinked photo.urls and a download event, which would open img-src to a host this site does not control. No row in data/images.json names this provider.",
+        "attribution_guideline": true,
+        "scope": "not_applicable",
+        "scope_question": "The guideline exists and this product does not take that route, so it binds nothing here. Recorded rather than omitted, because a requirement nobody wrote down is one the next person has to rediscover.",
+        "limit_tier": "not_applicable"
+      },
+      "internal_provenance_required": {
+        "value": true,
+        "question": "As above."
+      }
     }
   }
 }

@@ -20,6 +20,7 @@ import os
 import re
 from urllib.parse import urlsplit
 
+from . import attribution
 from .i18n import Strings
 
 # One catalogue, loaded once. Adding a language means adding a file, not
@@ -850,12 +851,13 @@ def photo_credits(images, keys, more=""):
     honestly. A credit names the photographs that are ON the page; a key with
     no row is a photograph that is not.
     """
-    n, out, seen = 0, [], set()
+    n, out, seen, provs = 0, [], set(), set()
     for k in keys:
         row = (images or {}).get(k)
         if not row:
             continue
         n += 1
+        provs.add((row.get("provider") or "").lower())
         nm = row["photographer"]
         if nm in seen:
             continue
@@ -863,6 +865,27 @@ def photo_credits(images, keys, more=""):
         out.append(f'<a href="{esc(row["source"])}" rel="noopener" '
                    f'target="_blank">{esc(nm)}</a>')
     if not out:
+        return ""
+    # THE ONE DECISION POINT, AND IT IS NOT THIS FUNCTION'S TO MAKE.
+    #
+    # This line is the whole of the visitor-facing attribution on the site
+    # outside `credit_html`, and six bands call it. Whether it is OWED is a
+    # question about somebody else's terms, so it is answered in one place
+    # — `lib.attribution`, off the separated facts in the licence gate —
+    # rather than by six call sites each deciding, or by this function
+    # assuming that a photograph from a provider implies a credit for it.
+    #
+    # It returns True today, and the pages are unchanged. Pexels' ordinary
+    # licence requires no attribution and its API guideline asks for a
+    # prominent link *whenever you are doing an API request*, and whether
+    # that binds the requesting application or any surface showing what it
+    # fetched is `unresolved` in the register. Unresolved shows. What has
+    # changed is that resolving it is one field rather than six edits, and
+    # that the register no longer states a licence obligation it cannot
+    # support: see `attribution_layers` in
+    # docs/data-licenses/photo-providers.json for the four facts and the
+    # archived quote behind each.
+    if not attribution.show_visitor_credit(provs):
         return ""
     return ('<p class="sheetcred rowcred">Photograph'
             + ("s" if n != 1 else "") + " by " + ", ".join(out)

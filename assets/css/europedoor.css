@@ -10896,7 +10896,34 @@ body[data-family="institutional"] main > :is(.band, .split, .manifesto, .prose) 
 .journeyrow:hover :is(h2, h3), .journeyrow:focus-visible :is(h2, h3) { color: var(--door); }
 .jart .constel { width: 100%; }
 .jart .constel:not(.framed) .constel-lit circle { r: 11px; }
-.jart .constel-route { stroke-width: 8; }
+/* A STROKE OF CONSTANT WEIGHT IS NOT A STROKE OF THE RIGHT WEIGHT, and one
+   declaration was setting the core and its casing together.
+
+   `non-scaling-stroke` was added to this family for a real fault — 4.5 user
+   units is 3 pixels on a 1000-unit frame and 9 on a 340-unit one, so the
+   Hanseatic Arc's route was three times the Arctic one's in the same band —
+   and it fixed the CONSISTENCY while nobody asked about the MAGNITUDE. The
+   stroke then became CSS pixels, the drawing is 240 CSS pixels wide, and
+   the ratio was never computed.
+
+   Measured in Chromium at 1280, on one page, in two bands that draw the
+   same seventeen routes: the opening draws its core at 2.57px and its
+   casing at 5.78px on a 642px drawing, which is 0.90% of the width; the
+   rows drew both at 8px on a 240px drawing, which is 3.33%. **3.7 times
+   heavier than the page's own good value**, and the casing equal to the
+   core means there is no casing at all — `route_line`'s whole argument is
+   a wider stroke in the ground's tone UNDER a narrower one in the route's,
+   because no colour clears 3:1 on both cream land and deep water. Both at
+   one width composites to a single fat rope, which is what a reader got:
+   at 3x the drawn Scandinavia was buried under its own route.
+
+   Four weights were RENDERED AND LOOKED AT at 3x rather than picked — 8/8,
+   3.2/6, 2.4/5 and 1.8/4 — and 1.8 loses the route to a hairline while 2.4
+   keeps it as the subject with Norway, Sweden, Finland and the Baltic
+   legible under it. 3.33% to 2.08%. */
+.jart .constel-route { stroke-width: 2.4; }
+.jart .constel-route.case { stroke-width: 5; stroke: var(--atlas-land);
+                            opacity: .9; }
 /* No `color`: `.row .rowmeta` already sets --ink-3 and every .jfacts is
    one, so restating it is a declaration that changes nothing. It only became
    visible when the dead-rule scan started visiting a motion page. */
