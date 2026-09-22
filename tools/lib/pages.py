@@ -8077,15 +8077,26 @@ ATLAS_RELIEF_MIN = 80.0
 ATLAS_RELIEF_BANDS = (600, 1200, 2000)
 
 
-def atlas_relief(land, view):
-    """The hypsometric bands, kept only where this drawing draws ground."""
+def atlas_relief(view, ds):
+    """The hypsometric bands, kept only where this drawing draws ground.
+
+    IT TAKES THE PATH DATA RATHER THAN THE MARKUP, because two drawings that
+    both need this keep their land in markup that does not look alike.
+    `landmass()` gives a plate a named country as `<path d=…><title>…</title>`
+    and `LAND_PATH` reads exactly that; /map wraps every country in an `<a>`
+    and puts the name on the anchor, so the same regex matches ZERO paths
+    there. Extracting inside this function would have meant one regex that
+    fits one caller and silently empties for the other — and an empty terrain
+    layer looks exactly like one that was never drawn, which is the assertion
+    at the bottom of this function. So the KEEPING is one implementation and
+    the extraction belongs to whoever owns the markup.
+    """
     wash = cartography.relief_wash(MAPPROJ, view,
                                    thin_units=ATLAS_RELIEF_THIN,
                                    min_units=ATLAS_RELIEF_MIN,
                                    bands=ATLAS_RELIEF_BANDS)
     if not wash:
         return ""
-    ds = [m.group(1) for m in LAND_PATH.finditer(land)]
     if not ds:
         return ""
     ground = NameGround(ds)
@@ -8670,7 +8681,8 @@ def atlas_register(data):
             + "L".join(f"{px:.1f} {py:.1f}" for px, py in keep)
             + 'Z"/></clipPath></defs>')
 
-    relief = atlas_relief(land, _view)
+    relief = atlas_relief(_view,
+                          [m.group(1) for m in LAND_PATH.finditer(land)])
     fig = (
         # THE ROLE GOES ON THE `<svg>`, WHICH IS WHERE THE CHECK READS IT —
         # `c_map_roles` matches the element carrying the map class, and this
@@ -14276,6 +14288,98 @@ def map_page(data):
                              thin_units=1.6, min_lake_units=25.0)
     mapwater = (f'<g class="lyr lyr-rivers" aria-hidden="true">{_mw}</g>'
                 if _mw else "")
+    # THE INSTRUMENT HAD NO GROUND. This drawing carries rivers, lakes, a
+    # graticule, six sea names, twenty-four country names and fifty
+    # interactive country shapes, and the one thing it never drew is the
+    # height of the land under all of it — so the Alps and the Hungarian
+    # plain are the same stone on the page whose whole subject is the
+    # continent. The hero draws it and plate 05 draws it, from this data and
+    # this renderer; `relief_wash` is the CONTINENTAL family and its own
+    # docstring says the 1,500 km frame cap is a rule about destination and
+    # journey plates rather than about a picture of Europe.
+    #
+    # THE ORDER IS THE POINT AND IT IS NOT WHAT `ORDER` LITERALLY SAYS.
+    # Terrain goes after LAND, and this drawing's land is three groups:
+    # `#context`, `#countries` and `#detail`, which map.js fills with
+    # higher-detail geometry on zoom. Emitting the bands before `#detail`
+    # would have them painted over by the very land they describe the moment
+    # a reader zoomed in — invisible at rest, invisible in every count, and
+    # visible only to somebody who zoomed. So the layer sits after all three.
+    #
+    # AND IT TAKES `.atplate`'s PAINT RATHER THAN A FOURTH COPY OF THE RAMP.
+    # /map binds the light map set, exactly as plate 05 does, so the three
+    # band colours and the .45 fill-opacity are the same decision and are
+    # written once. That block also carries `pointer-events: none`, which is
+    # the lesson the hero paid for: every layer above the land has a fill,
+    # and each one swallowed the click in turn.
+    # AND IT IS KEPT ONLY WHERE THIS DRAWING DRAWS GROUND, WHICH RENDERING
+    # IS WHAT SAID SO. `relief_wash` is the whole continent's bands and it
+    # clips nothing — the hero masks it to its own land and plate 05 keeps it
+    # ring by ring — so the first version of this layer painted Greenland's
+    # mountains in the sea above Iceland, a wedge in the Norwegian Sea and
+    # ground east of the Caspian where this frame draws none. Every count was
+    # right and the picture was wrong, which is what a contact sheet is for.
+    # `atlas_relief` is that keeping, and the extraction is /map's own
+    # because /map's land is not shaped like a plate's: a country here is an
+    # `<a>` carrying the name with a bare `<path>` inside it, so `LAND_PATH`
+    # — which wants `<path d=…><title>…</title>` — matches zero of the fifty.
+    # Both groups count as ground: the atlas land and the land beyond it are
+    # both drawn here, and relief over Anatolia is relief over ground.
+    _mds = re.findall(r'<path[^>]*\sd="([^"]+)"',
+                      "".join(context) + "".join(shapes))
+    _mt = atlas_relief(_mview, _mds)
+    # AND ON AN INSTRUMENT IT IS A LAYER THE READER TURNS ON, NEVER THE
+    # GROUND. `c_terrain`'s first promise is that relief is an ILLUSTRATION
+    # layer and never on a map that declares itself an instrument, and the
+    # reason survives re-reading: a reader reads VALUES off an instrument, so
+    # a wash nobody asked for on the drawing whose subject is which countries
+    # and destinations exist reads as a data layer rather than as ground. That
+    # refusal is about it being the GROUND. This map already has four
+    # geography layers a reader switches, so the fifth answers the objection
+    # instead of overruling it: off by default, named in the key, and the
+    # reader's own choice.
+    #
+    # `display="none"` as well as `hidden`, because the UA sheet's
+    # `[hidden] { display: none }` is namespaced to HTML and an SVG group
+    # marked hidden goes on drawing — map.js pays for that lesson in a
+    # comment of its own, and two browser versions disagreed about it for
+    # three months. `hidden` is what assistive technology is told; the
+    # presentation attribute is what removes the ink, with no stylesheet and
+    # no cascade in the way.
+    mapterr = (f'<g id="relief" class="lyr lyr-terrain" aria-hidden="true"'
+               f' hidden display="none">{_mt}</g>'
+               if _mt else "")
+    # THE CONTROL, THE KEY AND THE CREDIT ALL FOLLOW THE DRAWING rather than
+    # the intention, which is `cartography.credited()`'s own rule applied to
+    # three surfaces that function cannot reach. A checkbox for a group this
+    # page did not emit is a control that does nothing — `data-rotate` and
+    # the chip that filters nothing — a key row for an absent layer names a
+    # colour the drawing does not contain, and a credit for a layer nobody
+    # can see is the thing `credited()` exists to refuse.
+    #
+    # THE KEY NAMES ALL THREE BANDS AND NOT ONE OF THEM. A single swatch
+    # would be a key that names the wrong colour on two thirds of the layer,
+    # which this page has already paid for once: `.legend .sw.dest` read
+    # `var(--sea)` and the drawing painted `var(--sea)`, the same token
+    # resolving to cobalt inside the graphite figure and to pine-deep in the
+    # light band beside it. The three rows are the three fills and the
+    # figures are the band floors out of `data/geo/terrain-lod1.json`, so a
+    # ramp that changes in the data changes here.
+    _mapreliefctl = (
+        '<label><input type="checkbox" name="geo" value="relief">'
+        ' Relief</label>' if mapterr else "")
+    _mapreliefkey = (
+        '<li><span class="sw relief">'
+        + "".join(f'<i class="tb t{m}"></i>'
+                  for m in cartography.band_floors(600))
+        + '</span> The height of the ground, off until you ask for it '
+          '&mdash; '
+        + ", ".join(f"{m:,}" for m in cartography.band_floors(600)[:-1])
+        + f" and {cartography.band_floors(600)[-1]:,} metres</li>"
+        if mapterr else "")
+    _mapreliefsay = (" " + cartography.RELIEF_CREDIT.replace(
+        "Relief from",
+        "The height of the ground is drawn from") if mapterr else "")
     mapopen = f"""
   <div class="pagehead instrument">
     <p class="kicker">The map</p>
@@ -14301,7 +14405,7 @@ def map_page(data):
   <g id="context" class="context" aria-hidden="true">{''.join(context)}</g>
   <g id="countries" class="countries">{''.join(shapes)}</g>
   <g id="detail" class="countries"></g>
-  {mapwater}{mapgrat}
+  {mapterr}{mapwater}{mapgrat}
   {cut_fade('map', MAP_W, MAP_H, dusk_reach())}
   <g id="nogeo" class="nogeo">{''.join(nogeo)}</g>
   <g id="route"></g>
@@ -14327,6 +14431,7 @@ def map_page(data):
       <li><span class="sw dest"></span> A destination we have written</li>
       <li><span class="sw ring"></span> A country too small to draw at this scale &mdash;
         Monaco and Vatican City, and four more at the widest zoom</li>
+      {_mapreliefkey}
     </ul>
     <p class="small mapread">Drag to pan, scroll or use + and &minus; to zoom. Zooming past
     1.6&times; loads a finer coastline; opening a country loads that country&rsquo;s
@@ -14357,6 +14462,7 @@ def map_page(data):
         <label><input type="checkbox" name="geo" value="regions"> Regions</label>
         <label><input type="checkbox" name="geo" value="cities" checked> Destinations</label>
         <label><input type="checkbox" name="geo" value="places"> Places ({len(placedots)})</label>
+        {_mapreliefctl}
       </fieldset>
     </div>
     <div class="askset">
@@ -14418,7 +14524,7 @@ def map_page(data):
     and which we host ourselves: the file your browser drew this from is on our own
     servers, fetched once by a script in this repository, hashed, and committed. There is
     no map account behind it and no per-view bill, and that is a deliberate architectural
-    choice rather than a stage we have not reached yet.</p>
+    choice rather than a stage we have not reached yet.{_mapreliefsay}</p>
     <p class="note">It is built to look right at a stated scale, and at the scale of a
     whole continent a border is a line a few kilometres wide. <strong>Do not read a
     disputed frontier off this map.</strong> Two countries in the Atlas &mdash; Monaco and

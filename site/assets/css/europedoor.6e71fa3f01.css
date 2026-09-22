@@ -3539,6 +3539,16 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
                   border-color: color-mix(in srgb, var(--atlas-coast) 32%, transparent); }
 .legend .sw.dest { background: var(--cobalt); border-radius: 50%; border-color: var(--cobalt); width: .75rem; height: .75rem; }
 .legend .sw.ring { background: var(--atlas-land); border-radius: 50%; border-color: var(--ink-3); border-width: 2px; width: .8rem; height: .8rem; }
+/* THE RELIEF SWATCH IS THREE SWATCHES, because the layer is three fills and
+   a key that names one of them names the wrong colour on two thirds of it —
+   which is this page's own recorded failure, where `.legend .sw.dest` and
+   the drawing both said `var(--sea)` and painted cobalt inside the figure
+   and pine-deep in the light band beside it. The three tiles take the SAME
+   declarations the layer does, one selector list up, so a ramp that moves in
+   `HYPSOMETRIC` moves here and cannot be restated wrongly. Wider than a
+   square swatch and no taller, so the row keeps the legend's own rhythm. */
+.legend .sw.relief { display: flex; width: 2.4rem; padding: 0; overflow: hidden; }
+.legend .sw.relief .tb { flex: 1 1 0; display: block; }
 /* Land under the small maps. The country map is the middle rung of
  * Europe -> country -> region -> destination, and before there was geometry
  * it did not exist: a country page could list its regions and could not show
@@ -12079,11 +12089,56 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    link and every layer above the land swallows the click in turn — terrain,
    then the frontiers, then the dusk — which the hero paid for with a picture
    whose one job is to be the way in and which led nowhere. */
-.atplate .lyr-terrain { pointer-events: none; }
-.atplate .lyr-terrain .tband { fill-rule: evenodd; fill-opacity: .45; }
-.atplate .lyr-terrain .t600  { fill: #d0c8bb; }
-.atplate .lyr-terrain .t1200 { fill: #cac0b0; }
-.atplate .lyr-terrain .t2000 { fill: #c3b8a6; }
+/* AND /map TAKES THIS BLOCK RATHER THAN A FOURTH COPY OF THE RAMP. The
+   instrument binds the same light map set this band does — stone land on
+   pale water — so the three band colours and the .45 fill-opacity are one
+   decision written once, and the `pointer-events` line above is the same
+   sentence about the same fifty links. A separate `.europemap` block would
+   be a second chance to disagree about what 1,200 metres looks like, which
+   is the fault this stylesheet has paid for in a token name, in a dispatch
+   cap and in a credential scan. */
+.atplate .lyr-terrain,
+.europemap .lyr-terrain { pointer-events: none; }
+/* AND ON /map THE BANDS MULTIPLY, BECAUSE THE FRONTIER IS UNDERNEATH THEM.
+   `c_terrain`'s third promise is that a boundary is drawn ABOVE the relief,
+   and a frontier here is a STROKE ON THE LAND PATH: the bands paint over it,
+   which is the defect the destination plates unfold their boundary to avoid
+   and the hero avoids by drawing none. Neither answer is available to an
+   instrument whose subject is fifty countries — and the third copy of the
+   geometry a stroke-only pass needs is 43 KB, refused on this page by name.
+
+   Multiply never lightens, so it darkens the frontier by the same factor it
+   darkens the ground it runs across and the step between them survives.
+   Measured on the shipped values (--map-land #D8D4C7, --map-border #68716E,
+   the 2,000 m band #c3b8a6 at .45):
+
+     the frontier on bare land            3.39:1
+     under a band composited normally     1.90:1   <- buried
+     under the same band multiplied       3.16:1
+
+   93% of the contrast a reader gets with the layer off, for one declaration
+   and no bytes. `.atplate` does NOT take it: that band's own frontier is the
+   hero's, drawn in a pass of its own above everything. */
+.europemap .lyr-terrain { mix-blend-mode: multiply; }
+.atplate .lyr-terrain .tband,
+.europemap .lyr-terrain .tband { fill-rule: evenodd; fill-opacity: .45; }
+.atplate .lyr-terrain .t600,
+.europemap .lyr-terrain .t600  { fill: #d0c8bb; }
+.atplate .lyr-terrain .t1200,
+.europemap .lyr-terrain .t1200 { fill: #cac0b0; }
+.atplate .lyr-terrain .t2000,
+.europemap .lyr-terrain .t2000 { fill: #c3b8a6; }
+/* AND THE KEY'S OWN TILES READ THE SAME THREE VALUES. A swatch is a
+   `background` and a band is a `fill`, so the one thing that cannot be
+   shared is the property — the VALUES are, on the line above, and these are
+   the same hexes in the same order. `fill-opacity: .45` is not applied
+   here: the band sits over the land tone and the swatch sits on the page, so
+   matching the declaration would not match the pixel, and what a key has to
+   agree with is what a reader sees. Composited against `--atlas-land` the
+   three bands measure within a hundredth of these three. */
+.legend .sw.relief .t600  { background: #d0c8bb; }
+.legend .sw.relief .t1200 { background: #cac0b0; }
+.legend .sw.relief .t2000 { background: #c3b8a6; }
 .atplate .lyr-land path { vector-effect: non-scaling-stroke; }
 /* THE SOCKET A CORNER LIFTS OUT OF. The band's paper is the map's water, so
    the void a translated corner leaves was painted SEA — measured at 2x on

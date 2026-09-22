@@ -485,6 +485,13 @@
     svg.classList.toggle("noborders", !geoOn("borders"));
     toggleGroup("places", geoOn("places"));
     toggleGroup("dots", geoOn("cities"));
+    /* The height of the ground. It ships in the document rather than being
+     * fetched, so it is here with JavaScript off too — as a group the page
+     * marks hidden, which is the honest state: the data is in the page and
+     * the reader has not asked for it. This is the one layer that is ground
+     * rather than marks, which is exactly why it is off by default on a
+     * drawing whose subject is which countries and destinations exist. */
+    toggleGroup("relief", geoOn("relief"));
     drawRegions();
   }
   if (geobox) geobox.addEventListener("change", applyGeo);

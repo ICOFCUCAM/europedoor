@@ -4642,16 +4642,77 @@ def c_terrain():
     for key, m in doc["relief"].items():
         if C.draws_relief(m):
             want_terrain.add(key)
-    drew, offenders, portraits = set(), [], 0
+    # The two helpers the instrument branch needs. Local rather than shared,
+    # because every other contrast arithmetic in this file works on a HEX
+    # from the stylesheet and this one has to composite two colours first.
+    def _rgb(hexv):
+        h = hexv.lstrip("#")
+        return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+    def _contrast(a, b):
+        def _l(c):
+            ch = [v / 255 for v in c]
+            ch = [v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+                  for v in ch]
+            return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+        la, lb = _l(a), _l(b)
+        hi, lo = max(la, lb), min(la, lb)
+        return (hi + 0.05) / (lo + 0.05)
+
+    drew, offenders, portraits, instruments = set(), [], 0, 0
     for path in site_files():
         html = open(path, encoding="utf-8").read()
         if 'class="lyr lyr-terrain"' not in html:
             continue
         n += 1
         r = rel(path).lstrip("/")
-        assert 'data-role="instrument"' not in html.split(
-            'class="lyr lyr-terrain"')[0][-900:], (
-            f"/{r}: relief on a map that declares itself an instrument")
+        # THE PROMISE WAS ENFORCED BY A 900-CHARACTER WINDOW, AND THE ONE
+        # PAGE IT IS ABOUT IS 27,000 CHARACTERS WIDE. This read the last 900
+        # bytes before the layer for `data-role="instrument"` — a proximity
+        # test, which holds on a plate whose whole drawing is a few hundred
+        # bytes of head and fails on the instrument itself: `#europemap`
+        # declares its role and then emits an ocean rect, the ground beyond
+        # and fifty country shapes before any layer above the land, so the
+        # role is 26,889 bytes away and the window could not see it. A guard
+        # that cannot reach the case it was written for is the check that
+        # matched `pointsmap arched"><svg` and examined 0 dots on a site with
+        # 130 region maps. The enclosing `<svg>` is read instead, which is
+        # the element that carries the claim.
+        #
+        # AND THE PROMISE IS NOW ABOUT THE GROUND RATHER THAN ABOUT THE
+        # LAYER. The reason it was written survives re-reading — a reader
+        # reads VALUES off an instrument, so a wash nobody asked for on the
+        # drawing whose subject is which countries and destinations exist
+        # reads as a data layer rather than as ground — and it is a reason
+        # about relief being the GROUND of an instrument. /map already has
+        # four geography layers a reader switches, so the fifth answers the
+        # objection instead of overruling it, and the three conditions are
+        # what make that checkable rather than asserted: the group ships
+        # hidden, the control exists and is unchecked, and the key names the
+        # layer. A weaker claim, made deliberately, and it still fails on the
+        # thing it was protecting — a topographic instrument ground.
+        for _m in re.finditer(r'class="lyr lyr-terrain"', html):
+            _svg = html.rfind("<svg", 0, _m.start())
+            _tag = html[_svg:html.find(">", _svg) + 1] if _svg != -1 else ""
+            if 'data-role="instrument"' not in _tag:
+                continue
+            _grp = html[html.rfind("<g", 0, _m.start()):_m.end() + 120]
+            assert 'hidden' in _grp and 'display="none"' in _grp, (
+                f"/{r}: an instrument draws relief as its GROUND. On a map a "
+                f"reader reads values off, the height of the land is a layer "
+                f"they ask for: the group ships hidden and with "
+                f'display="none", because the UA sheet\'s [hidden] rule is '
+                f"namespaced to HTML and does not reach an SVG group")
+            assert ('name="geo" value="relief"' in html
+                    and 'value="relief" checked' not in html), (
+                f"/{r}: relief ships on an instrument with no unchecked "
+                f"control to turn it on — a layer a reader cannot ask for is "
+                f"either the ground this refuses or dead weight")
+            assert '<span class="sw relief">' in html, (
+                f"/{r}: the key does not name the relief layer. A key that "
+                f"omits a layer the drawing can paint is the swatch that "
+                f"said cobalt while the drawing drew pine-deep, one row over")
+            n += 3
         # THE PROMISE IS THAT RELIEF CANNOT BURY A FRONTIER, and there are
         # two ways to keep it. A plate unfolds the boundary and re-emits it
         # above the bands. The hero draws no frontier at all — it is filled,
@@ -4688,6 +4749,46 @@ def c_terrain():
                 f"the hero's frontiers are {m.group(1)}% of the way to the "
                 f"page's ink. At reading distance nobody should think 'I see "
                 f"borders'; past 40% this is a political map")
+            n += 2
+        elif r == "map/index.html":
+            # AND THE INSTRUMENT KEEPS THE SAME PROMISE A THIRD WAY, WHICH
+            # IS ARITHMETIC RATHER THAN A CLASS. A plate unfolds its
+            # boundary and re-emits it above the bands; the hero draws no
+            # frontier at all. Neither is available here: the subject IS
+            # fifty countries, so there has to be a frontier, and the
+            # stroke-only pass that would put it above the relief is a third
+            # copy of the geometry — 43 KB, refused on this page by name,
+            # with the trigger written beside the refusal.
+            #
+            # Multiply never lightens. It darkens the frontier by the same
+            # factor it darkens the ground the frontier runs across, so the
+            # step between them survives where source-over destroys it. That
+            # is checkable from the stylesheet's own hexes rather than
+            # asserted, and it is recomputed here rather than typed, because
+            # a number typed into a check is the number that was true when
+            # somebody typed it.
+            assert re.search(r"\.europemap \.lyr-terrain\s*\{[^}]*"
+                             r"mix-blend-mode:\s*multiply", css), (
+                "/map draws relief over a frontier that is a stroke on the "
+                "land path, and the bands do not multiply — composited "
+                "normally they bury it, which is the defect a plate unfolds "
+                "its boundary to avoid")
+            _land = _rgb(css_hex(css, "--map-land"))
+            _bord = _rgb(css_hex(css, "--map-border"))
+            _top = _rgb([v for _lo, _hi, v, _w in C.HYPSOMETRIC][-1])
+            _a = float(re.search(r"\.europemap \.lyr-terrain \.tband\s*"
+                                 r"\{[^}]*fill-opacity:\s*([\d.]+)",
+                                 css).group(1))
+            def _mult(bg):
+                return tuple((1 - _a) * bg[i] + _a * (bg[i] * _top[i] / 255)
+                             for i in range(3))
+            bare = _contrast(_bord, _land)
+            under = _contrast(_mult(_bord), _mult(_land))
+            assert under >= bare * 0.85, (
+                f"/map's frontier measures {under:.2f}:1 under the top "
+                f"relief band against {bare:.2f}:1 with the layer off — the "
+                f"bands are burying it, which is what multiply is here to "
+                f"stop")
             n += 2
         else:
             assert 'class="lyr lyr-country-bounds"' in html, (
@@ -4731,12 +4832,25 @@ def c_terrain():
             # browser-checks.js, because a token separation cannot see what a
             # layer above the fill does to it.
             portraits += 1
+        elif r == "map/index.html":
+            # THE FIFTH FAMILY IS THE INSTRUMENT, AND IT IS THE ONLY ONE
+            # WHERE THE LAYER IS OFF UNTIL A READER ASKS. The three
+            # conditions above are what admit it; this branch is only the
+            # statement that the page is expected to carry it, so a
+            # regression that stopped drawing it is an offender rather than
+            # a silence.
+            instruments += 1
         elif parts[0] != "journeys":
             offenders.append("/" + r)
     assert not offenders, (
         f"relief on {len(offenders)} page(s) outside the destination, "
-        f"journey, hero and country-portrait families, the four it was "
-        f"approved for: {offenders[:4]}")
+        f"journey, hero, country-portrait and instrument families, the five "
+        f"it was approved for: {offenders[:4]}")
+    assert instruments == 1, (
+        f"{instruments} instrument(s) carry the relief layer and /map is the "
+        f"one that should. A family approved by name and then drawing "
+        f"nothing is the check that examined 0 dots on a site with 130 "
+        f"region maps")
     # AND THE FOURTH FAMILY CARRIES A FLOOR OF ITS OWN, because a family
     # approved by name is a family that can silently stop drawing. The 23 are
     # decided by the ground and by the frame cap, so this is a floor rather

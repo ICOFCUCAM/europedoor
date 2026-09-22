@@ -8224,6 +8224,84 @@ fill rather than a restatement of the one just removed — with the real refacto
 recorded, which is that **four rules state that policy separately** and the
 other three still change something.
 
+**THE INSTRUMENT HAD NO GROUND, AND THE RULE THAT REFUSED IT ONE WAS
+ENFORCED BY A 900-CHARACTER WINDOW.** /map draws rivers, lakes, a graticule,
+six sea names, twenty-four country names and fifty interactive country shapes,
+and the one thing it never drew is the height of the land under all of it — so
+the Alps and the Hungarian plain are the same stone on the page whose whole
+subject is the continent. The hero draws it and the homepage's atlas register
+draws it, from this data and this renderer: `relief_wash`'s own docstring says
+the 1,500 km frame cap is a rule about destination and journey plates rather
+than about a picture of Europe.
+
+**`c_terrain`'s first promise is that relief is never on a map that declares
+itself an instrument, and the reason survives re-reading** — a reader reads
+VALUES off an instrument, so a wash nobody asked for on the drawing whose
+subject is which countries and destinations exist reads as a data layer rather
+than as ground. **It is a reason about relief being the GROUND.** This map
+already has four geography layers a reader switches, so the fifth answers the
+objection instead of overruling it: **off by default, named in the key, and the
+reader's own choice.** Three conditions make that checkable rather than
+asserted — the group ships `hidden` AND `display="none"`, the control exists
+and is unchecked, and the key names the layer — and the claim still fails on
+the thing it was protecting, which is a topographic instrument ground.
+
+**And the old assertion could not see /map at all.** It read the last 900 bytes
+before the layer for `data-role="instrument"`, which is a proximity test: it
+holds on a plate whose whole head is a few hundred bytes and fails on the
+instrument itself, because `#europemap` declares its role and then emits an
+ocean rect, the ground beyond and fifty country shapes before any layer above
+the land. **The role is 26,889 bytes away.** A guard that cannot reach the case
+it was written for is the check that matched `pointsmap arched"><svg` and
+examined 0 dots on a site with 130 region maps. It reads the enclosing `<svg>`
+now, which is the element that carries the claim.
+
+**The layer ships in the document rather than being fetched, and that is the
+cheaper architecture rather than the lazier one.** 15,725 bytes at plate 05's
+own settings, 2.6% of a 592 KB page, against a request and a JSON file for a
+page that currently loads no geometry over the network at all — and it keeps
+the no-JavaScript case honest, because the data is in the page and the reader
+simply has not asked for it. **`display="none"` as well as `hidden`**, because
+the UA sheet's `[hidden] { display: none }` is namespaced to HTML and an SVG
+group marked hidden goes on drawing; map.js pays for that lesson in a comment
+of its own, and two Chromium versions disagreed about it for three months.
+
+**The order is the point and it is not what `ORDER` literally says.** Terrain
+goes after LAND, and this drawing's land is three groups — `#context`,
+`#countries` and `#detail`, which map.js fills with higher-detail geometry on
+zoom. Emitting the bands before `#detail` would have them painted over by the
+very land they describe the moment a reader zoomed in: invisible at rest,
+invisible in every count, and visible only to somebody who zoomed. **And it
+sits under `cut_fade`**, so the 52°E data cut fades the relief with everything
+else rather than ending it on a ruled line.
+
+**It takes `.atplate`'s paint rather than a fourth copy of the ramp**, because
+/map binds the same light map set that band does — stone land on pale water —
+so the three band colours, the .45 fill-opacity and the `pointer-events: none`
+are one decision written once. A separate `.europemap` block would be a second
+chance to disagree about what 1,200 metres looks like, which this repository
+has paid for in a token name, in a dispatch cap and in a credential scan.
+
+**AND THE KEY NAMES ALL THREE BANDS, NOT ONE OF THEM.** A single swatch is a
+key that names the wrong colour on two thirds of the layer, which is this
+page's own recorded failure: `.legend .sw.dest` read `var(--sea)` and the
+drawing painted `var(--sea)`, the same token resolving to cobalt inside the
+graphite figure and to pine-deep in the light band beside it. Three tiles, the
+same three hexes in the same order, with the figures derived from
+`cartography.band_floors()` so a ramp that moves in the data moves in the key.
+`fill-opacity` is deliberately not applied to the tiles: a band sits over the
+land tone and a swatch sits on the page, so matching the declaration would not
+match the pixel, and what a key has to agree with is what a reader sees.
+
+**And the switch is proved by moving it.** The static check can read that the
+group ships hidden; it cannot read whether the control works, and a layer that
+ships hidden and cannot be turned on is 15 KB of dead weight every static
+assertion would report as correct. The browser suite turns it on, asserts three
+bands paint three declared colours rather than the SVG default, asserts each
+takes `pointer-events: none` — every layer above this land swallows the click
+in turn, which the hero paid for with a picture whose one job was to be the way
+in and which led nowhere — and turns it off again.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

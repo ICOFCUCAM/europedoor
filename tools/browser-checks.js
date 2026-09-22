@@ -1605,6 +1605,63 @@ async function main() {
   ok(!(await layerDrawn("#dots")),
      `the destinations layer will not turn off: ${await layerState("#dots")}`);
 
+  // ── the height of the ground, which is the one layer that is GROUND ──
+  //
+  // `c_terrain` refuses relief as an instrument's ground and admits it as a
+  // layer a reader asks for, on three conditions it can read off the shipped
+  // HTML: the group ships hidden, the control is unchecked, the key names it.
+  // What it cannot read is whether the switch WORKS, and a layer that ships
+  // hidden and cannot be turned on is 15,725 bytes of dead weight that every
+  // static assertion would report as correct. So this moves it.
+  //
+  // AND IT ASSERTS THE CLICK STILL LANDS. Every country on this drawing is a
+  // link and every layer above the land swallows the click in turn — the
+  // hero paid for that with a picture whose one job was to be the way in and
+  // which led nowhere. `elementFromPoint` over a lit band is the only
+  // instrument that can see it: `pointer-events: none` computes correctly on
+  // an element that is still eating the pointer if a stylesheet elsewhere
+  // put it back.
+  ok(!(await layerDrawn("#relief")),
+     `the relief layer starts visible: ${await layerState("#relief")}`);
+  const reliefBands = await page.locator("#relief .tband").count();
+  ok(reliefBands === 3,
+     `the relief layer ships ${reliefBands} bands and the wash draws three`);
+  await page.check('#geolayers input[value="relief"]');
+  await page.waitForTimeout(120);
+  ok(await layerDrawn("#relief"),
+     `the relief layer will not turn on: ${await layerState("#relief")}`);
+  const reliefPaint = await page.evaluate(() => {
+    const out = {};
+    for (const b of document.querySelectorAll("#relief .tband")) {
+      const cs = getComputedStyle(b);
+      out[b.getAttribute("class").split(" ").pop()] =
+        `${cs.fill} pe=${cs.pointerEvents} op=${cs.fillOpacity}`;
+    }
+    return out;
+  });
+  for (const [band, paint] of Object.entries(reliefPaint)) {
+    ok(/^rgb\(/.test(paint) && !/rgb\(0, 0, 0\)/.test(paint),
+       `the relief band ${band} paints ${paint} — an unreached band takes ` +
+       `the SVG default, which is the one colour this palette does not have`);
+    ok(paint.includes("pe=none"),
+       `the relief band ${band} takes the pointer: ${paint}`);
+  }
+  // The land under a band is still a link a click reaches.
+  const overBand = await page.evaluate(() => {
+    const b = document.querySelector("#relief .t2000");
+    if (!b) return "no band";
+    const r = b.getBoundingClientRect();
+    const el = document.elementFromPoint(
+      Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2));
+    return el ? (el.closest("a") ? "a" : el.tagName + "." +
+                 (el.getAttribute("class") || "")) : "nothing";
+  });
+  ok(overBand !== "no band",
+     "the relief layer has no top band to test the pointer over");
+  await page.uncheck('#geolayers input[value="relief"]');
+  ok(!(await layerDrawn("#relief")),
+     `the relief layer will not turn off again: ${await layerState("#relief")}`);
+
   // ── the country map ────────────────────────────────────────────────
   //
   // The middle rung of Europe -> country -> region -> destination, which did
