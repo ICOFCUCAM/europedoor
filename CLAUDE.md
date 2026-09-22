@@ -7764,6 +7764,58 @@ doing its job. And the atlas register's names ALREADY come off below 44rem
 own rule exists to prevent was never on plate 05.
 
 
+**THE PLATE-OVERLAP SWEEP READ FIFTEEN URLs TYPED BY HAND FOR 817 MAP PAGES,
+AND HAD BEEN WIDENED TWICE BY TYPING MORE.** Its own comment records the
+sample being extended when it turned out to hold two plates that did not have
+the thing it was written for — and the answer, both times, was three more
+strings. That is the hand-typed-list fault this file already records twice:
+the accessibility scan's twenty URLs, fixed by reading
+`tools/lib/families.js`, and the crop sweep's three entries, every one of
+which had drifted. Since this list was last touched the country portraits and
+the macro maps changed frame shape, the region maps took a frame floor, the
+atlas register was built and two indexes were recomposed. The list did not
+move.
+
+**MEASURED OVER EVERY ONE OF THEM BEFORE DERIVING IT — the set is
+`grep -rl 'class="minimap' site --include=index.html` — AND THE VERDICT WAS
+CLEAN: 867 figures, ZERO overlapping pairs at 1280 and zero at 390.** So
+the typed list was not hiding a defect — it was the REACH that was wrong, not
+the answer, and that measurement is what makes a derived sample a repair
+rather than a shot in the dark. The set is enumerated from the built site,
+grouped by the route's own shape (twelve families), and sampled
+proportionally — a thirty-second of a family, never fewer than four and never
+more than twelve — which spreads the whole set over 61 samples at two widths
+for about two minutes. The twelve URLs that are EVIDENCE stay in unconditionally,
+because each is a plate a recorded defect was measured on and **a sample that
+can drop the case it was written for is the fault being repaired.** Reach is
+asserted per run, from the site's own figure count rather than a typed
+number.
+
+**AND THE SWEEP READ THE PAGE BEFORE THE BROWSER HAD SETTLED, WHICH IS HOW IT
+REPORTED A LABEL THAT IS NOT DRAWN.** With no wait after `goto` on a reused
+page, `getClientRects()` can hand back a box for an element the stylesheet has
+since hidden. Measured on `/europe/sweden` at 390, the full-site instrument
+reported *"Skåne & the South" through "Ystad" by 17px* on **three runs of
+eight** — a region name that is `display: none` at that width and is not on
+the screen at all — and **zero of eight** with two frames of settle. The
+stylesheet was never late: `.rlabel` computed `display: none` on 6 of 6 loads
+at both `domcontentloaded` and `load`, so this is a stale LAYOUT read rather
+than a stylesheet race. A check that can fail for a reason that is not about
+the page is a check whoever hits it re-runs until green, which is exactly how
+a real defect gets through — the same argument that replaced the dead-rule
+scan's jittering count with a list of named rules.
+
+**AND TWO OF MY OWN INSTRUMENTS WERE WRONG IN THE SAME HOUR, BOTH ABOUT
+PROCESS RATHER THAN ABOUT PIXELS.** `timeout 900 python3 tools/build.py |
+tail -4` reports **`tail`'s** exit code, so a `checks.py` run with 7,093
+failures and a `sys.exit(1)` came back as exit 0 — *a green run that has
+stopped counting*, arriving through a pipe. And the parent `timeout` process
+sitting at 0% CPU in `sigsuspend` was read as "the build has finished", so it
+was killed: the pages were written and `site/stories/feed.xml` and 4,565 of
+the 12,390 derivatives were not, which is what produced those 7,093 failures.
+**Never judge a gate by a piped exit code, and never kill a build** — the
+wchan and the CPU figure of a wrapper say nothing about its child, which is
+`pgrep` matching a name rather than a run, one level up.
 
 
 ## Gates

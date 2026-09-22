@@ -5178,26 +5178,119 @@ async function main() {
    * arrangement was never asked. Türkiye, Ukraine and Switzerland are the
    * three deepest, so the sample now contains the case.
    */
+  /* AND THE LIST WAS FIFTEEN URLs TYPED BY HAND FOR 817 PAGES, ANSWERED
+   * TWICE BY TYPING MORE. The paragraph above records the sample being
+   * widened when it turned out to hold two plates that did not have the
+   * thing — and the answer both times was three more strings. That is the
+   * hand-typed-list fault this repository records twice already: the
+   * accessibility scan's twenty URLs, and the crop sweep's three entries
+   * which had every one of them drifted. Since this list was last touched
+   * the country portraits and the macro maps changed frame shape, the region
+   * maps took a frame floor, the atlas register was built and two indexes
+   * were recomposed; the list did not move.
+   *
+   * Measured before deriving it, with a one-off instrument over EVERY page
+   * carrying a `figure.minimap` — 817 pages, 867 figures — the answer is
+   * **zero overlapping pairs at 1280 and zero at 390**. So the typed list
+   * was not hiding a defect, and that measurement is what makes a derived
+   * sample defensible rather than a shot in the dark: it is the reach that
+   * was wrong, not the verdict.
+   *
+   * SAMPLED RATHER THAN EXHAUSTIVE, AND THE SAMPLE IS SPREAD. 817 pages at
+   * two widths is about ten minutes on a suite that already takes forty;
+   * a handful per FAMILY, taken at even intervals through each family's own
+   * list, costs under two and moves as the site moves. The twelve URLs that
+   * are EVIDENCE stay in the set unconditionally — each one is a plate a
+   * recorded defect was measured on, and a sample that can drop the case is
+   * the fault above. Every family has to contribute, and that is asserted:
+   * a family that stops being found reports zero overlaps and passes.
+   *
+   * AND IT READ THE PAGE BEFORE THE BROWSER HAD SETTLED. With no wait after
+   * `goto` on a reused page, `getClientRects()` can hand back a box for an
+   * element the stylesheet has since hidden: measured on /europe/sweden at
+   * 390, the sweep reported "Skåne & the South" through "Ystad" by 17px on
+   * **three runs of eight** — a region name that is `display: none` at that
+   * width and is not drawn at all. Two frames of settle takes it to zero of
+   * eight. A check that can fail for a reason that is not about the page is
+   * a check whoever hits it re-runs until green, which is how a real defect
+   * gets through — the same argument that replaced the dead-rule scan's
+   * jittering count with a named list. */
+  /* THE TWELVE THAT ARE EVIDENCE. Each is a plate a recorded defect was
+   * measured on — Chamonix and Athens for the 271 pairs, Levoča for the
+   * worst of them, Andorra la Vella for the 91px phone clash, Türkiye,
+   * Ukraine and Switzerland for the 32 pairs the portrait's missing phone
+   * pass produced, the Alpine Grand Tour and /europe-in/islands for the
+   * box-versus-distance test. A sample that can drop the case it was written
+   * for is the fault this block is being repaired for, so these are in the
+   * set whatever the sampling says. */
+  const EVIDENCE_PLATES = [
+    "/europe/france/alps-and-east/chamonix",
+    "/europe/greece/athens-and-the-peloponnese/athens",
+    "/europe/norway/fjord-norway/bergen",
+    "/europe/poland/lesser-poland/krakow",
+    "/europe/andorra/the-valleys/andorra-la-vella",
+    "/europe/slovakia/tatras-and-the-north/levoca",
+    "/europe/armenia/yerevan-and-ararat/yerevan",
+    "/europe/turkiye",
+    "/europe/ukraine",
+    "/europe/switzerland",
+    "/journeys/the-alpine-grand-tour",
+    "/europe-in/islands",
+  ];
+  const _mmPages = (() => {
+    const out = [];
+    const walk = (d) => {
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const q = path.join(d, e.name);
+        if (e.isDirectory()) walk(q);
+        else if (e.name === "index.html" &&
+                 fs.readFileSync(q, "utf8").includes('class="minimap'))
+          out.push("/" + path.relative(OUT, q).replace(/\/?index\.html$/, ""));
+      }
+    };
+    walk(OUT);
+    // The family key is the ROUTE's own shape, which is what decides which
+    // builder drew the map: /europe/<c> is a country, /europe/<c>/<r> a
+    // region, and so on down. render.ed_family() makes the same argument
+    // about a page's room — a family is what a route IS.
+    const fam = (u) => {
+      const p = u.split("/").filter(Boolean);
+      if (!p.length) return "home";
+      if (p[0] === "europe") return "europe/" + p.length;
+      return p.length > 1 ? p[0] + "/*" : p[0];
+    };
+    const by = new Map();
+    for (const u of out) {
+      const k = fam(u);
+      if (!by.has(k)) by.set(k, []);
+      by.get(k).push(u);
+    }
+    // PROPORTIONAL, WITH A FLOOR AND A CEILING, because a flat four per
+    // family samples 4 of 319 destination plates and 4 of 1 story — one
+    // number cannot be right for both ends of a 319:1 spread. A thirty-second
+    // of a family, never fewer than four and never more than twelve, spreads
+    // 817 pages over about sixty at two widths, which is a couple of minutes
+    // on a forty-minute suite.
+    const pick = new Set(EVIDENCE_PLATES);
+    for (const [, list] of [...by].sort()) {
+      list.sort();
+      const want = Math.max(4, Math.min(12, Math.round(list.length / 32)));
+      const n = Math.min(want, list.length);
+      for (let i = 0; i < n; i++)
+        pick.add(list[Math.floor((i * list.length) / n)]);
+    }
+    return { urls: [...pick].sort(), families: by.size, total: out.length };
+  })();
+
   for (const [vw, vh] of [[1280, 900], [390, 800]]) {
     const lc = await browser.newPage({ viewport: { width: vw, height: vh } });
-    let pairs = 0, worst = 0, worstAt = "";
-    for (const u of ["/europe/france/alps-and-east/chamonix",
-                     "/europe/greece/athens-and-the-peloponnese/athens",
-                     "/europe/norway/fjord-norway/bergen",
-                     "/europe/poland/lesser-poland/krakow",
-                     "/europe/andorra/the-valleys/andorra-la-vella",
-                     "/europe/slovakia/tatras-and-the-north/levoca",
-                     "/europe/armenia/yerevan-and-ararat/yerevan",
-                     "/europe/armenia",
-                     "/europe/cyprus",
-                     "/europe/turkiye",
-                     "/europe/ukraine",
-                     "/europe/switzerland",
-                     "/journeys/the-alpine-grand-tour",
-                     "/europe-in/islands",
-                     "/europe/italy/north-italy"]) {
+    let pairs = 0, worst = 0, worstAt = "", seen = 0, figs = 0;
+    for (const u of _mmPages.urls) {
       const r = await lc.goto(base + u, { waitUntil: "domcontentloaded" });
       if (!r || r.status() !== 200) continue;
+      await lc.evaluate(() => new Promise((rr) =>
+        requestAnimationFrame(() => requestAnimationFrame(rr))));
+      seen++;
       const hit = await lc.evaluate(() => {
         const out = [];
         for (const fig of document.querySelectorAll("figure.minimap")) {
@@ -5213,9 +5306,10 @@ async function main() {
               if (ox > 0 && oy > 0) out.push([a[0] + " / " + c[0], ox]);
             }
         }
-        return out;
+        return { out, figs: document.querySelectorAll("figure.minimap").length };
       });
-      for (const [names, ox] of hit) {
+      figs += hit.figs;
+      for (const [names, ox] of hit.out) {
         pairs++;
         if (ox > worst) { worst = ox; worstAt = `${u}: ${names}`; }
       }
@@ -5227,6 +5321,24 @@ async function main() {
        `name is the one defect on these plates a reader cannot work around: ` +
        `the dot, the <title> and the row below survive a DROPPED label, and ` +
        `nothing survives an unreadable one`);
+    // AND THE REACH IS ASSERTED, because a page set that stops finding the
+    // drawings reports zero overlaps and passes — which is how the crop
+    // sweep made two green assertions a run about elements the site no
+    // longer had, and how `.qtile` printed "it examined 0 states" for three
+    // redesigns. The floors are a fraction of what the built site holds
+    // rather than a typed number: the figure count moves whenever a family
+    // gains or loses a map, and a floor that has to be re-typed is a floor
+    // somebody raises instead of reading.
+    ok(seen === _mmPages.urls.length && seen >= _mmPages.families,
+       `the plate sweep loaded ${seen} of ${_mmPages.urls.length} sampled ` +
+       `page(s) at ${vw}px across ${_mmPages.families} families of the ` +
+       `${_mmPages.total} carrying a figure.minimap — a page that 404s is ` +
+       `skipped silently and takes its family's coverage with it`);
+    ok(figs >= seen,
+       `the plate sweep found ${figs} figure.minimap over ${seen} page(s) at ` +
+       `${vw}px, fewer than one each. Every page in this set was chosen ` +
+       `because its HTML carries that class, so a page contributing none ` +
+       `means the selector and the markup have parted company`);
     await lc.close();
   }
 
