@@ -2490,7 +2490,36 @@ async function main() {
       ".minidot circle {opacity}",
       ".minidot.here circle {opacity}",
       ".minimap figcaption {color}",
-      ".minimap {color}",
+      // AND THREE KEYS GREW A PROPERTY THE MOMENT THE BACKGROUND BECAME
+      // READABLE, which is the same rule reported under a longer name
+      // rather than three new faults. All three are the case this
+      // comment already calls legitimate: a base beaten by a variant on
+      // every page that has one, where the honest fix is a refactor.
+      //   .minimap      every minimap on the site is `.minimap.arched`,
+      //                 and `.minimap.arched svg` paints none.
+      //   .sheet-atlas  `.sheet.sheet-atlas` is (0,2,0) and paints
+      //                 `--map-water` on both of its two users.
+      //   .card-art     `grep -rho 'class="card-art[^"]*"'` returns
+      //                 `card-art card-map` and nothing else, and
+      //                 `.card-map` paints the atlas water. The
+      //                 `--paper-3` base is the ground a photograph tile
+      //                 would stand on and no such tile is emitted yet,
+      //                 so it is recorded rather than deleted.
+      ".card-art {background-color}",
+      ".minimap {color,background-color}",
+      // AND THE APERTURE'S OWN GUARD LOST ITS SUBJECT IN THE SAME COMMIT.
+      // `.minimap.arched svg { background: none }` states the rule that a
+      // map figure paints no background — the corners outside the arch show
+      // the page through, and that is the difference between an aperture and
+      // a panel — and the only thing it was undoing on an arched minimap was
+      // `.countrymap svg`'s `--atlas-sea`, deleted here because it lost on
+      // all fifty. It is kept rather than deleted because it is a guard
+      // against the NEXT fill, not a restatement of this one; the refactor it
+      // points at is that four rules state this policy separately
+      // (`.minimap.arched svg`, `.routewrap .routemap.arched svg`,
+      // `.instrmap svg`, `.ed-opening-visual:has(svg)`) and the other three
+      // still change something, so folding them is its own measurement.
+      ".minimap.arched svg {background-color}",
       ".minimap.arched .context path {fill}",
       ".minimap.arched .context path {stroke}",
       ".minimap.arched .minidot.here circle {fill}",
@@ -2507,7 +2536,7 @@ async function main() {
       ".route .hop {color}",
       ".route .leg-nights {color}",
       ".scalebar text {fill}",
-      ".sheet-atlas {color}",
+      ".sheet-atlas {color,background-color}",
       ".staged .now {color}",
     ]);
     const seen = new Map();
@@ -2589,6 +2618,26 @@ async function main() {
       const rows = await dsp.evaluate(() => {
         const PROPS = ["fill", "stroke", "display", "color",
                        "background-color", "opacity", "visibility"];
+        // AND A SHORTHAND CARRYING A var() READS BACK AS AN EMPTY LONGHAND,
+        // so for 129 of this stylesheet's 2,074 live rules the one property
+        // this scan can read was invisible to it. CSSOM stores
+        // `background: var(--paper-2)` as a pending-substitution value:
+        // `getPropertyValue("background-color")` returns "" and
+        // `getPropertyValue("background")` returns the declaration. 129
+        // rules declare their ground that way — `body`, `.masthead`, `.btn`
+        // among them — against 29 using the longhand, so `props` came out
+        // EMPTY for the rules whose only readable property was a background
+        // and the rule was skipped before it was ever measured. Reading the
+        // shorthand as well takes the population from 494 rules to 521 and
+        // found six: `.ed-page` restating `body`'s own background on the
+        // <body> on 1,031 pages, `.countrymap svg` losing to the aperture's
+        // own `background: none` on all fifty, `.maplist` superseded by
+        // `.maptwin` on its only user, and three bases beaten by a variant
+        // on every page that has one. The removal is what proves it —
+        // `removeProperty("background")` does take a var() shorthand out,
+        // which was checked rather than assumed, because a remove that
+        // silently did nothing would report every one of those 129 dead.
+        const SHORTHAND = { background: "background-color" };
         const sheet = [...document.styleSheets]
           // The stylesheet is content-addressed — europedoor.<hash>.css — so
           // this matched nothing the day assets were hashed and the scan's
@@ -2637,7 +2686,12 @@ async function main() {
                          "!important; animation: none !important }", stopIdx);
         const out = [];
         for (const rule of flat) {
-          const props = PROPS.filter((p) => rule.style.getPropertyValue(p));
+          const direct = PROPS.filter((p) => rule.style.getPropertyValue(p));
+          const shorts = Object.keys(SHORTHAND).filter(
+            (sh) => rule.style.getPropertyValue(sh) &&
+                    !rule.style.getPropertyValue(SHORTHAND[sh]));
+          const props = [...new Set([...direct,
+                                     ...shorts.map((sh) => SHORTHAND[sh])])];
           if (!props.length) continue;
           let els;
           try { els = document.querySelectorAll(rule.selectorText); }
@@ -2666,8 +2720,13 @@ async function main() {
             .map((e) => props.map((p) => getComputedStyle(e).getPropertyValue(p))
                              .join("|"));
           const before = read();
-          const saved = props.map((p) => [p, rule.style.getPropertyValue(p),
-                                          rule.style.getPropertyPriority(p)]);
+          // REMOVED BY WHAT THE RULE DECLARES, READ BY WHAT THE BROWSER
+          // COMPUTES. Removing `background-color` from a rule that only
+          // wrote `background` is a no-op, so the two lists are not the same
+          // list: `kill` is the declarations, `props` is the measurement.
+          const kill = [...direct, ...shorts];
+          const saved = kill.map((p) => [p, rule.style.getPropertyValue(p),
+                                         rule.style.getPropertyPriority(p)]);
           for (const [p] of saved) rule.style.removeProperty(p);
           const after = read();
           for (const [p, v, pr] of saved) rule.style.setProperty(p, v, pr);

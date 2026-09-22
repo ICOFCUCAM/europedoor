@@ -8178,6 +8178,52 @@ numerator rises, and reading the percentage alone would have called a
 7,046-pixel repair a regression. The instrument cannot be a gate for exactly
 this reason, and it says so on its own face.
 
+**A SHORTHAND CARRYING A var() READS BACK AS AN EMPTY LONGHAND, SO THE
+DEAD-RULE SCAN HAD NEVER MEASURED 129 RULES' GROUND.** CSSOM stores
+`background: var(--paper-2)` as a pending-substitution value:
+`getPropertyValue("background-color")` returns `""` and only
+`getPropertyValue("background")` returns the declaration. The scan reads seven
+longhands and builds its `props` list from them, so for every rule that
+declares its ground through the shorthand it measured nothing — and where a
+background was the rule's ONLY readable property, `props` came out empty and
+the rule was skipped before a single element was sampled. Counted on the live
+sheet: **129 rules of 2,074 declare a colour that way** — `body`, `.masthead`,
+`.btn` among them — against **29** using the longhand. Reading the shorthand as
+well takes the population from 494 rules to 517 and found six, of which three
+are deletions that changed no pixel:
+
+| | |
+|---|---|
+| `.ed-page` | is the `<body>`, and restated `body { background: var(--paper) }` on the same element, 8,800 lines further down, on every page (`grep -rlo 'class="ed-page' site --include=index.html | wc -l`) |
+| `.countrymap svg` | painted `--atlas-sea` and lost to `.minimap.arched svg { background: none }` on **all fifty** country maps — the aperture's own rule, and the sea a reader sees is `lyr-ocean`, inside the drawing |
+| `.maplist` | a bordered, filled, padded panel whose only user on the whole site is `class="maplist maptwin"`, and `.maptwin` undid every declaration of it |
+
+**And `.maplist summary` is the same fault with nothing to measure at all.**
+`grep -rlo '<summary' site --include=index.html | wc -l` is **zero** — there is
+no `<summary>` element anywhere on this site, the disclosures went when /map was
+rebuilt — and **a rule that matches nothing is invisible to this scan by
+construction**, because its question is whether a rule that MATCHES elements
+changes any of them. That is `.qtile` word for word, and it is why the
+deletions were proved with pictures rather than with the scan: seven pages at
+1280 and 390, **14 of 14 byte-identical**, with a run-to-run control of 14 of
+14 taken first.
+
+**The three that are not deletions are on the known list with the refactor
+named**, which is this check's own standing answer for a base beaten by a
+variant on every page that has one: `.card-art` (every one on the site is
+`card-art card-map`, and the `--paper-3` base is the ground a photograph tile
+would stand on, which nothing emits yet), `.minimap` and `.sheet-atlas`.
+
+**AND THE FIX EARNED ITS WIDENING IN THE RUN AFTER THE DELETION.**
+`.maptwin`'s four declarations existed only to undo the panel, so with the
+panel gone the scan named `.maptwin {background-color}` immediately — an undo
+whose subject has gone is dead code that looks like a decision. It collapsed to
+its margin. The second name it found is kept: `.minimap.arched svg
+{ background: none }` now undoes nothing, and it is a guard against the NEXT
+fill rather than a restatement of the one just removed — with the real refactor
+recorded, which is that **four rules state that policy separately** and the
+other three still change something.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

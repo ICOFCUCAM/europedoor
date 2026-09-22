@@ -3571,7 +3571,13 @@ h2.mini, h3.mini { font-size: var(--t-md); margin: 0 0 var(--s2); line-height: 1
    already records about `1fr` and `min-content`. A fixed height has no
    circularity in it, and the figure stays a block, so the arch, the caption
    and the source note share one left edge without anything being centred. */
-.countrymap svg { background: var(--atlas-sea); border-radius: var(--radius); }
+/* AND IT MAY NOT PAINT A GROUND. `.minimap.arched svg { background: none }`
+   is the aperture's own rule — the corners outside the arch show the page
+   through, and that is the difference between an aperture and a panel — and
+   all fifty country maps are `minimap countrymap arched`, so this fill lost
+   on every one of them for the life of the rule. The sea a reader sees is
+   `lyr-ocean`, a rect inside the drawing, which is where a sea belongs. */
+.countrymap svg { border-radius: var(--radius); }
 /* THE ORIENTATION IS CAPPED ON THE FIGURE, AND THE DRAWING KEEPS
    `width: 100%; height: auto`. Three attempts are recorded because each
    looked right and each failed in its own way:
@@ -4145,9 +4151,24 @@ html { scroll-padding-top: var(--mast); }
  * three columns where there is room; one where there is not, because a
  * multi-column list on a phone is a list you scroll past sideways.
  */
-.maplist { margin: var(--s6) 0; padding: var(--s5); border: 1px solid var(--rule);
-           border-radius: var(--radius); background: var(--paper-2); }
-.maplist summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+/* THE PANEL AND ITS DISCLOSURE BOTH LOST THEIR SUBJECT, AND NEITHER LOSS IS
+ * VISIBLE TO ANY INSTRUMENT HERE.
+ *
+ * `.maplist` was a bordered, filled, padded panel inside a closed
+ * `<details>`. The /map rebuild took the twin out of the disclosure and
+ * `.maptwin` undoes the margin, the padding, the border and the fill — and
+ * `grep -rho 'class="maplist[^"]*"' site --include=index.html` returns
+ * `class="maplist maptwin"` and nothing else, once, on the whole site. So
+ * every declaration was superseded on its only user. The dead-rule scan
+ * skipped the rule because its only readable property was declared through a
+ * `background:` shorthand carrying a var(), which CSSOM reports as an empty
+ * longhand.
+ *
+ * `.maplist summary` is worse and simpler: `grep -rlo '<summary' site
+ * --include=index.html | wc -l` is ZERO. There is no <summary> element
+ * anywhere on this site — the disclosures went when /map was rebuilt — and a
+ * rule that matches nothing is invisible to the scan by construction, which
+ * is `.qtile` word for word. */
 .maplist h3 { margin: var(--s5) 0 var(--s2); font-size: var(--t-md); }
 /* A MEASURE IS FOR PROSE, AND THIS IS A DIRECTORY OF 369 ENTRIES.
  * `main ul.stack { max-width: var(--measure) }` is (0,1,1) and capped all ten
@@ -8864,7 +8885,17 @@ body[data-family="instrument"] :is(.ed-eyebrow, .ed-section-index) {
    ground is the semantic surface, never a palette hex: that is what the
    two-worlds split is for, and hard-coding it here would also have made
    every INSTRUMENT page cream. */
-.ed-page { background: var(--paper); font-family: var(--ed-sans); }
+/* AND THE REPAIR ENDED ONE DECLARATION SHORT: `.ed-page` IS THE <body>, so
+   once it read `var(--paper)` it was restating `body { background:
+   var(--paper) }` on the same element, 8,800 lines further down, on 1,031
+   pages. Measured in Chromium: removing the declaration leaves the computed
+   background at rgb(248,246,239) on /countries and rgb(7,16,15) on /map, and
+   renaming the selector so it matches nothing leaves it there too. Two rules
+   painting one element one colour is the redundancy the dead-rule scan
+   exists to find, and it could not see it — a `background:` shorthand
+   carrying a var() reads back as an EMPTY longhand in CSSOM, so `props` came
+   out [] and the rule was skipped entirely. */
+.ed-page { font-family: var(--ed-sans); }
 
 .ed-opening {
   width: min(var(--ed-max), calc(100% - 2 * var(--ed-gutter)));
@@ -14568,11 +14599,20 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
 .askgrid #mapcount { margin-top: var(--s4); }
 
 /* ── 03 everything we hold, in words ──────────────────────────────── */
-/* NO BORDER, NO FILL, NO RADIUS. `.maplist` is a bordered panel because it
-   was a disclosure sitting in the flow of a page; as a band it is the
-   band's own content, and the four things that say "separate object placed
-   here by a system" are exactly what this composition does without. */
-.maptwin { margin: var(--s7) 0 0; padding: 0; border: 0; background: none; }
+/* NO BORDER, NO FILL, NO RADIUS — AND NOTHING LEFT TO UNDO. `.maplist` WAS a
+   bordered panel because it was a disclosure sitting in the flow of a page;
+   as a band it is the band's own content, and the four things that say
+   "separate object placed here by a system" are exactly what this
+   composition does without. So this rule spent four declarations undoing
+   them, and the day `.maplist`'s panel was deleted — its only user being
+   this one, every declaration of it superseded here — all four became
+   declarations that cannot move a pixel. The fixed dead-rule scan named
+   `.maptwin {background-color}` in the run after the deletion, which is the
+   instrument earning its widening immediately: an undo whose subject has
+   gone is dead code that looks like a decision, and the decision is now
+   simply that the twin is not a panel. The margin is real: it is the only
+   one left. */
+.maptwin { margin: var(--s7) 0 0; }
 .maptwin > .small { max-width: 46rem; }
 
 /* ── 04 what this drawing is ──────────────────────────────────────── */
