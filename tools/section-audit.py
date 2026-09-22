@@ -113,9 +113,56 @@ def spec_covers(*needles):
     return (not missing, f"specification missing {missing}" if missing else "recorded in the specification")
 
 
+def has_row(path, heading, state):
+    """Does THIS row carry THIS state — rather than does the page contain both?
+
+    `has(path, "Accounts", "designed, not built")` is TWO INDEPENDENT CLAIMS,
+    and the mutation sweep proved it: /how-it-works carries "designed, not
+    built" on four rows and "blocked" on eight, so the Accounts row could
+    change to `built` and the assertion would stay green on the AI planner's
+    state. That is the adjacency half of `a needle may not span an element` —
+    there the fix was to split one sentence into two needles, and here two
+    needles have to be put back together, because what is being asserted is a
+    PAIR.
+
+    The row's own span is read off the markup rather than off a character
+    window: every row is a `<div class="row">`, so the slice from this
+    heading to the next one is exactly this row and nothing else. A window
+    picked by eye is a number nobody can check, and it would have to grow
+    the day a row gains a sentence.
+    """
+    h = page(path)
+    if not h:
+        return (False, f"{path} is not served at all")
+    flat = " ".join(h.split())
+    i = flat.find(">" + heading + "</h3>")
+    if i < 0:
+        return (False, f"{path} has no row headed {heading!r}")
+    j = flat.find('<div class="row"', i)
+    row = flat[i:j if j > 0 else len(flat)]
+    return (state in row, f"{path}: {heading} reads {state!r}" if state in row
+            else f"{path}: the {heading!r} row does not read {state!r}")
+
+
 def doc_covers(doc, *needles):
-    text = src(doc)
-    missing = [n for n in needles if n not in text]
+    """`has()`'s sister, and it never got `has()`'s repair.
+
+    WHITESPACE IS COLLAPSED HERE FOR THE REASON IT IS COLLAPSED THERE: an
+    instrument a line break can defeat is reading the file rather than the
+    claim. §53's assertion that the content report states in its own head why
+    there is no dashboard failed on "An admin / dashboard needs
+    authentication", which is a paragraph wrap in a Markdown document — the
+    same defeat `c_published_projection` lost a year to on the homepage, in
+    the one helper of the two that was left behind. A RULE STATED ONCE AND
+    APPLIED TO ONE OF ITS CALL SITES.
+
+    Collapsing can only ever WIDEN a match, so no assertion that passed
+    before can fail because of it; what it removes is a way for one to fail
+    while the claim is present, and a way for the next needle somebody
+    writes to be a fact about where a line happened to wrap.
+    """
+    text = " ".join(src(doc).split())
+    missing = [n for n in needles if " ".join(n.split()) not in text]
     return (not missing, f"{doc} missing {missing}" if missing else f"recorded in {doc}")
 
 
@@ -2008,24 +2055,183 @@ def s52():
         f"and all {len(DATA['journeys'])} journeys are public"
 
 
+# NOTHING ON THIS SITE ACCEPTS A SUBMISSION, AND THAT IS ONE PREDICATE READ BY
+# TWO SECTIONS. §55 asks it about moderation and §53 asks it about the Reviews
+# and Users modules; a second copy is a second chance for the two to disagree
+# about what "accepts a submission" means, which is the dispatch cap exactly.
+def NO_SUBMISSION(h):
+    return 'method="post"' not in h.lower()
+
+
+# §53–54 — the twenty super-admin modules and the fifteen key metrics.
+#
+# A module in an admin dashboard LISTS, CREATES, EDITS and DELETES records of
+# one entity, so the honest question per module is not "is there a screen" but
+# "is there a record this product administers, and where does it live". What
+# stands in for the screen here is a committed file under `data/`, a validator
+# that refuses a bad record, and a diff — which has the one advantage a
+# dashboard does not, that the gaps show up in review.
+#
+# THE FIRST VERSION OF THIS ROW ASSERTED `bool(src("docs/content-report.md"))`
+# AND THREE MORE, FOR TWENTY MODULES AND FIFTEEN METRICS BETWEEN THEM. That
+# first assertion is §98's module-12 fault word for word: A FILE EXISTING IS
+# NOT A CLAIM ABOUT WHAT STANDS IN FOR WHAT — it is true of a product with a
+# dashboard and true of one without, so the one module it appeared to cover
+# was the one it said least about.
+#
+# Every count below is DERIVED from the running data rather than typed — a
+# figure typed here is the figure that was true two hundred destinations ago —
+# and each names the file a person would edit to change it.
+def _admin_records():
+    cs = list(DATA["countries"].values())
+    tax = len(DATA["interests"]) + len(DATA["categories"]) + len(DATA["macros"])
+    return [
+        ("Countries",    NCOUNTRY,                                       "data/countries/*.json"),
+        ("Regions",      sum(len(c["regions"]) for c in cs),             "data/countries/*.json"),
+        ("Destinations", NCITY,                                          "data/countries/*.json"),
+        ("Places",       len(PLACES),                                    "data/countries/*.json"),
+        ("Experiences",  len(EXPS),                                      "data/countries/*.json"),
+        ("Journeys",     len(DATA["journeys"]),                          "data/journeys.json"),
+        ("Events",       sum(len(c.get("festivals") or []) for c in cs), "data/countries/*.json"),
+        ("Stories",      len(DATA["stories"]),                           "data/stories.json"),
+        ("Businesses",   len(DATA["providers"]["providers"]),            "data/providers.json"),
+        ("Settings",     tax,                                            "data/taxonomy.json"),
+    ]
+
+
+# The seven modules that need an account, a server or a database, each named
+# AGAINST THE PROMISE THAT REFUSES IT rather than against a sentence in this
+# file — which is §36's shape, and the reason nine `or True` assertions came
+# out of that section. /how-it-works is the page that lists what is built and
+# what is not, so a module quietly becoming available is a row here whose
+# state has changed, and this audit goes red rather than the page going quiet.
+ADMIN_REFUSED = [
+    ("Users",         "/how-it-works",      "Accounts", "designed, not built"),
+    ("Subscriptions", "/how-it-works",      "Taking a payment", "blocked"),
+    ("AI",            "/how-it-works",      "AI planner", "designed, not built"),
+    ("Bookings",      "/how-it-works",      "Bookings &amp; commission", "designed, not built"),
+    ("Payments",      "/how-it-works",      "Holding contributions", "blocked"),
+    ("Reviews",       "/how-it-works",      "Storing business or user data", "blocked"),
+    ("Moderation",    "/experiences/join",  "Applications are not open yet"),
+]
+
+
+def csp_directive(h, name):
+    """The VALUE of one CSP directive, not a substring of the policy.
+
+    The first version asked whether "script-src 'self'" appeared in the page,
+    and the mutation sweep appended `https://zq.example` after it: the needle
+    was still there, so a page that had just opened its script origin to a
+    third party reported green twice. A PREFIX IS NOT A VALUE, which is the
+    same fault as a brand token standing in for a hostname.
+    """
+    m = re.search(r'Content-Security-Policy" content="([^"]+)"', h)
+    if not m:
+        return None
+    policy = m.group(1).replace("&#x27;", "'").replace("&quot;", '"')
+    for part in policy.split(";"):
+        bits = part.split()
+        if bits and bits[0] == name:
+            return " ".join(bits[1:])
+    return None
+
+
 @section(53, "Admin dashboard", "PARTIAL",
-         "An admin dashboard needs authentication and a backend. The figures "
-         "it would show are computed at build time and committed instead — "
-         "which puts the gaps in a diff, where a dashboard cannot.")
+         "Ten of the twenty modules administer a real record here — a "
+         "committed file, a validator that refuses a bad one, and a diff. "
+         "Three are a function rather than an entity and are generated: the "
+         "figures a dashboard would show, the reports beside them, and the "
+         "SEO surfaces. The other seven need an account, a server or a "
+         "database, and each is refused on a page a reader can check.")
 def s53():
-    yield bool(src("docs/content-report.md")), "the content report exists"
-    yield doc_covers("docs/content-report.md", "MVP target", "Where the dataset is thin")
-    yield exists("/sources/freshness"), "the fact-freshness board is public"
-    yield spec_covers("Admin dashboard"), "the authenticated version is specified"
+    # TEN MODULES THAT ADMINISTER A RECORD.
+    for name, n, where in _admin_records():
+        yield n > 0, f"{name}: {n} record(s), edited in {where}"
+
+    # THREE THAT ARE A FUNCTION RATHER THAN AN ENTITY, and are generated on
+    # every build. Naming the GUARD is the claim, because the document
+    # existing is the fault this row was rewritten for: `c_generated_docs_fresh`
+    # re-runs each generator and fails on drift, so a figure a dashboard would
+    # show cannot quietly stop agreeing with the data behind it.
+    guard = src("tools/checks.py")
+    yield ("content-report.py" in guard and "content-report.md" in guard), \
+        "Dashboard: the figures are generated, and a check re-runs the generator"
+    yield all(d in guard for d in ("section-audit.md", "ux-audit.md", "advertising.md")), \
+        "Reports: three more generated documents under the same guard"
+    yield doc_covers("docs/content-report.md",
+                     "An admin dashboard needs authentication"), \
+        "and the report says in its own head why there is no dashboard"
+
+    # SEO is the third function, and its claim is coverage rather than
+    # existence: a sitemap that names some of the routes is the `pop_line`
+    # shape, a list that omits part of its own set reading as a policy.
+    routes = sorted(glob.glob(os.path.join(OUT, "**", "index.html"), recursive=True))
+    locs = re.findall(r"<loc>(.*?)</loc>", src("site/sitemap.xml"))
+    yield len(locs) == len(routes) and len(routes) > 0, \
+        f"SEO: the sitemap names {len(locs)} routes and the build emits {len(routes)}"
+    robots = src("site/robots.txt")
+    yield "sitemap" in robots.lower() and "/sitemap.xml" in robots, \
+        "SEO: robots.txt points a crawler at the sitemap"
+
+    # SEVEN REFUSED, each against its own published row.
+    for row in ADMIN_REFUSED:
+        name, path, needles = row[0], row[1], row[2:]
+        ok, msg = has_row(path, *needles) if len(needles) == 2 else has(path, *needles)
+        yield ok, f"{name}: refused, and {path} says so ({msg})"
+
+    # And the two that refuse USER RECORDS have a measurement under them
+    # rather than only a sentence: there is no route by which a review or a
+    # business account could arrive to be administered.
+    yield every_page(NO_SUBMISSION, "no page accepts a submission")
 
 
 @section(54, "Admin key metrics", "PARTIAL",
-         "Content metrics are computed and published. Traffic, users and "
-         "revenue metrics need traffic, users and revenue.")
+         "One of the fifteen is computed and published — content published, "
+         "and the report's figures are asserted against the running data "
+         "rather than against themselves. Four are refused against a promise "
+         "on a page: two live only in the reader's own browser, and two would "
+         "be a crowd measurement this atlas states it does not hold. The "
+         "remaining ten need traffic, users or revenue, and the reason is "
+         "structural rather than a tag nobody has fitted — every page pins "
+         "`script-src` and `connect-src` to this origin, so no vendor can "
+         "load and nothing can be beaconed out.")
 def s54():
-    yield doc_covers("docs/content-report.md", "Countries", "Destinations", "Places",
-                     "Experiences", "Journeys", "Stories")
-    yield spec_covers("plan_requested", "unsupported_ask"), "the event schema is fixed in advance"
+    # ONE — computed. Asserted against the DATA, because a report checked only
+    # for staleness agrees with its own generator and says nothing about
+    # whether either still counts the thing it names.
+    for name, n, _ in _admin_records():
+        if name in ("Countries", "Destinations", "Places", "Experiences",
+                    "Journeys", "Stories"):
+            yield doc_covers("docs/content-report.md", f"| {name} | {n} |"), \
+                f"content published: {name} reads {n} in the report and {n} in the data"
+
+    # TWO — bookmarks and journey creations. The record is the reader's and
+    # never ours, so the count is unreachable BY DESIGN; what makes that a
+    # design rather than a gap is that the page says so.
+    yield has("/my-europe", "lives in your browser and nowhere else",
+              "there is no account"), \
+        "bookmarks and journey creations: the count is the reader's, and the page says so"
+
+    # TWO — top destinations and top experiences. This atlas publishes
+    # discoverability as explicitly NOT a crowd measurement and holds no
+    # visitor numbers for anywhere, so a leaderboard is refused rather than
+    # unbuilt — the nearby temptation is to rank by score and label it as
+    # though it were about readers.
+    yield has("/method", "not a crowd measurement"), \
+        "top destinations and top experiences: refused, and /method publishes the refusal"
+
+    # TEN — users, active users, new users, searches, AI queries, booking
+    # clicks, bookings, revenue, business accounts and traffic. The absence is
+    # STRUCTURAL: a page carrying an analytics vendor would fail its own
+    # Content-Security-Policy, so this is not "we have not added one yet".
+    yield every_page(lambda h: csp_directive(h, "script-src") == "'self'",
+                     "a page whose script-src admits another origin"), \
+        "no analytics vendor can load on any page"
+    yield every_page(lambda h: csp_directive(h, "connect-src") == "'self'",
+                     "a page whose connect-src admits another origin"), \
+        "and nothing can be beaconed off this origin"
+    yield has("/cookies", "sets no cookies"), \
+        "and the page that would disclose a tracker publishes that there is none"
 
 
 @section(55, "Moderation", "DEFERRED",
@@ -2040,8 +2246,7 @@ def s55():
     # on this site accepts a submission, so there is no route by which content
     # could arrive to be moderated. Measured on the built site there is one
     # `action` anywhere and it is a GET to /plan, which is navigation.
-    yield every_page(lambda h: 'method="post"' not in h.lower(),
-                     "no page accepts a submission")
+    yield every_page(NO_SUBMISSION, "no page accepts a submission")
     yield every_page(lambda h: 'action="http' not in h,
                      "no form posts to another origin")
     yield has("/experiences/join", "Applications are not open yet"), \
