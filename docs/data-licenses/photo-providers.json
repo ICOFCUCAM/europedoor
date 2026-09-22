@@ -58,12 +58,28 @@
         "limit_tier": "unknown",
         "limit_tier_question": "Ordinary/default limits, or an approved higher or unlimited arrangement? The higher-limit route carries its own attribution condition. Nothing in this repository records an application for one, and an absence of evidence in a repository is not evidence of absence: this is an account fact held by the provider and the owner. It is `unknown` rather than `false` for that reason.",
         "limit_tier_quote": "Do not abuse the API. By default, the API is rate-limited to 200 requests per hour and 20,000 requests per month. You may contact us to request a higher limit, but please include examples, or be prepared to give a demo, that clearly shows your use of the API with attribution. If you meet our API terms, you can get unlimited requests for free.",
-        "limit_tier_source": "https://www.pexels.com/api/documentation/"
+        "limit_tier_source": "https://www.pexels.com/api/documentation/",
+        "unlimited_api_requirement": {
+          "applicable": false,
+          "question": "Does the higher/unlimited-limit route's own attribution condition bind this product?",
+          "why": "No. That condition attaches to an arrangement a developer APPLIES for and the provider grants — *you may contact us to request a higher limit … if you meet our API terms, you can get unlimited requests for free* — and the owner declares that no such application was made and no such arrangement exists. It is `false` rather than `unknown` for that reason, and it does not make `limit_tier` `default`: the tier is the provider's record of an account, and the requirement is a condition on a grant that was never sought. Two facts, two fields, which is the whole argument of this block.",
+          "evidence_kind": "owner_declaration",
+          "evidence": "The owner, asked directly, states no higher or unlimited Pexels API arrangement has been applied for or granted. This is not an archived page and is not recorded as one."
+        },
+        "photographer_credit": {
+          "ordinary_license_required": false,
+          "api_wording": "when possible",
+          "question": "Separately from the prominent Pexels link, what does the guideline ask about naming the PHOTOGRAPHER?",
+          "why": "The ordinary licence says crediting the photographer is *not necessary but always appreciated*; the API guideline says *always credit our photographers WHEN POSSIBLE*. Neither is an unconditional obligation, and the second is a softer wording than the prominent-link sentence it sits beside in the same paragraph. Recorded as its own fact because a renderer reading the prominent-link answer was answering this question too, and they are not the same question.",
+          "source": "https://www.pexels.com/api/documentation/"
+        }
       },
       "internal_provenance_required": {
         "value": true,
         "question": "Must the register hold photographer, source, licence, hash and dates regardless of what a page shows?",
-        "why": "This one is EuropeDoor's own rule and not the provider's: *no external licence claim enters production from memory; every externally governed asset requires source, date and evidence*. It is what makes `this file is the file that was licensed` checkable rather than a sentence, and it is unaffected by any decision about what a visitor sees."
+        "why": "This one is EuropeDoor's own rule and not the provider's: *no external licence claim enters production from memory; every externally governed asset requires source, date and evidence*. It is what makes `this file is the file that was licensed` checkable rather than a sentence, and it is unaffected by any decision about what a visitor sees.",
+        "public_editorial_surface": false,
+        "public_editorial_surface_why": "The register's completeness is a rule about the REPOSITORY. It says nothing about whether a visitor is shown a photographer's name, and for a year it was read as though it did — which is how six editorial bands came to carry a roll-call. Provenance is published at /sources and in data/images.json; what an editorial page shows is decided by tools/lib/attribution.py from the two facts above and from nothing else."
       }
     }
   },
@@ -135,11 +151,24 @@
         "attribution_guideline": true,
         "scope": "not_applicable",
         "scope_question": "The guideline exists and this product does not take that route, so it binds nothing here. Recorded rather than omitted, because a requirement nobody wrote down is one the next person has to rediscover.",
-        "limit_tier": "not_applicable"
+        "limit_tier": "not_applicable",
+        "unlimited_api_requirement": {
+          "applicable": false,
+          "why": "The API route is refused for this provider, so no limit arrangement of any kind binds it.",
+          "evidence_kind": "not_applicable"
+        },
+        "photographer_credit": {
+          "ordinary_license_required": false,
+          "api_wording": "not_applicable",
+          "why": "The licence says *no permission needed (though attribution is appreciated!)* and this product does not take the API route. EuropeDoor credits anyway in the register.",
+          "source": "https://unsplash.com/license"
+        }
       },
       "internal_provenance_required": {
         "value": true,
-        "question": "As above."
+        "question": "As above.",
+        "public_editorial_surface": false,
+        "public_editorial_surface_why": "As above."
       }
     }
   }

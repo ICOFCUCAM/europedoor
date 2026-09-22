@@ -4716,6 +4716,13 @@ def country_page(data, c):
     # shared frame, and this atlas has several: Svalbard, the Azores, the
     # Canaries, Madeira. Each region gets its own.
     region_cards = []
+    # WHICH OF THEM PRODUCED A DRAWING, BECAUSE THE SHARED SILHOUETTE IS
+    # 18.8 KB AND NOTHING HERE CLONES IT ANY MORE. Every region card draws
+    # `geo.local()` now, so `#constel-eu` went from six users to none while
+    # `constel_defs()` went on emitting it once per country page — the atlas
+    # index band built and thrown away, created by the commit that replaced
+    # its only consumer. It ships only while a card still needs it.
+    region_arts = []
     for r in c["regions"]:
         meta = f'<p class="cardmeta">{n_of(len(r["cities"]), "city")}</p>'
         # AND A REGION WHOSE ONLY DESTINATION IS OFF THE CANVAS GETS NO
@@ -4727,8 +4734,28 @@ def country_page(data, c):
         rpts = [project(t["lat"], t["lon"]) for t in r["cities"]]
         onframe = [p for p in rpts
                    if 0.0 <= p[0] <= MAP_W and 0.0 <= p[1] <= MAP_H]
-        art = constellation(rpts, extra=" regionmini", frame=True,
-                            mark=11) if onframe else ""
+        # FAMILY-AWARE, AND MEASURED: all 129 region minimaps on the built
+        # site framed at exactly 34.0% of the continent, because
+        # `glyph_view`'s 340-unit floor is wider than every region's own
+        # padded box and so was never a floor at all — it was the frame. A
+        # region's geography spans a median 71 km and the frame was 2,206,
+        # so the subject occupied 3.2% of its own picture, on every one.
+        # `region_frame_span` derives the floor from this country's own
+        # coastline resolution instead, and `local=` gives the drawing the
+        # geometry that frame needs.
+        _span = region_frame_span(c["slug"], r["cities"])
+        art = constellation(rpts, extra=" regionmini", frame=True, mark=11,
+                            min_span=_span, local=c["slug"],
+                            min_pad=None if _span is None else _span * 0.10
+                            ) if onframe else None
+        # AND `""` IS NOT `None` TO `card()`: an empty string is still art,
+        # so it wrapped nothing in a `.card-art card-map` div and Svalbard's
+        # card shipped a rectangle of flat water with no coast, no dot and
+        # no subject. That is *present-but-empty says "we have this" and then
+        # does not*, drawn — and the comment two paragraphs up already says
+        # a drawing that cannot hold its subject is the wrong drawing rather
+        # than a quieter one. The card carries no art box at all instead.
+        region_arts.append(art)
         region_cards.append(
             card(urls.region(c, r), "Region", r["name"], r["summary"],
                  art=art, meta=meta)
@@ -5033,7 +5060,7 @@ def country_page(data, c):
   </div>
 </section>
 
-{constel_defs()}
+{constel_defs() if any('#constel-eu' in (a or '') for a in region_arts) else ''}
 {section("Travel regions", countrymap(data, c) + grid(region_cards, 3), id="regions",
          lede=f"{len(c['regions'])} editorial regions, each opening onto its cities.")}
 
@@ -12957,9 +12984,74 @@ def offframe_line(pts, data, listed=True):
             + "in the list below.")
 
 
+# A CARD'S DRAWING IS ABOUT 366 PIXELS WIDE, MEASURED IN CHROMIUM ON THE
+# BUILT PAGE AT 1280 (324 AT 390). It is not a taste: it is the divisor that
+# turns a coastline's resolution in kilometres into a length on a screen,
+# and the whole family-aware frame below is arithmetic on it.
+REGION_CARD_PX = 366.0
+# AND THE ONE DECISION IS HOW LONG A COASTLINE SEGMENT MAY RENDER. Four
+# frames were built into the real page and looked at — 400, 520, 650 and 820
+# km across the United Kingdom's six region cards, which is 8.4, 6.4, 5.1 and
+# 4.1 pixels per segment. At 820 Scotland reads as Scotland, Wales carries
+# the Irish Sea and London & the South East carries the Channel and northern
+# France; at 650 the first two still read and the southern two are becoming
+# fragments; below that the geography stops being recognisable at all and the
+# card is an abstract shape. So the boundary is between 5.1 and 4.1, and 4.5
+# is where it is set — one number, stated once, which is a claim about
+# legibility that can be argued with, where 340 continental units was a claim
+# about a document this family does not draw.
+REGION_SEG_PX = 4.5
+
+
+def km_per_unit(lat, lon):
+    """The projection's own scale at a point, because a unit is not a distance.
+
+    This conic is conformal, so the scale is the same in every direction at a
+    point and different at different latitudes: measured across the extent it
+    runs 6.28 km per unit in the south to 6.58 in the north. A floor stated in
+    kilometres therefore has to be converted where it is used, and not once
+    with a constant that is exact on one parallel — which is the
+    equirectangular correction this projection replaced, in a smaller costume.
+
+    There is no inverse on this projection, so it takes lat/lon rather than
+    the frame's own coordinates: the caller has the destinations that made
+    the frame and they carry both.
+    """
+    x0, y0 = MAPPROJ.xy(lat, lon)
+    x1, y1 = MAPPROJ.xy(lat, lon + 0.5)
+    d = math.hypot(x1 - x0, y1 - y0) or 1.0
+    return (0.5 * 111.320 * math.cos(math.radians(lat))) / d
+
+
+def region_frame_span(slug, cities):
+    """The narrowest frame a region card may take, in projection units.
+
+    Derived twice over and picked nowhere: `geo.coast_resolution_km` measures
+    how fine this country's own coastline is, `REGION_SEG_PX` says how long a
+    segment of it may render, and `REGION_CARD_PX` is the width the card was
+    measured at. The result is capped at `geo.LOCAL_LOD_MAX_KM` — this
+    repository's own recorded threshold for when a plate draws local geometry
+    at all — because a frame wider than that is a continental picture and the
+    local file it was derived from would not be drawn.
+
+    Returns None where the country has no local geometry, which is the
+    caller's signal to keep the continental floor: a tighter frame on a
+    coarser document is the fault this whole derivation exists to remove,
+    arrived at from the other side.
+    """
+    res = geo.coast_resolution_km(slug)
+    if not res or not cities:
+        return None
+    km = min(res * REGION_CARD_PX / REGION_SEG_PX, geo.LOCAL_LOD_MAX_KM)
+    lat = sum(t["lat"] for t in cities) / len(cities)
+    lon = sum(t["lon"] for t in cities) / len(cities)
+    return km / km_per_unit(lat, lon)
+
+
 def constellation(pts, extra="", route=False, frame=False, cut=False,
                   ocean=True, aspect=None, mark=None, term=None,
-                  labels=None, overlay="", min_span=None):
+                  labels=None, overlay="", min_span=None, local=None,
+                  min_pad=None):
     """A set of real destinations lit on the shared silhouette.
 
     THE ARGUMENT DRAWN, AND THE REASON IT REPLACED ELEVEN PAINTINGS. The
@@ -13007,8 +13099,19 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     # two-city story zooming past Europe was spending two thirds of the
     # frame on empty projection: measured, the Arctic-to-the-Baltic line
     # came out 130 pixels wide inside a 443-pixel column.
-    view = (glyph_view(pts, aspect=aspect,
-                       **({} if min_span is None else {"min_span": min_span}))
+    # AND `min_pad` IS THE SAME CONTINENTAL CONSTANT ONE PARAMETER OVER.
+    # It is 90 units — a legibility floor for a glyph drawn at the whole
+    # extent — and for a two-dot region whose own span is 15 units it alone
+    # produces a 195-unit box, so lowering `min_span` moved nothing at all:
+    # the first version of this repair emitted a 269-unit frame and looked
+    # identical. A family that derives its frame has to derive its padding
+    # with it, or the derivation is a parameter nothing reads.
+    _gv = {}
+    if min_span is not None:
+        _gv["min_span"] = min_span
+    if min_pad is not None:
+        _gv["min_pad"] = min_pad
+    view = (glyph_view(pts, aspect=aspect, **_gv)
             if (frame and pts) else f"0 0 {MAP_W} {MAP_H}")
     # THE DATA CUT SHOWED RAW ON EVERY INDEX OPENING. All 21 `.iheroart`
     # drawings are at the full extent, which means the straight diagonal at
@@ -13085,9 +13188,42 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
     framed = " framed" if (frame and pts and mark) else ""
     ground = (f'<rect class="glyph-sea" x="{vx:.0f}" y="{vy:.0f}" '
               f'width="{vw:.0f}" height="{vh:.0f}"/>') if ocean else ""
-    bounds = '<use class="glyph-bounds" href="#constel-eu"/>' if ocean else ""
+    # THE SHARED SILHOUETTE IS WHY THE FLOOR WAS 340, AND A FAMILY THAT
+    # LEAVES THE FLOOR HAS TO LEAVE THE SILHOUETTE WITH IT. `#constel-eu` is
+    # lod0 thinned at 5 units and cloned by every glyph on the page — one
+    # coastline for thirteen themes, which is the whole economy of this
+    # family — and at a 113-unit frame those 5 units render 16 pixels. So a
+    # caller that asks for a tight frame names the country whose own
+    # geometry it wants, and gets `geo.local()` clipped to the window:
+    # lod1 with that country's lod2 merged over it, which is the same escape
+    # the destination plates already make under `geo.LOCAL_LOD_MAX_KM`.
+    #
+    # It is NOT a clone, so it cannot be shared — but it is clipped to a
+    # window a fraction of the continent, and six UK region cards cost 22 KB
+    # against the 13 KB one continental clone would cost them anyway.
+    ownland = ""
+    if local and frame and pts:
+        thin = 1.2 * vw / REGION_CARD_PX
+        _ctx, _ours = geo.landmass(
+            MAPPROJ, (vx, vy, vw, vh), doc=geo.local(local),
+            thin_units=thin, min_units=thin * 5.0, pad=vw * 0.08)
+        ownland = (f'<g class="glyph-land glyph-own">{_ctx}{_ours}</g>')
+    bounds = ("" if ownland else
+              '<use class="glyph-bounds" href="#constel-eu"/>') if ocean else ""
     if ocean:
-        ground += '<use class="glyph-beyond" href="#constel-beyond"/>'
+        # AND THE GROUND BEYOND HAS TO LEAVE WITH THE SILHOUETTE. This is a
+        # clone of `#constel-beyond`, emitted by the same `constel_defs()`
+        # that the region cards stopped needing — so the first version of
+        # the own-geometry glyph shipped 51 country pages cloning a def the
+        # page no longer carried. A `<use>` that resolves to nothing draws
+        # nothing at all, so the land east of the cut simply vanished with
+        # no error and no empty box, and it was `c_use_resolves` that said
+        # so in the run that introduced it.
+        ground += (beyond_ground((vx, vy, vw, vh), cls="lyr glyph-beyond",
+                                 thin_units=1.2 * vw / REGION_CARD_PX,
+                                 min_units=6.0 * vw / REGION_CARD_PX)
+                   if ownland else
+                   '<use class="glyph-beyond" href="#constel-beyond"/>')
     # A NAME BESIDE A MARK, WHERE THE CALLER HAS ONE. A route drawn with no
     # stops named is a line: the journey plate on the homepage has to say
     # Tromso and Rome or it is decoration. Sized from the frame rather than
@@ -13101,9 +13237,10 @@ def constellation(pts, extra="", route=False, frame=False, cut=False,
             f'<text x="{x + 13 * z:.1f}" y="{y + 4 * z:.1f}" '
             f'font-size="{11 * z:.2f}">{esc(nm)}</text>'
             for (x, y), nm in zip(pts, labels) if nm) + "</g>"
+    ownland = ownland or '<use class="glyph-land" href="#constel-eu"/>'
     return (f'<svg class="constel{extra}{framed}" viewBox="{view}" '
             f'aria-hidden="true" focusable="false">{ground}'
-            f'<use class="glyph-land" href="#constel-eu"/>'
+            f'{ownland}'
             f'{bounds}'
             f'{cut}{line}<g class="constel-lit">{dots}</g>{names}{overlay}</svg>')
 

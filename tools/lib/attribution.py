@@ -54,13 +54,37 @@ the one that costs nothing to reverse: when the scope is established, one
 field moves and every surface follows, because there is one decision here
 and not six.
 
-AND THE ACCOUNT-LEVEL LIMIT IS `unknown`, WHICH IS NOT `no`. The same
-document says *"You may contact us to request a higher limit, but please
-include examples ... that clearly shows your use of the API with
-attribution."* Nothing in this repository records an application for one,
-and an absence of evidence in a repository is not evidence of absence: that
-is an account fact held by the provider and the owner. It is recorded as
-unknown rather than inferred from silence.
+AND THE ACCOUNT-LEVEL LIMIT IS `unknown` WHILE THE CONDITION ON IT IS
+`false`, AND THOSE ARE NOT THE SAME FACT. The same document says *"You may
+contact us to request a higher limit, but please include examples ... that
+clearly shows your use of the API with attribution."* That condition
+attaches to an arrangement a developer APPLIES for and the provider grants,
+and the owner, asked directly, states that no such application was made —
+so `api.unlimited_api_requirement.applicable` is false, carrying
+`evidence_kind: owner_declaration`, because a refusal with no evidence
+behind it is a guess wearing a fact's clothes. The TIER stays `unknown`:
+that is the provider's record of an account, nothing in this repository
+records it, and an absence of evidence in a repository is not evidence of
+absence. Two facts, two fields — collapsing them would have inferred a
+verified account state from an owner's answer to a different question.
+
+AND THE PROMINENT LINK AND THE PHOTOGRAPHER'S NAME ARE TWO ASKS IN ONE
+PARAGRAPH. *"make sure to show a prominent link to Pexels"* is unqualified;
+*"always credit our photographers WHEN POSSIBLE"* is not, and the ordinary
+licence calls the same thing *"not necessary but always appreciated"*. One
+field was answering both, which is how this register got here in the first
+place, so `api.photographer_credit` records the wording of each separately.
+
+AND WHAT THE REGISTER MUST HOLD SAYS NOTHING ABOUT WHAT A PAGE SHOWS.
+`internal_provenance_required.public_editorial_surface` is false: the
+completeness rule is about the REPOSITORY, it was read for a year as though
+it were about a page, and six editorial bands carried a roll-call on the
+strength of it. THE THREE FACTS IN THIS PARAGRAPH AND THE TWO BEFORE IT ARE
+GOVERNANCE AND MAY NOT REACH A VISITOR: `visitor_attribution` is a function
+of the ordinary licence and the API scope and of nothing else, and
+`c_attribution_layers` proves that by flipping each of them and re-reading
+the verdict — because asserting it by reading this docstring would pass the
+day somebody wires one in.
 """
 
 import json

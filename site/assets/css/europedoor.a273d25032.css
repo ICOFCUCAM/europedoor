@@ -7460,6 +7460,24 @@ body[data-hero] .masthead { position: sticky; }
 .constel .glyph-bounds { fill: none; stroke: var(--atlas-coast);
                          stroke-width: .9; stroke-linejoin: round;
                          opacity: .45; }
+/* THE GLYPH THAT DRAWS ITS OWN GEOMETRY RATHER THAN CLONING THE SHARED ONE.
+   `#constel-eu` is lod0 thinned at 5 units for a 1,000-unit continental frame,
+   and a region card frames about 113 — where those 5 units render 16 pixels.
+   So the region minimap emits `geo.local(country)` clipped to its window, and
+   the paint follows the drawing rather than the clone:
+
+   - the fill is on the GROUP, so it inherits into every path the clip
+     produced, which is the same escape the hero needed when a selector could
+     not reach inside a `<use>`;
+   - the frontier is a stroke on each path — at this zoom the anti-aliased
+     edge between two adjacent fills is not enough to read as an atlas — and
+     it is `non-scaling-stroke`, because a width in user units is a width in
+     pixels at exactly one frame and this family's frames run 100 to 154
+     units depending on which country's coastline they are drawn from. */
+.constel .glyph-own { fill: var(--atlas-land); stroke: none; }
+.constel .glyph-own path { fill: inherit; stroke: var(--atlas-coast);
+                           stroke-width: .6; stroke-linejoin: round;
+                           vector-effect: non-scaling-stroke; opacity: 1; }
 .constel-lit circle { fill: var(--pine); }
 .themerow:hover .constel-lit circle { fill: var(--pine-deep); }
 /* And the row is baseline-aligned, which is right for two columns of type and

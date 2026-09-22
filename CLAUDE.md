@@ -8560,6 +8560,100 @@ inside the block being read. The shape is not incidental — answers are blocks
 so `c_gate_quotes` can assert each quote appears in the archived snapshot of
 the page it cites — so one reader knows both shapes and nothing else does.
 
+**ALL 129 REGION MINIMAPS FRAMED AT EXACTLY 34.0% OF THE CONTINENT, BECAUSE
+A FLOOR NOTHING REACHES IS NOT A FLOOR — IT IS THE FRAME.** `glyph_view`'s
+`min_span` is 340 of a 1,000-unit canvas, and its docstring says what it is
+for: *the floor a route and a story need and a region does not*. The comment
+knew and the call site did not pass it. Measured on the built site: a
+region's own geography spans a median **71 km** and every card framed
+**2,206 km**, so the subject occupied **3.2% of its own picture**, on every
+one of the 129 — six cards on a country page were six views of north-west
+Europe with two dots each.
+
+**AND 340 IS THE RESOLUTION OF A SHARED SILHOUETTE WRITTEN AS A NUMBER,
+WHICH IS HOW IT ESCAPED THE FAMILY IT WAS MEASURED FOR.** `#constel-eu` is
+lod0 thinned at 5 units and cloned by every glyph on a page — one coastline
+for thirteen themes, the whole economy of the family — and a card renders
+366 px for a 340-unit frame, so those 5 units are 5.4 px there and **19 px**
+at the UK's own span. The frame could not move until the geometry could.
+`geo.coast_resolution_km()` measures how fine a country's own lod2 actually
+is (**median 10.3 km between vertices**, 3.9 for Monaco and 13.3 for
+Georgia — `lod2` names a simplification TOLERANCE of 0.012°, not a segment
+length), and `region_frame_span()` turns that into a frame: **UK 744 km,
+Norway 651, Iceland 659, France 851, Monaco 318**, capped at
+`geo.LOCAL_LOD_MAX_KM` because a wider frame is a continental picture and
+would not draw the file the floor was derived from. **The one decision is
+`REGION_SEG_PX = 4.5`** — four frames were built into the real page and
+looked at, 400/520/650/820 km, which is 8.4/6.4/5.1/4.1 px per segment, and
+the boundary where Scotland stops reading as Scotland sits between the last
+two. One number that is a claim about legibility, where 340 continental
+units was a claim about a document this family does not draw.
+
+**AND `min_pad` IS THE SAME CONSTANT ONE PARAMETER OVER, SO THE FIRST REPAIR
+MOVED NOTHING.** It is 90 units — a legibility floor for a glyph at the full
+extent — and for a two-dot region whose own span is 15 units it alone
+produces a 195-unit box, grown to 250 by the canvas-proportion hold. Lowering
+`min_span` to 113 emitted a **269-unit frame** and rendered identically. *A
+family that derives its frame has to derive its padding with it, or the
+derivation is a parameter nothing reads.*
+
+**THREE MORE THINGS ONLY RENDERING OR COUNTING FOUND.** `""` IS NOT `None`
+to `card()`, so Svalbard — whose one destination is at 78°N, off the canvas —
+wrapped an empty string in a `.card-art card-map` div and shipped **a
+rectangle of flat water with no coast, no dot and no subject**, which is
+*present-but-empty says "we have this" and then does not*, drawn. The shared
+silhouette went from six users to **none** on a country page and went on
+being emitted, 18.8 KB, once per page — *the atlas index band built and
+thrown away, created by the commit that replaced its only consumer*, and
+found by counting references rather than by reading code. And the ground
+beyond the cut is a clone of the same defs, so the first version shipped
+**51 country pages cloning `#constel-beyond` with nothing defining it**.
+
+**A `<use>` THAT RESOLVES TO NOTHING DRAWS NOTHING AT ALL, AND NOTHING HERE
+COUNTED IT.** No error, no console warning, no missing element, no empty
+box — every box on the page is still the right size in the right place. It
+is the `.qtile` and `<clipPath>` shape, *the thing is simply not there*,
+recorded four times. `c_use_resolves` reads every same-document clone
+against the ids on its own page, 258 of them, and **caught those 51 in the
+run that introduced it**. Its reach floor is 60 rather than a pinned count,
+because the country pages legitimately left the set in the same commit.
+
+**And the eye was wrong twice in one sitting, in both directions.** A ruled
+vertical edge through the land on Trøndelag and Østlandet read as a clip
+boundary at contact-sheet scale and is the **Norway–Sweden frontier**, drawn
+correctly, which a 3× crop settled in one look; and the first candidate
+frame that measurement liked — 226 km, the subject at 35% of the frame —
+was unrecognisable as anywhere, because *the subject filling the frame* is
+not the same requirement as *the geography being legible*. Weight: Italy
+216 → 257 KB, France 210 → 242, the UK 130 → 147, Norway 204 → 214, all far
+under the 609 KB `/map` already carries.
+
+**AND THE ATTRIBUTION REGISTER GAINED THE THREE FACTS THE OWNER CONFIRMED,
+NONE OF WHICH MAY REACH A PAGE.** `api.unlimited_api_requirement.applicable`
+is **false** carrying `evidence_kind: owner_declaration` — the condition
+attaches to an arrangement a developer APPLIES for and the owner states none
+was sought — while `api.limit_tier` stays **`unknown`**, because that is the
+provider's record of an account and *an absence of evidence in a repository
+is not evidence of absence*. Two facts, two fields: collapsing them would
+have inferred a verified account state from an answer to a different
+question. `api.photographer_credit` separates the ordinary licence's *not
+necessary but always appreciated* from the API guideline's *always credit
+our photographers WHEN POSSIBLE*, which sits in the same paragraph as the
+unqualified prominent-link sentence and is worded differently on purpose.
+And `internal_provenance_required.public_editorial_surface` is **false**:
+the completeness rule is about the REPOSITORY, it was read for a year as
+though it were about a page, and six editorial bands carried a roll-call on
+the strength of it.
+
+**THE SEPARATION IS THE ARCHITECTURE, SO IT IS PROVED BY MOVING THE FACTS
+THAT MUST NOT MATTER.** `visitor_attribution` is a function of the ordinary
+licence and the API scope and of nothing else; `c_attribution_layers` flips
+all three governance facts and re-reads the verdict, because asserting that
+by reading the source would pass the day somebody wires one in — proved red
+by leaking `public_editorial_surface` into the decision, and red four more
+ways on the fields themselves. The visitor decision is unchanged: Pexels'
+scope is still `unresolved` and unresolved SHOWS.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

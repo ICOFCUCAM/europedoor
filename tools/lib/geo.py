@@ -194,6 +194,58 @@ def country(slug):
 LOCAL_LOD_MAX_KM = 1000.0
 
 _LOCAL = {}
+_COASTRES = {}
+
+
+def coast_resolution_km(slug):
+    """How fine this country's own coastline actually is, in kilometres.
+
+    A FRAME FLOOR IS THE GEOMETRY'S RESOLUTION WRITTEN AS A NUMBER, AND
+    WRITING IT AS A NUMBER IS HOW IT ESCAPED THE FAMILY IT WAS MEASURED
+    FOR. `pages.glyph_view`'s `min_span` was 340 of a 1,000-unit continental
+    canvas — a floor that keeps `#constel-eu`, a lod0 silhouette thinned at
+    5 units, legible when a glyph renders about 366 pixels wide. It is a
+    fact about ONE document, and it was applied to every family whether or
+    not that family drew it. Measured on the built site, all 129 region
+    minimaps framed at exactly 34.0% of the continent, while a region's own
+    geography spans a median 71 km: the subject occupied 3.2% of the frame's
+    width, on every one, because the floor was never reached and so was not
+    a floor at all but the frame.
+
+    So a family that draws its OWN geometry gets its own floor, derived from
+    that geometry. `lod2` names a simplification TOLERANCE of 0.012 degrees
+    and not a segment length: measured across the 49 country files, the
+    subject country's own rings run a median 10.3 km between vertices,
+    3.9 km for Monaco and 13.3 km for Georgia. That spread is real — a fjord
+    coast carries more vertices than a smooth one — so the floor is per
+    country and not one more constant.
+
+    Returns None where there is no local file, because a caller that cannot
+    draw finer geometry must not be handed a tighter frame.
+    """
+    if slug in _COASTRES:
+        return _COASTRES[slug]
+    doc = country(slug)
+    own = None
+    for rec in ((doc or {}).get("countries") or {}).values():
+        if rec.get("slug") == slug:
+            own = rec
+            break
+    seg = []
+    for ring in (own or {}).get("rings") or []:
+        pts = (list(zip(ring[0::2], ring[1::2]))
+               if ring and isinstance(ring[0], (int, float))
+               else [tuple(p) for p in ring])
+        for i in range(len(pts) - 1):
+            dx = (pts[i + 1][0] - pts[i][0]) * 111.0 * math.cos(
+                math.radians(pts[i][1]))
+            dy = (pts[i + 1][1] - pts[i][1]) * 111.0
+            d = math.hypot(dx, dy)
+            if d > 0:
+                seg.append(d)
+    seg.sort()
+    _COASTRES[slug] = seg[len(seg) // 2] if seg else None
+    return _COASTRES[slug]
 
 
 def local(slug):

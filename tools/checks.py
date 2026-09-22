@@ -9369,6 +9369,56 @@ def c_attribution_layers():
                      f"same page ({lic['source']}). They are different "
                      f"documents and that is the whole reason these are two "
                      f"fields")
+        # The higher/unlimited-limit route carries an attribution condition
+        # of its own. `false` there is a claim, so it has to say what kind
+        # of evidence it rests on — an owner declaration is not an archived
+        # page and must not be recorded as one.
+        ulr = api.get("unlimited_api_requirement")
+        n += 1
+        if not isinstance(ulr, dict) or not isinstance(
+                ulr.get("applicable"), bool):
+            fail(f"{slug}.attribution_layers.api has no boolean "
+                 f"`unlimited_api_requirement.applicable`. The condition on "
+                 f"a higher-limit arrangement is a separate question from "
+                 f"the guideline that binds every request")
+        elif ulr.get("applicable") is False and not ulr.get("evidence_kind"):
+            fail(f"{slug}: `unlimited_api_requirement.applicable` is false "
+                 f"with no `evidence_kind`. A refusal with no evidence "
+                 f"behind it is a guess wearing a fact's clothes, which is "
+                 f"the failure the whole gate exists to stop")
+
+        # The prominent LINK and the photographer's NAME sit in one
+        # paragraph of the same document and are two different asks. One
+        # field answering both is how this register got here.
+        pc = api.get("photographer_credit")
+        WORDINGS = {"when possible", "unconditional", "not_applicable"}
+        n += 2
+        if not isinstance(pc, dict):
+            fail(f"{slug}.attribution_layers.api has no "
+                 f"`photographer_credit`. Whether the photographer is named "
+                 f"is not the same question as whether the provider is "
+                 f"linked, and they are worded differently in the same "
+                 f"paragraph")
+        else:
+            if not isinstance(pc.get("ordinary_license_required"), bool):
+                fail(f"{slug}: `photographer_credit.ordinary_license_"
+                     f"required` must be a boolean")
+            if pc.get("api_wording") not in WORDINGS:
+                fail(f"{slug}: `photographer_credit.api_wording` is "
+                     f"{pc.get('api_wording')!r}; it must be one of "
+                     f"{sorted(WORDINGS)}. An open string is a value "
+                     f"nothing can act on")
+
+        # The register's own completeness rule may not read as a claim
+        # about a page. It was read that way for a year.
+        ipr = lay.get("internal_provenance_required") or {}
+        n += 1
+        if not isinstance(ipr.get("public_editorial_surface"), bool):
+            fail(f"{slug}: `internal_provenance_required` does not say "
+                 f"whether it reaches a `public_editorial_surface`. Six "
+                 f"editorial bands carried a roll-call because that "
+                 f"question had no field")
+
         # And the decision must have a reason that names a document.
         decision, why = A.visitor_attribution(slug)
         n += 1
@@ -9376,6 +9426,41 @@ def c_attribution_layers():
             fail(f"{slug}: the decision point returned {decision!r}")
         if not why or len(why) < 20:
             fail(f"{slug}: the decision carries no reason a person can audit")
+
+    # 2b. THE SEPARATION IS THE WHOLE ARCHITECTURE, SO IT IS PROVED BY
+    #     MOVING THE FACTS THAT MUST NOT MATTER. The visitor decision is a
+    #     function of the ordinary licence and the API scope and of nothing
+    #     else: the internal provenance rule, the photographer's wording
+    #     and the unlimited-limit branch are governance and may not reach a
+    #     page. Asserting that by reading the source would pass the day
+    #     somebody wires one in, so each is flipped and the verdict is
+    #     re-read.
+    import copy
+    for slug in [k for k in gate if not k.startswith("$")]:
+        before = A.visitor_attribution(slug)
+        saved = A._CACHE.get("v")
+        mutated = copy.deepcopy(A.providers())
+        lay = mutated[slug].setdefault("attribution_layers", {})
+        api2 = lay.setdefault("api", {})
+        api2.setdefault("unlimited_api_requirement", {})["applicable"] = True
+        api2.setdefault("photographer_credit", {})["api_wording"] = \
+            "unconditional"
+        lay.setdefault("internal_provenance_required",
+                       {})["public_editorial_surface"] = True
+        n += 1
+        try:
+            A._CACHE["v"] = mutated
+            after = A.visitor_attribution(slug)
+        finally:
+            A._CACHE["v"] = saved
+        if after[0] != before[0]:
+            fail(f"{slug}: flipping the internal provenance rule, the "
+                 f"photographer wording and the unlimited-limit branch "
+                 f"changed the visitor decision {before[0]!r} -> "
+                 f"{after[0]!r}. Those are governance facts; a page is "
+                 f"decided by the ordinary licence and the API scope, and "
+                 f"letting the register become a visual-design system is "
+                 f"the thing this block was built to stop")
 
     # 3. BEHAVIOURAL. Drive the decision to HIDE and the band must go quiet.
     row = {"photographer": "A. Photographer", "provider": "pexels",
@@ -9416,6 +9501,62 @@ def c_attribution_layers():
             fail(f"tools/lib/{name} composes a band credit of its own. "
                  f"`render.photo_credits` is the one producer, because "
                  f"whether a credit is owed is one decision")
+    return n
+
+
+@check("a <use> clone resolves to something on its own page")
+def c_use_resolves():
+    """A `<use>` pointing at nothing renders NOTHING AT ALL, and nothing counts it.
+
+    THE REGION MINIMAPS STOPPED CLONING THE SHARED SILHOUETTE AND THE
+    SILHOUETTE WENT ON SHIPPING. `constel_defs()` emits one thinned lod0
+    continent — 18.8 KB — for every glyph on a page to `<use>`; the six
+    region cards on a country page now draw `geo.local()` at their own
+    frame instead, so the defs went from six users to none while still
+    being emitted once per country page. That is the atlas index band built
+    and thrown away, created by the commit that replaced its only consumer,
+    and it was found by counting the references rather than by reading the
+    code.
+
+    Making the defs conditional is the repair; this is the guard on the
+    OTHER end of it, because the way that repair fails is worse than the
+    waste it removes. An `<svg>` whose `<use href="#x">` finds no `#x`
+    draws nothing — no error, no console warning, no missing element, no
+    empty box. Every box on the page is still the right size in the right
+    place. It is the `.qtile` and `<clipPath>` failure shape: *the thing is
+    simply not there*, and this repository has now recorded it four times.
+
+    Same-document references only. An external `href` is a different
+    question and this site emits none.
+    """
+    use = re.compile(r'<use[^>]*?href="#([^"]+)"')
+    ids = re.compile(r'\bid="([^"]+)"')
+    n = pages = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        want = set(use.findall(h))
+        if not want:
+            continue
+        pages += 1
+        have = set(ids.findall(h))
+        for w in sorted(want):
+            n += 1
+            if w not in have:
+                fail(f"{rel(f)} clones #{w} and nothing on the page defines "
+                     f"it. A <use> that resolves to nothing draws nothing at "
+                     f"all — no error and no empty box — so this is invisible "
+                     f"to every count on this site")
+    # A FLOOR ON REACH, NOT A PIN ON A COUNT. 146 pages clone something
+    # today — the theme, interest, story and homepage glyph families — and
+    # the country pages dropped out of that set in the commit that made this
+    # check, which is exactly the kind of legitimate movement a pinned count
+    # would go red on. What it is guarding against is the regex quietly
+    # matching nothing, which is the check that read `pointsmap arched"><svg`
+    # and examined 0 dots on a site with 130 region maps.
+    if pages < 60:
+        fail(f"c_use_resolves examined {pages} page(s) carrying a <use>; the "
+             f"glyph families alone are more than that, so the pattern has "
+             f"stopped matching")
     return n
 
 
