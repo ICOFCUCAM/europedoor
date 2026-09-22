@@ -3966,10 +3966,35 @@ async function main() {
     for (const u of LABELFAM_PAGES) {
       await page.goto(base + u, { waitUntil: "load" });
       const r = await page.evaluate(() => {
+        /* THE ANCESTOR CHAIN, NOT THE ELEMENT, BECAUSE `display: none` ON A
+           LAYER IS HOW THIS SITE TAKES A LABEL FAMILY OFF A PHONE.
+           `getComputedStyle(text).display` is `block` even when the `<g>`
+           above it computes `none`, so reading the element alone sees a
+           drawn label where the reader sees nothing — and the rect was doing
+           the real work. That is the eighty-nine-red-run browser split: for
+           an SVG `<g>` whose computed display is `none`, Chromium 141 returns
+           a zero rect for its children and Chromium 131 returns their
+           geometry. So this check was silent here and reported the hero's
+           five sea names at 5px and /map's six at 7px in CI — labels the
+           group rule removes at 390, measured at 0x0 with the group
+           computing `none`.
+
+           The LAYER assertion in this suite was moved onto the computed
+           display for exactly this and this one was not: *a rule stated once
+           and applied to one of its call sites*, across two checks in one
+           file. Both browsers agree about the GROUP, which is why asking the
+           chain is the browser-independent question. */
+        const drawn = (el) => {
+          for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
+            const s = getComputedStyle(e);
+            if (s.display === "none" || s.visibility === "hidden") return false;
+            if (e.tagName && e.tagName.toLowerCase() === "svg") break;
+          }
+          return true;
+        };
         let n = 0; const bad = [];
         for (const t of document.querySelectorAll("svg text")) {
-          const st = getComputedStyle(t);
-          if (st.display === "none" || st.visibility === "hidden") continue;
+          if (!drawn(t)) continue;
           const b = t.getBoundingClientRect();
           if (!b.width || !b.height) continue;
           n++;
@@ -4156,40 +4181,73 @@ async function main() {
         const sr = svg.getBoundingClientRect();
         /* Mid-Atlantic: sea on every frame this atlas draws. */
         const sea = at((sr.left + sr.width * 0.12) * dpr, (sr.top + scrollY + sr.height * 0.55) * dpr);
+        /* THE DOMINANT TONE OF THE INTERIOR, NOT THE FIRST POINT THAT
+           SATISFIES `isPointInFill`. The first version took that point off a
+           7x7 grid and sampled the pixel under it, and on a country a few
+           pixels wide that is a coin toss: `isPointInFill` is a question
+           about the PATH, and the pixel under a point just inside a 16-px
+           shape is anti-aliased with the sea.
+
+           Measured on Azerbaijan, which is 16 x 31 px at 1440: of 44 sample
+           points inside its fill, the commonest rendered pixel is
+           216,212,199 — the land tone, ratio 1.184, exactly what Norway
+           measures and exactly the separation the light map declares — and
+           SIX of the 44 land on sea pixels. The old sampler reported 1.14
+           and named a country that is drawn correctly. That is the eye
+           finding a defect and not confirming one, arriving in an
+           instrument: a check that can fail for a reason that is not about
+           the page is a check whoever hits it re-runs until green.
+
+           The sibling check on the country portraits already reads *the
+           dominant tone of each sampled set* for this reason; this is that
+           method, so there is one answer here to "what colour is this
+           country painted" rather than two. A shape yielding too few
+           interior samples to have a dominant tone is reported rather than
+           judged, because an unmeasurable shape and a dim one must not look
+           the same. */
         const pt = svg.createSVGPoint();
-        const bad = []; let seen = 0;
+        const bad = [], thin = []; let seen = 0;
         for (const s of document.querySelectorAll(".europemap .cshape")) {
           const path = s.tagName === "path" ? s : s.querySelector("path");
           if (!path) continue;
           const bb = path.getBBox();
           if (bb.width < 2 || bb.height < 2) continue;
-          let inside = null;
-          for (let gy = 1; gy < 8 && !inside; gy++)
-            for (let gx = 1; gx < 8 && !inside; gx++) {
-              pt.x = bb.x + bb.width * gx / 8; pt.y = bb.y + bb.height * gy / 8;
-              if (path.isPointInFill(pt)) inside = [pt.x, pt.y];
-            }
-          if (!inside) continue;
-          seen++;
           const t = path.getScreenCTM();
-          const sx = t.a * inside[0] + t.c * inside[1] + t.e;
-          const sy = t.b * inside[0] + t.d * inside[1] + t.f;
-          const r = ratio(at(sx * dpr, (sy + scrollY) * dpr), sea);
-          if (r < FLOOR) {
-            const ti = s.querySelector("title");
-            bad.push(`${ti ? ti.textContent.trim() : "?"} ${r.toFixed(2)}`);
+          const tally = new Map();
+          const N = 24;
+          for (let gy = 1; gy < N; gy++) for (let gx = 1; gx < N; gx++) {
+            pt.x = bb.x + bb.width * gx / N; pt.y = bb.y + bb.height * gy / N;
+            if (!path.isPointInFill(pt)) continue;
+            const sx = t.a * pt.x + t.c * pt.y + t.e;
+            const sy = t.b * pt.x + t.d * pt.y + t.f;
+            const i = ((Math.round((sy + scrollY) * dpr) * D.width)
+                       + Math.round(sx * dpr)) * 4;
+            const k = D.data[i] + "," + D.data[i + 1] + "," + D.data[i + 2];
+            tally.set(k, (tally.get(k) || 0) + 1);
           }
+          if (!tally.size) continue;
+          seen++;
+          let best = null, bestN = 0, total = 0;
+          for (const [k, n] of tally) { total += n; if (n > bestN) { bestN = n; best = k; } }
+          const ti = s.querySelector("title");
+          const name = ti ? ti.textContent.trim() : "?";
+          if (total < 8) { thin.push(`${name} (${total})`); continue; }
+          const [cr, cg, cb] = best.split(",").map(Number);
+          const r = ratio(lum(cr, cg, cb), sea);
+          if (r < FLOOR) bad.push(`${name} ${r.toFixed(2)} (${best}, ${bestN}/${total})`);
         }
-        return { seen, bad };
+        return { seen, bad, thin };
       }, shot);
       ok(m !== null, `${u}: no instrument map to measure`);
       if (!m) continue;
       ok(m.bad.length === 0,
          `${u}: ${m.bad.length} country/countries painted under the floor that `
          + `docs/palette.json declares against the sea — ${m.bad.join(", ")}. `
-         + "The tokens clear it; the data-cut fade paints on top of them, and a "
-         + "separation between two tokens says nothing about whether either is "
-         + "painted.");
+         + "Each figure is the DOMINANT tone of that country's interior against "
+         + "the mid-Atlantic, with the tone and the sample count beside it, "
+         + "because a separation between two tokens says nothing about whether "
+         + "either is painted — and a single sample says nothing about a shape "
+         + "a few pixels wide.");
       ok(m.seen >= 40,
          `${u}: only ${m.seen} countries were sampled — the shapes or their `
          + "fills have been renamed and this check is reporting on nothing");

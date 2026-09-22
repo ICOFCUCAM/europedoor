@@ -8826,6 +8826,68 @@ fix names the construct it refuses, which is the instrument-reads-its-own-
 documentation fault this file records seven times and the whole reason that
 stripper exists.
 
+
+**AND REACHING THE END OF THE SUITE IN CI FOUND THREE MORE, TWO OF WHICH
+WERE THE SAME BROWSER SPLIT ONE CHECK OVER.** With the crash fixed, run 406
+ran the browser suite to completion in CI for the first time in seven
+commits and reported four failures — the two this sandbox had already found,
+and two it had not:
+
+    / at 390 draws 38 map label(s) under 9px — seaname "NORTH SEA" 5.0px …
+    /map at 390 draws 6 map label(s) under 9px — seaname "NORTH SEA" 7.0px …
+
+**THE PRODUCT IS CORRECT AND THE CHECK WAS WRONG, AND THE FIX FOR IT WAS
+ALREADY IN THIS FILE.** Measured at 390: the sea-name group computes
+`display: none`, every one of those labels measures **0x0**, and the
+stylesheet comment beside the rule records that exact repair. What the check
+read was `getComputedStyle(text).display`, which is `block` even when the
+`<g>` above it computes `none` — so the ZERO RECT was doing the real work,
+and for an SVG group whose computed display is `none` **Chromium 141 returns
+a zero rect for its children and Chromium 131 returns their geometry.** The
+LAYER assertion in this suite was moved onto the computed display for
+precisely that, eighty-nine red runs ago, and the LABEL assertion never was:
+*a rule stated once and applied to one of its call sites*, across two checks
+in one file. It walks the ancestor chain now, which is the question both
+browsers answer the same way — and the skip counts land on CI's own numbers,
+38 on the homepage and 6 on /map.
+
+**AND THE DEAD-RULE SCAN NAMED A DEAD DECLARATION WHERE THE FAULT WAS A LOST
+FIGHT, WITH THE SEAM BACK ON THE HOMEPAGE AND THIS FILE CLAIMING OTHERWISE.**
+`.atplate .lyr-beyond path` sets the register's ground beyond to
+`--map-land`, and `.instrmap .lyr-beyond path` forty lines down sets
+`--atlas-far`. `.instrmap` is the FIGURE inside that plate, so both match the
+same path, **both are (0,2,1), and the later one wins.** Measured across the
+cut at three heights, every row ran 216,212,199 and then stepped to
+195,191,178 — the tone step the whole ground-beyond device exists to remove,
+and which the paragraph above records as removed on this drawing's own
+pixels. The `.macromap` collision exactly, rendering as *the thing is simply
+not there* for the fifth time, and the scan could only ever report the
+symptom: a rule that matches elements and changes none of them looks the same
+whether it is redundant or beaten. Naming the family — `.atplate .instrmap`,
+(0,3,1) — is the portrait terrain fix's own idiom rather than a third class.
+The step is gone from every row after.
+
+**AND THE /map COUNTRY-TONE CHECK WAS SAMPLING ITS OWN ANTI-ALIASING.** It
+took the FIRST point satisfying `isPointInFill` off a 7x7 grid and read the
+pixel under it — and `isPointInFill` is a question about the PATH, so on a
+country a few pixels wide the pixel under a point just inside it is blended
+with the sea. Measured on Azerbaijan, 16 x 31 px at 1440: of 44 points inside
+its fill the commonest rendered pixel is 216,212,199 at **1.184**, which is
+exactly what Norway measures and exactly the separation the light map
+declares, and **six of the 44 land on sea pixels**. The old sampler reported
+1.14 and named a country that is drawn correctly. It reads the DOMINANT tone
+of the interior now, which is the method the country-portrait check beside it
+already uses, so there is one answer here to *what colour is this country
+painted*; a shape yielding too few interior samples is reported rather than
+judged, because an unmeasurable shape and a dim one must not look the same.
+Proved red by painting Norway one step off the sea: 1.01.
+
+**And the failure message named a cause the page no longer has.** It read
+*the data-cut fade paints on top of them*, and the fade came off /map in the
+commit that drew the ground beyond. *A comment claiming evidence is read as
+evidence*, arriving in a failure message, which is the one place a reader has
+nothing else to go on.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

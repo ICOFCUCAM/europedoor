@@ -12207,7 +12207,26 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    simplified independently do not share an edge and a tenth of a unit of
    paper along a 700-unit cut is a bright hairline exactly where this
    drawing must not have one. */
-.atplate .lyr-beyond path { fill: var(--map-land); stroke: var(--map-land);
+/* `.atplate .instrmap` RATHER THAN `.atplate`, BECAUSE THE SEAM THIS RULE
+   REMOVES HAD COME BACK AND THE RECORD SAID IT HAD NOT. Both this and
+   `.instrmap .lyr-beyond path` forty lines down are (0,2,1) — `.instrmap` is
+   the FIGURE inside this plate, so both match the same path — and the later
+   one wins, so the register's ground beyond was painting `--atlas-far` where
+   this rule asks for `--map-land`. Measured across the cut at three heights:
+   every row ran 216,212,199 (the atlas land) and then stepped to
+   195,191,178, which is the tone step the whole ground-beyond device exists
+   to remove and which CLAUDE.md records as removed.
+
+   That is the `.macromap` collision exactly — two (0,2,1) selectors meet and
+   the later one wins — and it rendered as *the thing is simply not there*
+   for the fifth time. The dead-rule scan is what found it, and it named a
+   DEAD DECLARATION where the fault was a lost fight: a rule that matches
+   elements and changes none of them is the symptom either way.
+
+   Naming the family is not a third class invented to win; it is the selector
+   the fill already uses with the family it belongs to added, which is how the
+   portrait terrain fix was made one screen over. */
+.atplate .instrmap .lyr-beyond path { fill: var(--map-land); stroke: var(--map-land);
                             stroke-width: 1.4; vector-effect: non-scaling-stroke; }
 /* THE SAME GROUND ON THE TWO INSTRUMENTS, FOR THE SAME REASON AND AT A
    DIFFERENT TONE. `--atlas-land` rather than `--map-land`, because the
