@@ -484,7 +484,16 @@ def s9():
         h = page(f"/stories/{st['slug']}")
         yield "By " + st["author"] in h, f"{st['slug']} carries a byline"
         yield st["published"] in h, f"{st['slug']} says when it was published"
-        yield all(t in h for t in st["tags"]), f"{st['slug']} carries its tags"
+        # `all(...)` OVER AN EMPTY LIST IS TRUE, so this row claimed "carries
+        # its tags" while asserting nothing at all: emptying every story's
+        # tags left the whole audit green. That is the check that examined 0
+        # dots on a site with 130 region maps, and the answer is the same
+        # one — assert the reach. The validator already refuses a story with
+        # fewer than two tags, so this floor is that same promise rather
+        # than a new editorial rule, and the count is in the message because
+        # a failure with no measurement in it cannot be diagnosed.
+        yield bool(st["tags"]) and all(t in h for t in st["tags"]), \
+            f"{st['slug']} carries its {len(st['tags'])} tags"
     for st in DATA["stories"]:
         for cid in st.get("places", []):
             yield st["title"] in page(f"/europe/{cid}"), f"{cid} links back to {st['slug']}"
@@ -1319,8 +1328,18 @@ def s36():
         "authors is a field on a story"
     yield "def verification_of" in src("tools/lib/pages.py"), \
         "verification_records is `checked` on the record it verifies"
-    yield "my-europe.js" in src("data/contracts.json") or True, \
-        "bookmarks, itineraries and itinerary_items are localStorage in the reader's browser"
+    # THE LAST SURVIVING `or True`, in the section whose own comment eight
+    # lines up records nine of them being removed. Its left half happened to
+    # be true, so it was a landmine rather than a live false claim — and it
+    # tested the wrong thing either way: a consumer row in contracts.json
+    # says nothing about WHERE these three entities live. What makes them
+    # rowless is that they are keys in the reader's own browser, so that is
+    # what is asserted, and it fails the day one of them moves to a server.
+    mine = src("assets/js/my-europe.js")
+    yield mine.count("localStorage.setItem") >= 3, \
+        (f"bookmarks, itineraries and itinerary_items are "
+         f"{mine.count('localStorage.setItem')} localStorage keys in the "
+         f"reader's browser, not three tables")
 
     # REFUSED, each against the promise that refuses it.
     schema = src("tools/lib/data.py")

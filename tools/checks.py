@@ -9624,41 +9624,76 @@ def c_use_resolves():
     return n
 
 
-@check("the advertising audit's document is not stale")
-def c_ad_audit_fresh():
-    """§1-33 IS A GENERATED TABLE NOW, AND A GENERATED DOCUMENT GOES STALE.
+@check("every generated document still equals what its generator produces")
+def c_generated_docs_fresh():
+    """A GENERATED DOCUMENT WHOSE GENERATOR HAS MOVED ON IS `site/` EXACTLY.
 
-    `docs/advertising.md` mapped all thirty-three sections of the
-    advertising specification in a table nobody asserted, and reading it
-    against the code found four rows that were not true — a declared
-    placement field none of the nine carried, a form shape the document said
-    was in the registry and was not, a sixth inventory product declared
-    nowhere, and a sentence the document said was on a page that did not
-    carry it. `tools/ad-audit.py` asserts every row now.
+    THIS WAS ONE DOCUMENT AND SHOULD ALWAYS HAVE BEEN FOUR, AND THE COMMIT
+    THAT WROTE IT FOR ONE IS WHY. `docs/advertising.md` got this guard
+    because reading its hand-written table against the code found four rows
+    that were not true. The three older generated documents — the section
+    audit, the UX audit and the content report — were guarded only by
+    `.github/workflows/checks.yml`, and that is a gate you find out about
+    after you have pushed.
 
-    Which moves the failure one step along rather than removing it: a
-    generated document whose generator has moved on is `site/` and
-    `docs/invariants.json` exactly, and both are already guarded this way.
-    The audit runs itself and CI runs the audit; this asserts the committed
-    prose still equals what the audit produces, so a verdict cannot change
-    in code and stay the old word on the page.
+    WHICH IS EXACTLY WHAT HAPPENED, FOR SIX COMMITS. The Journey 01 commit
+    added an assertion to §17 and did not re-run `--write`, so the committed
+    `docs/section-audit.md` said 1,457 where the generator said 1,458. CI
+    caught it correctly on that very push and on the four after it, and
+    nobody read the result: every one of those sessions reported `all gates
+    green` from a local run that could not see it. Then the commit after
+    those put an assertion count in CLAUDE.md, which `c_claude_counts`
+    refuses — and because `checks.py` sits ABOVE the staleness steps in the
+    workflow, that failure skipped them, so the sixth run could not even
+    report the drift that was still there. A gate that cannot run is worse
+    than a gate that fails, which is this workflow's own recorded lesson
+    about a missing Pillow, one step further down the same file.
+
+    ONE IMPLEMENTATION OVER A TABLE, NOT FOUR COPIES. A second
+    implementation of a thing is a second chance to make its mistake, and
+    this repository has paid for that in a token name, a dispatch cap and a
+    credential scan. Each generator is run with `--write` in a subprocess
+    and the document compared; the original is restored on failure, because
+    a check that leaves the working tree dirty is a check whose own failure
+    has to be cleaned up before the next run means anything.
+
+    It costs about thirty seconds on a gate that already takes three
+    minutes. That is the trade the terrain fingerprint refused at a minute
+    for a rebuild nobody could otherwise verify, and accepted here for the
+    same reason in reverse: these four are cheap enough to simply run, and
+    the thing they protect has already gone wrong.
     """
     import subprocess
-    doc = os.path.join(ROOT, "docs", "advertising.md")
-    if not os.path.exists(doc):
-        return 0
-    before = open(doc, encoding="utf-8").read()
-    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "ad-audit.py"),
-                        "--write"], cwd=ROOT, capture_output=True, text=True)
-    after = open(doc, encoding="utf-8").read()
-    if after != before:
-        open(doc, "w", encoding="utf-8").write(before)
-        fail("docs/advertising.md is stale. Run "
-             "`python3 tools/ad-audit.py --write` and commit the result, "
-             "exactly as site/ and docs/invariants.json are committed")
-    if r.returncode != 0:
-        fail(f"tools/ad-audit.py --write failed: {(r.stderr or '')[-200:]}")
-    return 2
+    docs = (
+        ("section-audit.py", "section-audit.md"),
+        ("ux-audit.py", "ux-audit.md"),
+        ("content-report.py", "content-report.md"),
+        ("ad-audit.py", "advertising.md"),
+    )
+    n = 0
+    for tool, name in docs:
+        doc = os.path.join(ROOT, "docs", name)
+        gen = os.path.join(ROOT, "tools", tool)
+        if not (os.path.exists(doc) and os.path.exists(gen)):
+            fail(f"docs/{name} or tools/{tool} is missing — this check has "
+                 f"stopped examining the document it names")
+            continue
+        before = open(doc, encoding="utf-8").read()
+        r = subprocess.run([sys.executable, gen, "--write"], cwd=ROOT,
+                           capture_output=True, text=True)
+        after = open(doc, encoding="utf-8").read()
+        if after != before:
+            open(doc, "w", encoding="utf-8").write(before)
+            fail(f"docs/{name} is stale. Run `python3 tools/{tool} --write` "
+                 f"and commit the result, exactly as site/ and "
+                 f"docs/invariants.json are committed")
+        if r.returncode != 0:
+            fail(f"tools/{tool} --write failed: {(r.stderr or '')[-200:]}")
+        n += 1
+    if n != len(docs):
+        fail(f"examined {n} generated documents of {len(docs)} — a check "
+             f"that has stopped reading one of them reports green")
+    return n
 
 
 if __name__ == "__main__":

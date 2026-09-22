@@ -8687,10 +8687,13 @@ untouched. What was missing was four declarations and one published
 sentence.
 
 **`tools/ad-audit.py` IS THE 33 SECTIONS AS A GATE**, on `section-audit.py`'s
-own machinery: 185 assertions, `--write` regenerating the table AND the
-evaluation's counts, and `c_ad_audit_fresh` failing when the committed prose
-stops equalling what the audit produces — a generated document whose
-generator has moved on is `site/` and `docs/invariants.json` exactly.
+own machinery: an assertion per claim, `--write` regenerating the table AND
+the evaluation's counts, and `c_ad_audit_fresh` failing when the committed
+prose stops equalling what the audit produces — a generated document whose
+generator has moved on is `site/` and `docs/invariants.json` exactly. The
+total is what `python3 tools/ad-audit.py` prints and what
+`docs/advertising.md` carries; typing it here is the thing the Gates section
+below refuses, and CI caught it in the commit that wrote it.
 
 **AND ITS OWN FIRST RUN FAILED ON FIVE THINGS THAT WERE NOT ABOUT THE
 PRODUCT.** `advertising.json` in a **docstring** in `render.py`,
@@ -8718,6 +8721,70 @@ the shape-check fault inside the stripper written to remove shape checks.
 proving it red: `[...][0]` on an empty list raised an IndexError, and *a
 suite that crashes has stopped counting* — it reports no failure and leaves
 every later section unrun.
+
+
+**CI HAD BEEN RED FOR SIX COMMITS WHILE EVERY LOCAL RUN REPORTED GREEN, AND
+THE SECOND FAILURE HID THE FIRST.** Auditing the 99 sections meant reading
+the workflow result rather than only the local one, and the last six runs on
+this branch were every one of them a failure. Two causes, five commits apart:
+
+| | |
+|---|---|
+| runs 399–403 | `docs/section-audit.md` was **one assertion short of what the generator produced**. The Journey 01 commit added one to §17 — *the drawn route comes before the photographs of its stops* — and did not re-run `--write`. The two figures are in that run's log and in the document; writing either here is the thing the Gates section refuses, and this paragraph went red on its own first draft for exactly that — a thousands comma does not stop the pattern matching the three digits after it |
+| run 404 | `checks.py` refused **an assertion count typed into this file**, added by the commit before this one, three screens above the Gates section that says *no counts here on purpose* |
+
+**THE SECOND IS WHY THE FIRST COULD NOT EVEN BE REPORTED.** `checks.py` runs
+ABOVE the staleness steps in `checks.yml`, so failing it skipped them — the
+sixth run never reached the drift that was still there. That is this
+workflow's own recorded lesson about a missing Pillow, thirty lines further
+up the same file: *a gate that cannot run is worse than a gate that fails,
+because the log still ends in one error and looks like one problem.*
+
+**AND THE STALENESS GUARD EXISTED, IN CI ONLY, WHICH IS A GATE YOU FIND OUT
+ABOUT AFTER YOU HAVE PUSHED.** The commit before this one gave
+`docs/advertising.md` a LOCAL guard and left the three older generated
+documents — the section audit, the UX audit and the content report — on the
+workflow alone: *a rule stated once and applied to one of its call sites*,
+in the commit that wrote the rule down. `c_generated_docs_fresh` is that
+guard over a table of four rather than four copies of it, asserts its own
+reach, restores the document on failure, and costs about thirty seconds on a
+gate that already takes three minutes. Proved red on each of the four, and
+the fourth needed a second mutation: **`ad-audit.py --write` rewrites only
+the region it owns**, so a line appended past that region is correctly not
+its to remove, and the honest mutation is a verdict inside the table.
+
+**AND THE AUDIT ITSELF WAS FALSIFIED RATHER THAN READ.** Eighteen mutations
+against the claims of the BUILT rows — the distance origin, the country
+geometry, the Natural Earth credit, a placement field in the search index, a
+journey's `TouristTrip`, the onward stops, *Open the door to Europe*, the
+manifesto's four provenance labels, the planner's weights, the diversity
+term, the shoulder-season weight, the masthead's own links — and every one
+reddened the section it was aimed at, naming its own claim. **The first run
+of that sweep proved nothing**, because it matched the failure lines on a
+stripped `§N` where the runner prints `- §N`, so all eighteen read *(red
+elsewhere)*: a mutation that reddens a different section is not evidence
+about the section it targets.
+
+**TWO ASSERTIONS SURVIVED IT, AND NEITHER IS VISIBLE TO A MUTATION OF THE
+PRODUCT.** `all(...)` over an empty list is True, so §9's *`{slug}` carries
+its tags* asserted nothing at all: emptying every story's tags left the whole
+audit green, on 39 tags across nine stories. The validator already refuses a
+story with fewer than two, so the reach floor is that same promise rather
+than a new editorial rule. And §36 carried **the last surviving `or True`**,
+eight lines under its own comment recording nine of them being removed — its
+left half happened to be true, so it was a landmine rather than a live false
+claim, and it tested the wrong thing either way: a consumer row in
+`contracts.json` says nothing about WHERE bookmarks, itineraries and
+itinerary items live. What makes them rowless is that they are three
+`localStorage` keys in the reader's browser, so that is what is asserted now.
+**And my own mutation of it was `cell` catching `cellar`** — the replacement
+string contained `localStorage.setItemX`, which still contains the needle, so
+the first proof reported a survivor that was the instrument rather than the
+check.
+
+**The other three were measured and are covered.** Emptying the stories, the
+journeys or their legs goes red in §9, §16 and §17, so the vacuous-truth risk
+is real only where nothing else counts the set.
 
 ## Gates
 
