@@ -40,6 +40,11 @@
    * the form actually ships, because comparing the copies to each other
    * goes green the moment somebody types the same number twice. */
   var DAY_MIN = 3, DAY_MAX = 45, PARTY_MIN = 1, PARTY_MAX = 12;
+  /* A journey sharing ONE stop with your route is a coincidence — 41 of
+     the 313 destinations sit on some journey, so a single overlap says
+     nothing. Two is the smallest number that is a claim, which is the
+     same reasoning as FACET_MIN and GROUP_MIN one family over. */
+  var JOURNEY_MIN = 2, JOURNEY_MAX = 3;
 
   var SEASON = { peak: 1.18, shoulder: 1.0, off: 0.74 };
   var PACE = { slow: 1, balanced: 0, fast: -1 };
@@ -1415,6 +1420,7 @@
       "</div>" +
       '<p class="small" id="planstate"></p>' +
       '<div class="whatif" id="whatif"></div>' +
+      '<div id="planjourneys"></div>' +
       '<p class="small">Each day lists the places and experiences we hold for that stop. ' +
       'It does not name a hotel or a restaurant: EuropeDoor lists neither yet, and ' +
       '<a href="/for-businesses">the reason is on the businesses page</a>. ' +
@@ -1429,6 +1435,66 @@
     wireSaveAndShare(route, opts, out);
     wireEditing(out, route, opts);
     renderWhatIf(out, route, opts);
+    renderJourneys(out, route);
+  }
+
+
+  /* ── The journeys that go this way ─────────────────────────────────
+   *
+   * THE SPECIFICATION ASKS THIS ENGINE FOR FOUR OUTPUTS AND THIS WAS THE
+   * ONE WITH NOTHING BEHIND IT. Destinations are the itinerary, experiences
+   * are listed per stop from the atlas's own `exp`, business recommendations
+   * are REFUSED and the result says so in its own words — and journeys were
+   * simply absent, while `ATLAS.journeys` sat in the reader's browser,
+   * already declared in `data/contracts.json` as *the curated routes it
+   * compares against*, and read by exactly one thing: the `#journey=`
+   * handler, which loads a named journey INTO the form. That is the journey
+   * page's hand-off, the reverse direction, so the row looked wired and the
+   * output did not exist.
+   *
+   * MATCHED ON SHARED STOPS, NEVER ON SIMILARITY. A journey that stops where
+   * you are stopping is a fact this atlas holds and a reader can check
+   * against the rows above; a "82% match" would be a score invented for the
+   * occasion, and the one thing this planner sells is that its arithmetic is
+   * published. So the claim is the overlap itself, counted and printed —
+   * *shares 3 of your 7 stops* — and the order is that count, which is a
+   * measurement rather than a ranking.
+   *
+   * AND IT IS NEVER SPONSORED, WHICH IS NOT A SENTENCE THIS FILE HAS TO ADD:
+   * a journey is an editorial record and the schema refuses `rank`, `boost`,
+   * `featured` and `sponsored` on every one of them. There is nothing here
+   * that could carry a placement.
+   *
+   * The reason every row shares is hoisted once above the list rather than
+   * repeated on each — *never explain the constraint back*, which is this
+   * product's own rule and the thing the first version of Discover Mode got
+   * wrong. */
+  function renderJourneys(scope, route) {
+    var panel = scope.querySelector("#planjourneys");
+    if (!panel || !ATLAS.journeys) return;
+    var mine = {};
+    route.forEach(function (st) { mine[st.city.id] = true; });
+    var hits = [];
+    for (var i = 0; i < ATLAS.journeys.length; i++) {
+      var j = ATLAS.journeys[i], n = 0;
+      for (var k = 0; k < j.legs.length; k++) if (mine[j.legs[k].id]) n++;
+      if (n >= JOURNEY_MIN) hits.push({ j: j, n: n });
+    }
+    if (!hits.length) { panel.innerHTML = ""; return; }
+    hits.sort(function (a, b) {
+      return b.n - a.n || a.j.name.localeCompare(b.j.name);
+    });
+    hits = hits.slice(0, JOURNEY_MAX);
+    panel.innerHTML =
+      '<h2 class="mini">Journeys that go this way</h2>' +
+      '<p class="small">Each of these is an edited route that stops where you are ' +
+      "stopping. They are not generated, and nothing about your plan changes if you " +
+      "open one.</p>" +
+      '<ul class="stack">' + hits.map(function (h) {
+        return '<li><a href="' + h.j.url + '">' + h.j.name + "</a> " +
+          '<span class="small">shares ' + h.n + " of your " + route.length +
+          " stop" + (route.length === 1 ? "" : "s") + " · " + h.j.days + " days</span></li>";
+      }).join("") + "</ul>";
   }
 
 

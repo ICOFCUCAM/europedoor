@@ -1570,38 +1570,138 @@ def s44():
 
 
 @section(45, "Recommendation engine", "PARTIAL",
-         "Interests, budget, season, duration, location, trip length and the "
-         "places you saved all feed the score. Travel history, weather and "
-         "crowding do not: two need accounts, one needs a licence.")
+         "EIGHT OF THE ELEVEN INPUTS FEED THE SCORE AND THREE ARE PUBLISHED "
+         "REFUSALS. Interests, budget, dates, location, saved destinations, "
+         "season, transport and trip duration are all read; travel history "
+         "needs an account, weather needs a licence and a forecast, and "
+         "crowding is refused because discoverability is published as "
+         "explicitly not a crowd measurement. Three of the four outputs are "
+         "built and the fourth is refused against the promise that refuses "
+         "it.")
 def s45():
     js = src("assets/js/planner.js")
-    for signal in ("wants", "budget", "month", "days", "start"):
-        yield signal in js, f"{signal} is an input"
+
+    # THE ELEVEN INPUTS, NAMED ONE BY ONE RATHER THAN SAMPLED.
+    # The first version asserted five of them and the note claimed seven,
+    # which is the pop_line shape: a list that omits part of its own set
+    # reads as a policy. Transport was in the mechanism and in neither.
+    for signal, why in (
+        ("wants", "user interests"),
+        ("budget", "budget"),
+        ("month", "dates"),
+        ("start", "location"),
+        ("days", "trip duration"),
+    ):
+        yield signal in js, f"{why} is an input ({signal})"
+
     # A place you saved is a stronger signal than any tag we assigned it, and
     # it is the one behavioural signal available without an account.
     yield "savedIds" in js, "and a saved place is favoured over our own tagging"
+
+    # SEASON IS NOT THE SAME INPUT AS THE DATE. The month a reader names is
+    # read once and spent twice: as the month itself, and through
+    # seasonFactor into a weighted season term of its own.
+    yield "seasonFactor" in js and "W.season" in js, \
+        "season is weighted separately from the month that names it"
+
+    # Transport: the rail preference multiplies the travel cost.
+    yield '"rail"' in js and "opts.transport" in js, \
+        "transport is an input and moves the answer"
+
+    # THE THREE REFUSALS, ASSERTED AGAINST THE PROMISE THAT REFUSES EACH.
+    # A refusal nobody can check is a slogan, which is this atlas's own
+    # sentence one family over.
+    yield has("/my-europe", "there is no account"), \
+        "travel history is refused: it needs an account and there is none"
+    yield has("/plan", "It will not tell you the weather"), \
+        "weather is refused, on the planner's own page"
+    yield has("/method", "not a crowd measurement"), \
+        "crowding is refused: we hold no visitor numbers for anywhere"
+
     yield "W = {" in js and "relevance: 0.30" in js, "the weighting is explicit"
     yield has("/plan", "30%", "20%", "15%", "10%", "5%"), "and published"
 
+    # THE FOUR OUTPUTS. Destinations are the itinerary itself; experiences
+    # are listed per stop; journeys are the edited routes that share the
+    # reader's own stops. The fourth is refused.
+    yield "renderRoute" in js or "route" in js, "destinations are recommended"
+    yield "experiences" in js, "and the experiences held for each stop"
+    yield "renderJourneys" in js and "JOURNEY_MIN" in js, \
+        "and the edited journeys that stop where this route stops"
+    yield "planjourneys" in js, "which the result band carries a container for"
+    yield has("/for-businesses", "There is no field on a campaign a ranking could read"), \
+        "a business recommendation is refused: nothing in the index could rank one"
 
-@section(46, "Personalisation", "DEFERRED",
-         "Learning from saved places needs a profile that persists across "
-         "devices, which needs an account. Saving works; learning does not.")
+
+@section(46, "Personalisation", "PARTIAL",
+         "THE LEARNING IS BUILT AND IT LIVES IN ONE BROWSER. Saving a place "
+         "teaches a preference model derived from the destinations behind "
+         "those saves, floored at four so three saves cannot wear a "
+         "percentage sign, adjustable per dimension and resettable; it hands "
+         "its top interests to the Planner and to Discover Mode, and both "
+         "read them. What is not built is the brief's own example ending: a "
+         "profile that follows a reader between devices needs an account, "
+         "and a personalised HOMEPAGE needs JavaScript on the one page whose "
+         "only script is the inert JSON-LD block.")
 def s46():
-    yield "localStorage" in src("assets/js/my-europe.js"), "saving is local only"
-    yield has("/my-europe", "no account")
+    mine = src("assets/js/my-europe.js")
+
+    # THE LEARNING ITSELF: a tally over the destinations behind the saves,
+    # divided by the number of saves that resolved to one. A profile with no
+    # denominator is a claim rather than a measurement.
+    yield "buildDna" in mine, "saved places are read into a preference model"
+    yield "DNA_MIN" in mine, "with a floor under how few saves may produce one"
+    yield "counted" in mine, "and the denominator is carried, not implied"
+
+    # A model of you that you cannot correct is a model being done to you.
+    yield "dnaAdjust" in mine and "dnaSave" in mine, \
+        "every dimension is adjustable"
+    # Written by renderDna into innerHTML, so it is in the script rather
+    # than in the shipped page: asserting it against the HTML would be a
+    # check that can never pass on a surface the build does not render.
+    yield "Reset the profile" in mine, "and the whole thing resettable"
+
+    # IT NEVER LEAVES THE BROWSER, and the page says so rather than the
+    # repository knowing it.
+    yield "localStorage" in mine, "it is stored in this browser"
+    yield "Nothing here is sent anywhere" in mine, "and the panel says so"
+
+    # THE HAND-OFF IS THE TEST OF WHETHER A PROFILE SHOULD EXIST, AND FOR A
+    # YEAR THE COMMENT CLAIMING IT WAS HALF FALSE. `my-europe.js` said it
+    # handed its top interests "to the Planner and to Discover Mode";
+    # planner.js read `?i=` and discover.js had no query reader of any kind,
+    # so the second half was a comment claiming evidence. Both ends are
+    # asserted, because either alone goes quietly wrong: a link carrying a
+    # parameter nothing reads is `data-rotate`, and a reader with no link to
+    # it is a code path nothing exercises.
+    yield "/plan?i=" in mine and "/discover?i=" in mine, \
+        "and it hands its top interests to the Planner and to Discover Mode"
+    yield 'q.get("i")' in src("assets/js/planner.js"), \
+        "the Planner reads that parameter"
+    yield 'q.get("i")' in src("assets/js/discover.js"), \
+        "and so does Discover Mode"
+
+    # WHAT IS NOT BUILT, against the promise that refuses each.
+    yield has("/my-europe", "there is no account"), \
+        "a profile that follows you between devices is refused: no account"
 
 
 @section(47, "Transport engine", "PARTIAL",
-         "A JOURNEY'S TRANSPORT IS AUTHORED AND STATED; A HOP'S MODE IS "
-         "REFUSED. All seventeen journeys carry their own transport list — "
-         "rail, ferry, bus, cable car, postbus, river boat, bicycle, flight, "
-         "car, on foot — written as editorial record, and none of the 121 "
-         "legs carries one, because every distance here is a great circle "
-         "between two coordinates and a mode derived from that is a claim "
-         "about ground this atlas holds no geometry for. Live timetables and "
-         "fares need providers, and aggregating them is the specification's "
-         "own preferred shape rather than operating transport.")
+         "FOUR OF THE SPECIFICATION'S SIX MODES HAVE SOMETHING BEHIND THEM "
+         "AND TWO HAVE NOTHING, AND THE DIVIDE IS DERIVED AGAINST AUTHORED. "
+         "Flights and ferries are GEOGRAPHY: 299 airport nodes carrying IATA "
+         "codes and 222 ports, from Natural Earth, attached to every "
+         "destination within 120 km and 60 and printed with a straight-line "
+         "distance. Rail and buses are EDITORIAL RECORD: every journey "
+         "carries its own transport list and every country its own sentence. "
+         "Car rental and local transit are held nowhere. What is refused "
+         "throughout is the ROUTE — an operator, a frequency, a duration and "
+         "a fare need a licensed feed, change without notice, and are the "
+         "single most damaging thing a travel page can state wrongly. The "
+         "specification's own preferred shape, aggregating or linking to "
+         "providers rather than operating transport, is the mechanism the "
+         "Stay layer already is; no transport provider is declared in it, "
+         "and adding one is the owner's decision rather than a build step.")
 def s47():
     # THIS VERDICT USED TO READ "distance and mode are computed and stated
     # for every hop", which is the behaviour `hop_note` REMOVED — its own
@@ -1611,20 +1711,76 @@ def s47():
     # green while the sentence it publishes had reversed. The thirteenth
     # assertion here to pin a shape rather than a promise, and the first
     # where the shape it pinned was a function NAME.
-    yield all(j.get("transport") for j in DATA["journeys"]), \
-        f"all {len(DATA['journeys'])} journeys carry an authored transport list"
+    facts = json.load(open(os.path.join(ROOT, "data/geo/facts.json"),
+                           encoding="utf-8"))
+    tr = facts["transport"]
+    nodes = [n for v in tr.values() for n in v["nodes"]]
+
+    # FLIGHTS AND FERRIES — derived, from a public-domain dataset, with the
+    # source recorded on every row.
+    air = [n for n in nodes if n["kind"] == "airport"]
+    sea = [n for n in nodes if n["kind"] == "port"]
+    yield len(air) > 200, f"flights: {len(air)} airport nodes are attached to destinations"
+    yield sum(1 for n in air if n.get("iata")) > 150, \
+        f"of which {sum(1 for n in air if n.get('iata'))} carry an IATA code"
+    yield len(sea) > 150, f"ferries: {len(sea)} port nodes"
+    yield all(v.get("source") for v in tr.values()), \
+        "and every row names the dataset it came from"
+
+    # RAIL AND BUSES — authored, per journey and per country.
+    modes = {m for j in DATA["journeys"] for m in j.get("transport", [])}
+    yield "rail" in modes, "rail is in the journey vocabulary"
+    yield "bus" in modes, "and so are buses"
+    yield "ferry" in modes and "flight" in modes, \
+        "which also names ferries and flights, so all four agree across surfaces"
+    # `DATA["countries"]` is KEYED BY CODE, so iterating it yields strings —
+    # which is what `'str' object has no attribute 'get'` was. Every other
+    # section in this file that walks it says `.values()`.
+    ga = [c for c in DATA["countries"].values() if c.get("getting_around")]
+    yield len(ga) == len(DATA["countries"]), \
+        f"and all {len(ga)} countries carry their own getting-around sentence"
+
+    # CAR RENTAL AND LOCAL TRANSIT — held nowhere, stated rather than
+    # quietly missing. A taxonomy that omits part of its own set reads as a
+    # policy, which is the `pop_line` shape.
+    yield "car rental" not in modes and "local transit" not in modes, \
+        "car rental and local transit are in no vocabulary here"
+
+    # THE ROUTE IS REFUSED, and the refusal is where the derivation is.
+    yield "the routes are refused" in src("scripts/map/process.py"), \
+        "the routes half is refused at the derivation"
     legs_with_mode = sum(1 for j in DATA["journeys"] for l in j["legs"]
                          if "transport" in l or "mode" in l)
     yield legs_with_mode == 0, \
-        f"and {sum(len(j['legs']) for j in DATA['journeys'])} legs carry none"
-    # The page half, on the shipped HTML rather than on the source — which is
+        f"and {sum(len(j['legs']) for j in DATA['journeys'])} legs carry no mode"
+    yield "MODE_CLAIMS" in src("tools/checks.py"), \
+        "with a check refusing a mode claim on any page"
+
+    # THE PAGE HALF, on the shipped HTML rather than on the source — which is
     # how the three surfaces left pointing at the removed claim were found.
     yield has("/journeys/the-alpine-grand-tour", "Transport"), \
         "the journey states its own modes"
     yield has("/journeys/the-alpine-grand-tour", "straight line"), \
         "and a hop distance says what kind of distance it is"
-    yield "MODE_CLAIMS" in src("tools/checks.py"), \
-        "with a check refusing a mode claim on any page"
+
+    # AND A DESTINATION WITH NO GATEWAY WITHIN REACH SAYS SO. It used to
+    # emit nothing at all, so 62 of 319 met silence where the rest met two
+    # gateways, and silence cannot be told from a surface nobody built.
+    yield has("/europe/romania/transylvania/brasov", "No airport within"), \
+        "a destination with neither states the radius it was searched to"
+    reach = facts.get("transport_reach_km") or {}
+    yield reach.get("airport") and reach.get("port"), \
+        f"read from the derivation's own constants ({reach.get('airport')} km, {reach.get('port')} km)"
+
+    # AGGREGATE OR LINK TO PROVIDERS — the mechanism exists and holds no
+    # transport provider. Asserted against the registry rather than against
+    # a sentence, because a page can describe a mechanism that has changed.
+    stay = json.load(open(os.path.join(ROOT, "data/stay.json"), encoding="utf-8"))
+    provs = stay.get("providers", stay if isinstance(stay, list) else [])
+    yield bool(provs), \
+        f"a referral registry exists ({len(provs)} provider(s)), which is the aggregate-or-link shape"
+    yield all("transport" not in json.dumps(pv).lower() for pv in provs), \
+        "and no transport provider is declared in it"
 
 
 @section(48, "Booking architecture", "DEFERRED",

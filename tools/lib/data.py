@@ -1099,6 +1099,10 @@ def load():
                     f'{c["slug"]}/{r["slug"]}/{t["slug"]}', {})
                 t["transport"] = tr.get("nodes", [])
                 t["transport_source"] = tr.get("source")
+                # The reach is a property of the derivation rather than of
+                # this destination, and the page needs it precisely where
+                # there are no nodes to carry it.
+                t["transport_reach"] = facts.get("transport_reach_km", {})
                 # An authored city_type wins over the derived one. Natural
                 # Earth is right about Bergen and has never heard of Theth.
                 if "city_type" not in t and d.get("city_type"):

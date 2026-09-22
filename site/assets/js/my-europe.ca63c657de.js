@@ -136,6 +136,10 @@
       return;
     }
     var top = dna.rows.slice(0, 6);
+    // Both hand-offs carry the same four slugs under the same parameter
+    // name, composed once. The Planner and Discover Mode each read `i`, so
+    // two lists here would be two answers to "what did this reader learn".
+    var handoff = top.slice(0, 4).map(function (r) { return r.slug; }).join(",");
     host.innerHTML =
       '<div class="note dna"><h2 class="mini">Your travel profile</h2>' +
       "<p>Computed from the <strong>" + dna.counted + " places</strong> you have saved in " +
@@ -155,9 +159,8 @@
           ' aria-label="More ' + r.name + '">+</button></span></div>';
       }).join("") + "</div>" +
       '<div class="hero-actions mt0">' +
-      '<a class="btn" href="/plan?i=' + top.slice(0, 4).map(function (r) { return r.slug; }).join(",") +
-      '">Plan a journey from this</a>' +
-      '<a class="btn ghost" href="/discover">Explore with it</a>' +
+      '<a class="btn" href="/plan?i=' + handoff + '">Plan a journey from this</a>' +
+      '<a class="btn ghost" href="/discover?i=' + handoff + '">Explore with it</a>' +
       '<button class="btn ghost" type="button" id="dnareset">Reset the profile</button>' +
       "</div>" +
       '<p class="small">Adjusting a row overrides what your saves say, and reset removes every ' +

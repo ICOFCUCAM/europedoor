@@ -5435,6 +5435,32 @@ def city_page(data, c, r, t):
         for nd in t.get("transport", [])
     )
 
+    # AND THE 62 DESTINATIONS WITH NEITHER SAID NOTHING AT ALL. The band was
+    # emitted only where a node was found, so a reader on Brasov, Viscri or
+    # Bialowieza met silence where a reader on Gjirokaster met two gateways
+    # — and silence is the one answer that cannot be told apart from a
+    # surface nobody built. It is a real measurement: Natural Earth's 893
+    # European airports and its ports, searched to 120 km and 60, and
+    # finding none within that is a fact about the place worth printing,
+    # because it says a destination is reached by rail and road.
+    #
+    # The radii come from the derivation's own constants through
+    # facts.json — prose that typed them would be a second copy of
+    # NODE_KINDS, still claiming 120 the day it becomes 100.
+    reach = t.get("transport_reach") or {}
+    _air, _port = reach.get("airport"), reach.get("port")
+    transnote = (
+        '<p class="sourcenote">Airports and ports within reach, from Natural Earth — '
+        'public domain, hosted by us. The distance is a straight line, which is the only '
+        'thing a coordinate can honestly tell you: 43 km across the Accursed Mountains is '
+        'four hours, and we hold no timetables, operators or fares.</p>'
+        if transrows else
+        f'<p class="sourcenote">No airport within {_air} km and no port within {_port}, '
+        'searched against Natural Earth\u2019s European airports and ports — public domain, '
+        'hosted by us. That is a fact about where this place sits rather than a gap in the '
+        'record: it is reached overland. We hold no timetables, operators or fares.</p>'
+        if _air and _port else "")
+
     # Events, now that §2.9 gives one an edge into the graph.
     #
     # This used to print every festival in the country on every destination
@@ -5523,7 +5549,7 @@ def city_page(data, c, r, t):
     ("Overview", "why-visit"),
     ("Places", "places" if placerows else ""),
     ("Things to do", "things-to-do" if exps else ""),
-    ("Getting near", "getting-near" if transrows else ""),
+    ("Getting near", "getting-near"),
     ("Events", "events" if (festrows or widerows) else ""),
     ("Travel tips", "tips"),
     (staytab, "stay"),
@@ -5554,12 +5580,9 @@ def city_page(data, c, r, t):
              + f'<p class="sourcenote">{len(t.get("places", []))} recorded so far. We hold what each one is and how long to give it, and deliberately not its opening hours or price.</p>',
              id="places") if placerows else ""}
     {section("Things to do", f'<div class="rows">{exps}</div>', id="things-to-do") if exps else ""}
-    {section("Getting near", f'<div class="rows">{transrows}</div>'
-             + '<p class="sourcenote">Airports and ports within reach, from Natural Earth — '
-               'public domain, hosted by us. The distance is a straight line, which is the only '
-               'thing a coordinate can honestly tell you: 43 km across the Accursed Mountains is '
-               'four hours, and we hold no timetables, operators or fares.</p>',
-             id="getting-near", opens=True) if transrows else ""}
+    {section("Getting near", f'<div class="rows">{transrows}</div>' + transnote,
+             id="getting-near", opens=True) if transrows else
+     section("Getting near", transnote, id="getting-near", opens=True)}
     {section("Events here", f'<div class="rows">{festrows}</div>', id="events",
              lede=f"Fixtures tied to {t['name']} itself.") if festrows else ""}
     {section(f"Elsewhere in {c['name']}" if festrows else "Events",
@@ -7014,9 +7037,20 @@ def planner_api(data):
             # LICENCE obligation, which is the one place this repository has
             # already learned not to have one.
             cities[-1]["shotCredit"] = credit_html(_row)
+    # THE URL TRAVELS WITH THE JOURNEY, exactly as it already does with a
+    # destination. `planner.js` recommends the edited journeys that stop where
+    # a reader's own route stops, and the first version composed the href in
+    # the browser as "/journeys/" + slug — a second implementation of where a
+    # journey lives, in the one place no gate can read it. `c_script_links`
+    # said so in the run that introduced it: it reads every href a script can
+    # write and resolves it against the built site, and a concatenated path is
+    # exactly what it cannot resolve. `routes.hash` exists so a URL cannot move
+    # without somebody deciding to; a route composed in a script moves without
+    # anybody deciding anything.
     journeys = [
         {
             "slug": j["slug"], "name": j["name"], "days": j["days"],
+            "url": urls.journey(j),
             "legs": [{"id": l["city"], "nights": l["nights"]} for l in j["legs"]],
             "interests": j["interests"],
         }

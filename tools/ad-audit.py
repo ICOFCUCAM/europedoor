@@ -270,7 +270,15 @@ def s8():
          "A check asserts `planner.js` contains no reference to the "
          "registry, and the six published weights are unchanged.")
 def s9():
-    js = src("assets/js/planner.js")
+    # THROUGH `bare_js`, BECAUSE THE PROMISE IS ABOUT THE CODE AND A COMMENT
+    # IS NOT COUPLING. This file's own first run already failed on the word
+    # "advertisement" inside a comment in discover.js, and `bare_js` is what
+    # was written for it — and then two of the three script scans here kept
+    # reading raw source, which is a rule stated once and applied to one of
+    # its call sites. A paragraph in the planner explaining that a journey
+    # recommendation is never sponsored is the opposite of the coupling this
+    # section refuses, and it tripped it.
+    js = bare_js(src("assets/js/planner.js"))
     yield "advertising" not in js.lower(), "the planner never mentions advertising"
     yield "sponsor" not in js.lower(), "and never mentions sponsorship"
     yield REG["planner"]["may_influence"] is False, "declared as may_influence: false"
@@ -657,7 +665,8 @@ def s32():
     false_rows = [
         ("ADVERTISING_ENABLED is false", REG["flags"]["ADVERTISING_ENABLED"] is False),
         ("no visible advertisements", ads.served() == []),
-        ("no ad tracking", "advertis" not in src("assets/js/map.js").lower()),
+        ("no ad tracking",
+         "advertis" not in bare_js(src("assets/js/map.js")).lower()),
         ("no ad scripts", not os.path.exists(os.path.join(ROOT, "assets/js/ads.js"))),
         ("no advertiser influence on organic results",
          REG["planner"]["may_influence"] is False),

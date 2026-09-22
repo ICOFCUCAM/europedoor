@@ -12207,27 +12207,41 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    simplified independently do not share an edge and a tenth of a unit of
    paper along a 700-unit cut is a bright hairline exactly where this
    drawing must not have one. */
-/* `.atplate .instrmap` RATHER THAN `.atplate`, BECAUSE THE SEAM THIS RULE
-   REMOVES HAD COME BACK AND THE RECORD SAID IT HAD NOT. Both this and
-   `.instrmap .lyr-beyond path` forty lines down are (0,2,1) — `.instrmap` is
-   the FIGURE inside this plate, so both match the same path — and the later
-   one wins, so the register's ground beyond was painting `--atlas-far` where
-   this rule asks for `--map-land`. Measured across the cut at three heights:
-   every row ran 216,212,199 (the atlas land) and then stepped to
-   195,191,178, which is the tone step the whole ground-beyond device exists
-   to remove and which CLAUDE.md records as removed.
+/* ONE RULE FOR THE GROUND BEYOND, BECAUSE FOUR WERE FOUR ANSWERS TO ONE
+   QUESTION AND THE ONE THEY ALL REACHED WAS THE SAME.
 
-   That is the `.macromap` collision exactly — two (0,2,1) selectors meet and
-   the later one wins — and it rendered as *the thing is simply not there*
-   for the fifth time. The dead-rule scan is what found it, and it named a
-   DEAD DECLARATION where the fault was a lost fight: a rule that matches
-   elements and changes none of them is the symptom either way.
+   `.instrmap .lyr-beyond path` painted `--atlas-far`; `.europemap` and
+   `.instrstage .instrmap` each overrode it with `--atlas-land`; and the
+   commit before this one added a fourth, `.atplate .instrmap`, with
+   `--map-land`, to win a specificity fight against the first. The dead-rule
+   scan then reported the base as changing nothing — correctly, and in CI
+   only, because /discover is not in its page set and the homepage is.
 
-   Naming the family is not a third class invented to win; it is the selector
-   the fill already uses with the family it belongs to added, which is how the
-   portrait terrain fix was made one screen over. */
-.atplate .instrmap .lyr-beyond path { fill: var(--map-land); stroke: var(--map-land);
-                            stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+   MEASURED IN CHROMIUM ON ALL THREE PAGES THAT DRAW THE LAYER, the ground
+   beyond and the atlas in front of it are the same value and that value is
+   `--atlas-land` every time: 216,212,199 on / and on /map, 243,240,230 on
+   /discover. `--atlas-far` is 195,191,178 and 108,115,110 — it matches the
+   land on neither, which is WHY every user had to override it. A base whose
+   value is wrong everywhere is not a default, it is a fourth opinion that
+   each page has to argue with.
+
+   `--atlas-*` is a ROLE that resolves per world and `--map-*` is the
+   palette, so the role is the whole mechanism here: the ground beyond must
+   be the same tone as the atlas in front of it — that is the entire device,
+   and it is what takes the 52°E cut out of the picture without a fade over
+   it — and one token states that on a light plate and on a dark instrument
+   without either page naming a colour.
+
+   The hero keeps its own rule at (0,2,1) and is not touched: it paints the
+   ground beyond in `--graphite` on purpose, because *Europe is what the
+   light falls on* is a different device from *there is no seam to hide*.
+
+   Drawn under the fifty and stroked in its own fill, because two datasets
+   simplified independently do not share an edge and a tenth of a unit of
+   paper along a 700-unit cut is a bright hairline exactly where this
+   drawing must not have one. */
+.lyr-beyond path { fill: var(--atlas-land); stroke: var(--atlas-land);
+                   stroke-width: 1.4; vector-effect: non-scaling-stroke; }
 /* THE SAME GROUND ON THE TWO INSTRUMENTS, FOR THE SAME REASON AND AT A
    DIFFERENT TONE. `--atlas-land` rather than `--map-land`, because the
    cartography roles are what /map and /discover bind — a second name for
@@ -12253,10 +12267,7 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    there was no Europe left on the page whose subject is 313 European
    destinations. *Europe is what the light falls on*, undone by the commit
    that removed the fade. */
-.europemap .lyr-beyond path { fill: var(--atlas-land); stroke: var(--atlas-land);
-                              stroke-width: 1.4; vector-effect: non-scaling-stroke; }
-.instrmap .lyr-beyond path { fill: var(--atlas-far); stroke: var(--atlas-far);
-                             stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+
 /* AND ON /discover THE GROUND IS ONE TONE, WHICH IS THE THIRD ANSWER AND THE
    ONLY ONE THAT REMOVES THE LINE.
 
@@ -12280,7 +12291,6 @@ body[data-hero] main > .crumbs { padding-inline: var(--page-gutter); }
    cartography split, for the recorded reason that stroking it in ink drew
    every internal border of the Maghreb. One tone, no boundary to rule, and
    the argument the plate makes is carried by the thing it is about. */
-.instrstage .instrmap .lyr-beyond path,
 .instrstage .instrmap .context path { fill: var(--atlas-land);
                                       stroke: var(--atlas-land);
                                       stroke-width: 1.4;

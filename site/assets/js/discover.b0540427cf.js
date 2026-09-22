@@ -334,13 +334,22 @@
    * It binds to whatever carries `data-interest` rather than to a class, so
    * the look of the control is the stylesheet's business and this file has
    * no opinion about it. */
+  /* ONE IMPLEMENTATION OF "A CHIP IS PRESSED", because there are two ways
+   * in now and a second copy is a second chance for the state and the
+   * control to disagree — the fault this repository has paid for in a
+   * dispatch cap, a credential scan and a token name. `picked` and the
+   * chip's own `aria-pressed` move together or they move wrong. */
+  function press(b, on) {
+    var slug = b.getAttribute("data-interest");
+    if (on) { picked[slug] = true; } else { delete picked[slug]; }
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+
   function chips() {
     var box = el("discover-interests");
     box.querySelectorAll("[data-interest]").forEach(function (b) {
       b.addEventListener("click", function () {
-        var slug = b.getAttribute("data-interest");
-        if (picked[slug]) { delete picked[slug]; } else { picked[slug] = true; }
-        b.setAttribute("aria-pressed", picked[slug] ? "true" : "false");
+        press(b, !picked[b.getAttribute("data-interest")]);
         render();
       });
     });
@@ -357,9 +366,40 @@
       }).join("");
   }
 
+  /* THE LEARNED PROFILE ARRIVES HERE THE SAME WAY IT ARRIVES AT THE
+   * PLANNER, AND FOR A YEAR ONLY HALF OF THAT WAS TRUE.
+   *
+   * `my-europe.js` derives a reader's top interests from what this browser
+   * has saved and its own comment says it "hands its top interests to the
+   * Planner and to Discover Mode". The Planner reads `?i=` (planner.js,
+   * `applyAsk`); this file had no query reader of any kind and the button
+   * beside it linked to a bare `/discover`, so the second half of that
+   * sentence was a comment claiming evidence — the fault recorded five
+   * times in CLAUDE.md, arriving in a script rather than in a stylesheet.
+   *
+   * `i` rather than a second spelling, because a second name for one thing
+   * is two names waiting to disagree, and the Planner named it first.
+   *
+   * THE CHIPS ARE THE READBACK. This page has no sentence box and needs
+   * none: a slug that reaches a chip presses it visibly, and a slug that
+   * reaches nothing presses nothing, so what the page understood is on the
+   * screen rather than asserted in prose. */
+  function applyQuery() {
+    var q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var raw = q.get("i");
+    if (!raw) return;
+    var want = {};
+    raw.split(",").forEach(function (t) { if (t) want[t.trim()] = true; });
+    root.querySelectorAll("[data-interest]").forEach(function (b) {
+      if (want[b.getAttribute("data-interest")]) press(b, true);
+    });
+  }
+
   fetch("/api/atlas.json").then(function (r) { return r.json(); }).then(function (json) {
     ATLAS = json;
     chips();
+    applyQuery();
     el("discover-month").addEventListener("change", function (e) {
       constraints.month = e.target.value; render();
     });

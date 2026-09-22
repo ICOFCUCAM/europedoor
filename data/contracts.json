@@ -22,6 +22,7 @@
         "/api/atlas.json": {
           "cities": "every destination it can route through",
           "journeys": "the curated routes it compares against",
+   "journeys.url": "where that journey lives, so the browser never composes one. The recommendation band writes a link per journey and the first version built \"/journeys/\" + slug, which is a second implementation of a route in the one place `c_script_links` cannot resolve \u2014 it reads every href a script can write and checks it against the built site, and a concatenated path is precisely what it cannot check. `routes.hash` exists so a URL cannot move without somebody deciding to; one composed in a script moves without anybody deciding anything. Same shape as cities.url.",
           "interests": "matching a stated interest to a destination",
           "months": "seasonality",
           "monthNames": "reading the query back",

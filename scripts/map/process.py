@@ -939,6 +939,15 @@ def facts(graph):
         "countries": countries,
         "destinations": dests,
         "transport": transport(graph),
+        # THE RADII TRAVEL WITH THE ANSWER. 62 destinations have neither
+        # kind within reach, and a page that says so has to say it in the
+        # derivation's own numbers -- prose typing 120 and 60 is a second
+        # copy of NODE_KINDS that goes on claiming the old radius the day
+        # one moves, which is the dispatch cap exactly. A sibling key
+        # rather than an entry inside `transport`, because that map is
+        # keyed by destination and a meta row inside it is a row every
+        # reader of the map has to learn to skip.
+        "transport_reach_km": {k: int(v) for k, v in NODE_KINDS.items()},
     }
 
 
@@ -998,6 +1007,7 @@ def transport(graph):
                         "source": "Natural Earth 1:10m airports and ports",
                         "nodes": near[:4],
                     }
+
     return out
 
 
