@@ -8355,6 +8355,44 @@ a display-size title. A summary that averages an h1 at y=164 with an h2 at
 y=4,156 is measuring two different things, and it can only say so once it
 knows which is which.
 
+**TWO LABEL FAMILIES ON THE COUNTRY PORTRAITS WERE MEASURED WITH A THIRD
+FAMILY'S MODEL.** `_try_label(..., "sname", metric="rlabel")` and the same for
+`"fname"`: `rlabel` is fitted for a region name at 15px bold with normal
+tracking, and a sea name is display ITALIC UPPERCASE at `--t-xs` with **.32em
+of tracking** — a different face, a different size, and a third of an em
+between every pair of letters that the model knows nothing about. Measured in
+Chromium with `getBBox`, over all 21 names in `marine-lod1.json` rendered
+inside a real portrait at the size the stylesheet gives them: **`rlabel`
+understates 20 of the 21**, worst MEDITERRANEAN SEA at 202.0 units against a
+modelled 169.9 — 32 units, a sixth of the label. The same measurement says it
+**overstates every physical feature** (CAUCASUS by 14.5 units), which is safe
+and costs a label that would have fitted.
+
+**An envelope that understates is the dangerous direction**, and this file
+already says why: it lets a name into ground the drawing has already spent. It
+had not bitten — no pair of labels overlaps on any portrait at 1280 — which is
+what a latent model fault looks like until the day another country draws one.
+Both families are fitted as upper envelopes by the browser rather than by the
+model, `pad + ch * chars` with the smallest total slack that still covers every
+measured width: **sname (0.0, 11.96), fname (6.4, 8.63)**, against rlabel's
+(18.8, 8.89). France gains the English Channel, Russia gains the Central
+Russian Upland and the Balkan Mountains, and Norway loses the Gulf of Bothnia,
+whose honest box does not fit where its understated one did. Seventeen sea
+names on twelve portraits before and after; the features go 3 to 5.
+
+**AND MY OWN FIRST THREE COUNTS OF THIS WERE WRONG, FOR THE REASON THIS FILE
+ALREADY RECORDS.** `grep -c 'class="sname"'` reports **3 of 50** portraits
+naming water and the browser reports **12**, because `phone_declutter()` marks
+a label it drops on a narrow screen by rewriting the first `class="` — so every
+`wide-only` sea name is `class="sname wide-only"` and a pattern with the
+closing quote in it misses all of them. That is the check that matched
+`pointsmap arched"><svg` and examined 0 dots on a site with 130 region maps,
+arriving in a scratch measurement rather than in a gate: **a class attribute is
+a LIST, and an instrument that reads it as a string is measuring its own
+punctuation.** The premise the first version of this work was built on — that
+the portraits name no water at all — was that miscount, and the measurement
+that corrected it also refuted a whole commit's worth of intended change.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

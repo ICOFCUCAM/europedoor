@@ -4432,11 +4432,14 @@ def countryportrait(data, c):
     # other level and in the owner's order: after the places, before the
     # groupings. ALPS is geography and a region is an editorial grouping;
     # when only one of them fits, the geography wins.
+    # EACH FAMILY WITH ITS OWN FITTED MODEL, which is what `LABEL_METRICS`
+    # is for: these two borrowed `rlabel`, a region name at 15px bold, and
+    # they are display italic uppercase tracked at .32em.
     for px, py, nm in cartography.feature_points(proj.xy, (0, 0, w, h)):
-        _try_label(px, py, nm, "fname", metric="rlabel", off=8.0,
+        _try_label(px, py, nm, "fname", metric="fname", off=8.0,
                    prefer="over")
     for px, py, nm in cartography.water_points(proj.xy, (0, 0, w, h)):
-        _try_label(px, py, nm, "sname", metric="rlabel", off=8.0,
+        _try_label(px, py, nm, "sname", metric="sname", off=8.0,
                    prefer="over")
     # And the rivers, last of the physical families for the same reason they
     # are last on a destination plate: everything with a dot outranks them.
@@ -9581,6 +9584,34 @@ LABEL_METRICS = {
     # too wide for the country it belongs to. Same width model — the wider
     # half decides — and a box two lines deep, centred on the anchor.
     "cname2": (10.4, 17.35, 17.9 + CNAME_LEAD / 2, 4.7 + CNAME_LEAD / 2),
+    # AND THE TWO PHYSICAL FAMILIES ON A PORTRAIT WERE MEASURED WITH THE
+    # REGION LABEL'S MODEL, WHICH IS A THIRD FAMILY'S.
+    #
+    # `_try_label(..., "sname", metric="rlabel")` and the same for `fname`:
+    # `rlabel` is fitted for a region name at 15px bold with normal tracking,
+    # and a sea name is display ITALIC UPPERCASE at `--t-xs` with .32em of
+    # tracking — a different face, a different size, and a third of an em
+    # between every pair of letters that the model knows nothing about.
+    # Measured in Chromium with `getBBox` over all 21 names in
+    # `marine-lod1.json`, rendered inside a real portrait at the size the
+    # stylesheet gives them: **`rlabel` understates 20 of the 21**, worst
+    # MEDITERRANEAN SEA at 202.0 units against a modelled 169.9 — 32 units,
+    # a sixth of the label.
+    #
+    # An envelope that UNDERSTATES is the dangerous direction, and this file
+    # already says why: it lets a name into ground the drawing has already
+    # spent. It has not bitten yet — the three portraits that draw one place
+    # it in open water and no pair overlaps at 1280 — which is exactly what
+    # a latent model fault looks like until the day a fourth country draws
+    # one. The same measurement says `rlabel` OVERSTATES every physical
+    # feature (CAUCASUS by 14.5 units), which is safe and costs a label that
+    # would have fitted.
+    #
+    # Both are fitted as upper envelopes over every name the register holds,
+    # by the browser rather than by the model: `pad + ch * chars` with the
+    # smallest total slack subject to covering every measured width.
+    "sname": (0.0, 11.96, 11.3, 2.8),
+    "fname": (6.4, 8.63, 11.3, 2.8),
     # AND THE SEA NAMES, WHICH HAD NO BOX AT ALL.
     #
     # Every other label family on this site goes through `place_label_box`:
