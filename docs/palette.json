@@ -50,6 +50,20 @@
     "why_a_separation_and_not_a_claim": "A claim says a colour may carry TEXT; these say two drawn areas must be told apart. AND ON THE LIGHT MAP THEY CANNOT BE TOLD APART BY LUMINANCE AT ALL: land against water measures 1.18, so the BORDER carries the coastline and this register asserts the border rather than the fill. That is a printed atlas's answer and it is the first time this file has had to make it.",
     "separations": [
       {
+        "a": "bone-light",
+        "b": "map-land",
+        "min": 1.3,
+        "measured": 1.37,
+        "why": "the subject of a country portrait against its nearest neighbour — the one separation the comment beside path.here claimed was already here and was not, on the fifty plates whose whole job is to say which country the page is about"
+      },
+      {
+        "a": "atlas-hereline",
+        "b": "bone-light",
+        "min": 3.0,
+        "measured": 9.24,
+        "why": "the subject's own frontier read from inside it, and the ceiling the relief ridge is measured against: a range is a fact about the ground and a border is a claim about it, so the ridge sits at 1.83 where this is 9.24"
+      },
+      {
         "a": "map-border",
         "b": "map-land",
         "min": 3.0,

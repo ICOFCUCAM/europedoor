@@ -463,3 +463,83 @@ needs a water-label family that takes the `--z` compensation, counts toward
 `dense_class()` and is marked by `phone_declutter()` — because the last label
 family added here inherited none of those and printed Monte Rosa through
 Chamonix's own name at 390.
+
+---
+
+## The country portraits: a ridge rather than a wash
+
+Measured on the built site before this pass: the destination pages and six
+journeys carry `lyr-terrain` and **not one of the fifty country plates did.**
+The second-largest family here, and the page a reader arrives on from a search
+for "Austria travel", drew its land as one flat tone — Switzerland, Norway and
+Iceland with it.
+
+### The gate is this file's own two thresholds
+
+`data/geo/terrain-lod1.json` carries `min_spread: 300`, `min_crest: 600` and a
+`[spread, crest]` pair for every destination, measured over 40 km of ground. A
+country's figure is **the highest of its own destinations'** and
+`cartography.draws_relief` is the same predicate the destination plates use, so
+there is no second gate to disagree with the first. A list of mountainous
+countries would be an authored measurement.
+
+| | |
+|---|---|
+| qualify on the ground | 33 of 50, Georgia at 3,456 m of crest down to Portugal at 894 |
+| refused by the ground | 17, the Netherlands at 23 m of crest to Vatican City at 522 |
+| refused by the frame cap | Norway at 1,879 km and Türkiye at 1,652, against `TERRAIN_MAX_KM` |
+| drawn as a setting rather than an outline | Andorra, Liechtenstein, Monaco, San Marino |
+| no ridge above `PORTRAIT_RIDGE_M` | Croatia 998, Cyprus 1,007, Czechia 906, Portugal 894, San Marino 847 |
+| **draw a ridge** | **23** |
+
+### The highlight and the relief are the same variable
+
+A portrait tells its subject apart by being LIGHTER than its neighbours —
+`--atlas-here` on the nearest distance band — and relief works by making high
+ground DARKER. Measured on the rendered page with the bands laid over the
+subject:
+
+| | subject : nearest neighbour | the bands' own steps |
+|---|---|---|
+| no relief | 1.371 | — |
+| the plates' opaque fills | **1.022** on Switzerland, all three bands darker than the neighbour | 1.084 / 1.089 |
+| a 30% wash | 1.213 | 1.019 / 1.026 |
+
+Opaque inverts the hierarchy: the subject becomes the darkest thing on the
+plate and its neighbours read as the paper. A wash is worse rather than
+better — a relief nobody can see, bought with a highlight nobody can see
+either. **There is no value in between.**
+
+### So the boundary is read instead of the area
+
+Stroke only, no fill, on the two upper band boundaries, clipped to the
+subject's own outline — which is the hero's own treatment of the ranges and the
+aperture's own treatment of the opening. `--atlas-hereline` at 34% measures
+**1.83:1** against the subject where the frontier measures 9.24, because a
+range is a fact about the ground and a border is a claim about it. The measured
+1.371 step survives exactly.
+
+### What it costs, and what the 200 m band was worth
+
+| | all four bands, filled | the two upper boundaries |
+|---|---|---|
+| Italy | 112 KB | **37 KB** |
+| Sweden | 156 KB | 11 KB |
+| median | 18 KB | **10 KB** |
+
+The 200 m band is 36% of the filled layer across the 33 and **67% of
+Sweden's** — 104 KB of 156 for a step that is 0.013 of luminance from the land
+tone. It is not in this family at all.
+
+### Refused, with the reason
+
+- **The unclipped version** was rendered and looked at: the ridges cross the
+  `near`/`mid`/`far` context bands at the same weight on a darker ground, and
+  the busiest part of a plate of Austria becomes Switzerland. The clip is the
+  portrait's own logic — the same logic that draws neighbours without their
+  destinations, their regions or their names.
+- **The four micro-states** take a trigger rather than a refusal.
+  `_settingportrait` draws a 440 km window with the country as a ringed point,
+  and *being a speck against the Pyrenees* would be stronger with the Pyrenees
+  drawn. That figure carries no `<figcaption>` at all, and a relief layer with
+  no credit is refused, so the caption is what has to exist first.

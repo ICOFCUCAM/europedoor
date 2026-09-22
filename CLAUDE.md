@@ -7818,6 +7818,146 @@ wchan and the CPU figure of a wrapper say nothing about its child, which is
 `pgrep` matching a name rather than a run, one level up.
 
 
+**THE FIFTY COUNTRY PORTRAITS DREW NO RELIEF, AND THE PAGES THAT DO ARE THE
+ONES THAT NEED IT LEAST.** `grep -rl 'lyr-terrain' site --include=index.html`
+finds the destination pages and six journeys and **not one of the fifty
+country plates** — so the second-largest family here, and the page a reader
+arrives on from a search for "Austria travel", drew its land as one flat tone.
+Switzerland, Norway and Iceland with it.
+
+**THE RULE IS THE FILE'S OWN TWO THRESHOLDS AND NOTHING NEW.**
+`data/geo/terrain-lod1.json` carries `min_spread: 300`, `min_crest: 600` and a
+`[spread, crest]` pair for every destination, measured by `relief.py` over 40
+km of ground. A country's figure is the highest of its own destinations' — the
+same measurement, over the places this atlas actually writes about — and
+`cartography.draws_relief` is the same predicate the destination plates use,
+so there is no second gate to disagree with the first. **A list of mountainous
+countries would be an authored measurement**, which is the sentence the
+destination rule was written under and is the same sentence here. 33 of 50
+qualify on the ground, from Georgia at 3,456 m of crest down; the 17 refused
+run from the Netherlands at 23 m to Vatican City at 522.
+
+**AND THE HIGHLIGHT AND THE RELIEF ARE THE SAME VARIABLE, WHICH NO ALPHA
+RECONCILES.** A portrait tells its subject apart by being LIGHTER than its
+neighbours — `--atlas-here` on the nearest distance band, 1.371 measured on
+the rendered page — and relief works by making high ground DARKER. Measured
+with the bands laid over the subject:
+
+| | subject : nearest neighbour | the bands' own steps |
+|---|---|---|
+| no relief | 1.371 | — |
+| opaque bands | **1.022** on Switzerland, and all three darker than the neighbour | 1.084 / 1.089 |
+| 30% wash | 1.213 | 1.019 / 1.026 |
+
+Opaque inverts the hierarchy — the subject becomes the darkest thing on the
+plate and its neighbours read as the paper — and a wash is worse rather than
+better: a relief nobody can see, bought with a highlight nobody can see
+either. **There is no value in between.** *It cannot be fixed by darkening the
+opening* is on this record about two near-blacks and is true here about two
+near-whites.
+
+**SO THE BOUNDARY IS READ INSTEAD OF THE AREA**, which is this repository's
+answer to that shape twice already: the aperture by its REVEAL, and the hero's
+ranges by *a hairline on the two upper band boundaries* rather than by the
+wash. Stroke only, no fill, `--atlas-hereline` at 34% — **1.83:1 against the
+subject where the frontier is 9.24**, because a range is a fact about the
+ground and a border is a claim about it. The measured 1.371 survives exactly.
+
+**AND THE FLOOR IS THE GATE, so nothing asks for a layer it cannot draw.**
+`PORTRAIT_RIDGE_M` is 1200 — a band floor out of the data file rather than a
+number chosen here — and a country whose highest crest is below it has no
+ridge to draw: Croatia, Cyprus, Czechia, Portugal and San Marino come out by
+the ground. The 200 m band is not in this family at all, and what that is
+worth was never measured until now: drawing FILLS it was **36% of the layer's
+bytes and 67% of Sweden's** — 104 KB of 156 for a step that is 0.013 of
+luminance from the land tone. 23 portraits draw ridges, 37 KB on Italy, 10 KB
+median, against 86 and 23 for the fills.
+
+**AND THE `terrain` CLASS WAS ATTACHED TO THE REQUEST RATHER THAN TO THE
+DRAWING, IN THREE CALLERS.** `credited()` carries the whole argument already —
+*"IT IS ATTACHED TO THE DRAWING, NEVER TO THE INTENTION … a journey can ask
+for relief, be refused for its width, and would then have printed a credit
+for a layer nobody can see"* — and the credit was fixed while the class was
+not. Measured on the built site: 304 figures carried `class="… terrain"` and
+**17 of them drew no band** — eight journeys refused by the 1,500 km frame
+cap, and nine Icelandic destination and place plates whose frame holds no
+ground above the lowest band they draw. A class is a claim to every
+stylesheet rule and every instrument that reads one. `cartography.plate`
+derives it now, in the one place that knows, which also removes the third
+copy of the decision. 17 → 0.
+
+**AND THE SAME FAULT ONE ATTRIBUTE OVER, IN THE COMMIT THAT FIXED IT.** The
+portrait's own gate was blind to the frame cap, so Norway (1,879 km) and
+Türkiye (1,652) emitted a `<clipPath>` for a layer that was never drawn —
+a definition attached to the request. `cartography.TERRAIN_MAX_KM` is READ
+in the gate rather than retyped.
+
+**AND THE FIRST RULE LOST A SPECIFICITY FIGHT**, which is the fourth
+collision in this stylesheet to render as *the thing is simply not there*:
+`fill: none` in the file and `fill=rgb(202,192,176)` on the shipped page,
+because `.minimap.arched.atlas .lyr-terrain .t1200` is (0,4,0) and
+`.minimap.portrait .lyr-terrain .tband` is (0,3,0). Naming the family's own
+four classes is not a third class invented to win — it is the selector the
+fills already use with the family added.
+
+**AND THE FOUR MICRO-STATES TAKE A TRIGGER RATHER THAN A REFUSAL.** Andorra,
+Liechtenstein, Monaco and San Marino are drawn by `_settingportrait` — a 440
+km window with the country as a ringed point, because no source here draws an
+outline for them at a size a picture could show — and *being a speck against
+the Pyrenees* is the most specific true thing this atlas can draw about
+Andorra. Relief would make that reading stronger, and that figure carries no
+`<figcaption>` at all: a relief layer with no credit is refused, so the
+caption is what has to exist first.
+
+**AND THE CSS COMMENT UNDER `path.here` PREDICTED ALL OF THIS AND CLAIMED AN
+ASSERTION THAT DOES NOT EXIST.** It says the subject's step and its frontier
+are *"both separations in `docs/palette.json` now, so the step cannot be
+tuned away"* — and `docs/palette.json`'s `cartography.separations` holds five
+rows, none of them about `atlas-here`. The prediction was right (*"the day
+one does, the translucency comes back for that family"* — measured out above)
+and the evidence was not there. **A comment claiming evidence is read as
+evidence**, fifth occurrence, and this one guarded the subject of fifty
+plates.
+
+
+**AND GIVING THE PORTRAITS RELIEF BROKE THE STRICTEST RULE HERE ABOUT
+SOMEBODY ELSE'S DATA, ON ALL 23 AT ONCE.** *Every page that draws relief
+names the survey that measured it*, and `cartography.credited()` appends
+GMTED2010 and ETOPO1 to the figcaption of the plate that drew it — reading
+the RENDERED markup, so a journey refused for its width cannot print a credit
+for a layer nobody can see. What it cannot do is append to a caption that is
+not there: the portrait's `cap` is `""` on every country whose frame is not
+cut at 52°E, so `credited()` returned `""` and the 23 plates drawing a ridge
+named neither survey. **The gate said so in the same run**, which is the
+whole reason it reads the shipped HTML for `lyr-terrain` rather than the
+source for `relief=True`. The caption now says what the two lines ARE, with
+the metres read from `terrain-lod1.json`'s own band floors through
+`cartography.band_floors()` rather than typed — *a figure in prose is the
+figure that was true when somebody typed it*.
+
+**AND THE RELIEF CHECK NAMES ITS APPROVED FAMILIES, WHICH IS WHY A FOURTH ONE
+IS A DELIBERATE ACT.** `c_terrain` refused *"relief on 23 page(s) outside the
+destination, journey and hero families, the three it was approved for"* —
+correctly, because a relief layer is a claim about somebody's ground and a
+family that acquires one silently is how a drawing starts saying things
+nobody argued for. The country portrait is the fourth, with its gate, its
+stroke-only treatment and its own FLOOR: a family approved by name is a
+family that can quietly stop drawing, which is the check that examined 0 dots
+on a site with 130 region maps. And the register's `map.relief_pages` moved
+262 → 285 with the reason written in `tools/invariants.py`, because **moving
+one is allowed and moving one silently is not.**
+
+**AND THE FEATURE LABELS ARE PLACED AGAINST THE FRAME WHILE THE RIDGE IS
+CLIPPED TO THE SUBJECT**, so on Austria's plate the word ALPS sits on German
+and Italian ground with no contour under it while the contours it names run
+through Tirol. Both halves are true — the label names a real range at a real
+place — and the alternative was rendered and refused: unclipped, the ridges
+cross the `near`/`mid`/`far` context bands at the same weight on a darker
+ground, and the busiest part of a plate of Austria becomes Switzerland. The
+clip is the portrait's own logic, the same logic that draws neighbours without
+their destinations, their regions or their names.
+
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

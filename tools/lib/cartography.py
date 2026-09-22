@@ -605,8 +605,41 @@ def credited(caption, drew):
     return caption[:cut] + " " + RELIEF_CREDIT + caption[cut:]
 
 
-def terrain(proj, view, draw=False, frame_km=None):
+def band_floors(floor_m=0):
+    """The elevation band boundaries this atlas holds, at or above a floor.
+
+    A CAPTION THAT NAMES A CONTOUR HAS TO NAME THE ONE THAT IS DRAWN, and the
+    only place the boundaries are written down is `data/geo/terrain-lod1.json`.
+    The country portraits print theirs, so a hand-typed "1,200 and 2,000"
+    would be a second copy of the ramp — wrong the day `relief.py` is run at
+    different thresholds, and wrong in the sentence a reader is given rather
+    than in a comment.
+    """
+    return [m for m, _ in _bands() if m >= floor_m]
+
+
+def terrain(proj, view, draw=False, frame_km=None, floor_m=0, clip=""):
     """The hypsometric bands, painted lowest first.
+
+    `floor_m` DROPS THE BANDS BELOW IT, AND THE ONLY CALLER THAT USES IT HAS
+    THE REASON ALREADY WRITTEN DOWN. `relief_wash` — the continental picture
+    treatment — says of the 200 m step that it "is 0.013 of luminance from
+    the land tone on a plate and nothing at all here", and that measurement
+    does not stop being true on a country frame. What it COSTS was never
+    measured until the country portraits asked for relief: across the 33
+    countries that qualify the 200 m band is 36% of the whole layer, and on
+    Sweden it is 67% — 104 KB of the 156 the plate would otherwise carry, for
+    a step nobody can see. Default 0, so the 255 destination plates and the
+    six journeys that draw relief today are untouched.
+
+    `clip` IS A PATH ID, AND IT IS WHAT MAKES RELIEF POSSIBLE ON A PORTRAIT
+    AT ALL. A country plate frames its neighbours, so bands drawn across the
+    frame are mostly somebody else's ground — and worse, ORDER puts terrain
+    ABOVE land, so they would paint over the `--atlas-here` fill that is the
+    whole point of a portrait: the drawing would stop saying which country
+    the page is about. Clipped to the subject's own outline it says something
+    stronger than a tone step ever did — this country, in relief, inside a
+    flat continent — and the neighbours stay context.
 
     NOT A HILLSHADE. A hillshade is a light source: it invents a direction
     and paints structure onto flat ground. A band claims only height, which
@@ -643,6 +676,8 @@ def terrain(proj, view, draw=False, frame_km=None):
     box = (x - pad, y - pad, x + w + pad, y + h + pad)
     out = []
     for min_m, rows in _bands():
+        if min_m < floor_m:
+            continue
         ds = []
         for _lo0, _la0, _lo1, _la1, flat in rows:
             pts = [proj.xy(flat[i + 1], flat[i]) for i in range(0, len(flat), 2)]
@@ -665,6 +700,8 @@ def terrain(proj, view, draw=False, frame_km=None):
                 ds.append("".join(d) + "Z")
         if ds:
             out.append(f'<path class="tband t{min_m}" d="{"".join(ds)}"/>')
+    if out and clip:
+        return f'<g clip-path="url(#{clip})">{"".join(out)}</g>'
     return "".join(out)
 
 
@@ -1117,7 +1154,8 @@ def region_bounds(proj, view):
 
 
 def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
-          transform="", relief=False, frame_km=None, cut_reach=None,
+          transform="", relief=False, frame_km=None, relief_floor_m=0,
+          relief_clip="", defs="", cut_reach=None,
           cities="", destinations="", labels="", route="", caption="",
           features="", waters="", summits="",
           role="illustration", figure_class="minimap arched atlas",
@@ -1162,7 +1200,27 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
         """Into the plate's own space, if it has one."""
         return f'<g transform="{transform}">{body}</g>' if (transform and body) else body
 
-    terrain_body = terrain(proj, view, relief, frame_km)
+    terrain_body = terrain(proj, view, relief, frame_km,
+                           floor_m=relief_floor_m, clip=relief_clip)
+    # THE CLASS FOLLOWS THE DRAWING, NEVER THE REQUEST — and for the life of
+    # this function it followed the request, in three callers, each appending
+    # `" terrain" if tdraw else ""` to its own figure class. `credited()` two
+    # screens down already carries the whole argument: "IT IS ATTACHED TO THE
+    # DRAWING, NEVER TO THE INTENTION. `relief=True` is a REQUEST … a journey
+    # can ask for relief, be refused for its width, and would then have
+    # printed a credit for a layer nobody can see." The credit was fixed and
+    # the class was not.
+    #
+    # Measured on the built site before this: 304 figures carried
+    # `class="… terrain"` and 17 of them drew no band — eight journeys
+    # refused by the 1,500 km frame cap, and nine Icelandic destination and
+    # place plates whose frame contains no ground above the lowest band they
+    # draw. A class is a claim to every stylesheet rule and every instrument
+    # that reads one, so 17 figures said "this map has relief" and had none.
+    # Derived here, in the one place that knows, which also takes the third
+    # copy of the decision out of the callers.
+    _terrain_class = " terrain" if terrain_body else ""
+
     body = []
     for name in ORDER:
         if name == "ocean":
@@ -1217,10 +1275,18 @@ def plate(*, uid, w, h, proj, view, land="", context="", ocean=True,
             body.append(_group(name, route))
     inner = "".join(body)
     return (
-        f'<figure class="{figure_class}" data-role="{role}">'
+        f'<figure class="{figure_class}{_terrain_class}" data-role="{role}">'
         f'<svg viewBox="0 0 {w:.0f} {h:.0f}" role="img" data-world="discover"'
         f'{f" aria-label={chr(34)}{aria}{chr(34)}" if aria else ""}>'
-        f'<defs>{arch_clip(uid, w, h)}</defs>'
+        # A PLATE THAT NEEDS A DEFINITION SAYS SO, rather than smuggling one
+        # into a layer string. The country portrait clips its relief to the
+        # subject's own outline, and the `<clipPath>` for it has to live
+        # somewhere the reference resolves. Hiding it inside the land group
+        # would work and would also mean a caller could quietly put anything
+        # in a layer; this repository has already lost the hero's relief to a
+        # `<use>` of a GROUP inside a clipPath, so the definition is explicit
+        # and the caller builds it from a PATH id.
+        f'<defs>{arch_clip(uid, w, h)}{defs}</defs>'
         f'<g clip-path="url(#arch-{uid})">{inner}</g>'
         f'{arch_rim(w, h) if rim else ""}{arch_edge(w, h)}'
         f'</svg>{credited(caption, terrain_body)}</figure>'

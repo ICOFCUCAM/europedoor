@@ -5422,6 +5422,144 @@ async function main() {
        `reserved. A pair here means that wiring came undone`);
     checked += drawings;
 
+    /* THE SUBJECT OF A COUNTRY PORTRAIT IS TOLD APART FROM ITS NEIGHBOURS ON
+     * THE PIXELS A READER IS PAINTED, WHICH IS THE ONLY PLACE THIS CAN BE
+     * ASKED.
+     *
+     * `docs/palette.json` declares `bone-light` against `map-land` at 1.3 and
+     * checks.py recomputes it from the hexes — and a token separation cannot
+     * see what a LAYER above the fill does to it. The relief ridges are the
+     * case: drawn as the plates' opaque band FILLS, Switzerland's subject and
+     * its nearest neighbour measured **1.022** on the shipped page with every
+     * token in the register unchanged, because all three bands are darker than
+     * the neighbour and the hierarchy inverted — the plate stopped saying which
+     * country the page is about. Drawn as STROKES the fill is untouched and the
+     * step is 1.701, 1.501 and 1.371 on the three sampled plates.
+     *
+     * `isPointInFill` on the subject's own path and on each neighbour's, then
+     * the dominant tone of each sampled set off a screenshot: the subject's
+     * `path.here`, the neighbours' paths, and nothing modelled. The sample is
+     * a 44x44 grid over the viewBox, which is how many points land inside a
+     * country the size of Switzerland at this frame.
+     *
+     * AND THE RIDGE IS ASSERTED TO PAINT, by removing the layer and diffing —
+     * a stroke at 0.6 device pixels never renders at its declared colour, so
+     * asking `getComputedStyle` for its stroke would agree with the file and
+     * say nothing about the drawing. `fill: none` is asserted for the same
+     * reason it had to be: the first version lost a specificity fight to
+     * `.minimap.arched.atlas .lyr-terrain .t1200` and shipped the fills. */
+    {
+      const rp = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+      let seen = 0, withRidge = 0, worstStep = Infinity, worstWhere = "";
+      for (const slug of ["switzerland", "austria", "italy", "sweden", "czechia"]) {
+        const r0 = await rp.goto(base + "/europe/" + slug, { waitUntil: "load" });
+        if (!r0 || r0.status() !== 200) continue;
+        await rp.evaluate(() => new Promise((r) =>
+          requestAnimationFrame(() => requestAnimationFrame(r))));
+        const info = await rp.evaluate(() => {
+          const fig = document.querySelector("figure.minimap.portrait");
+          if (!fig) return null;
+          const svg = fig.querySelector("svg");
+          if (!svg || !svg.viewBox) return null;
+          const b = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+          const here = svg.querySelector("path.here");
+          const others = [...svg.querySelectorAll(".lyr-land path:not(.here)")];
+          if (!here) return null;
+          const sx = b.width / vb.width, sy = b.height / vb.height;
+          const at = (x, y) => [Math.round(b.left + x * sx), Math.round(b.top + y * sy)];
+          const subj = [], other = [];
+          for (let gx = 0; gx < 44; gx++) for (let gy = 0; gy < 44; gy++) {
+            const x = (gx + 0.5) * vb.width / 44, y = (gy + 0.5) * vb.height / 44;
+            const pt = new DOMPoint(x, y);
+            if (here.isPointInFill(pt)) { subj.push(at(x, y)); continue; }
+            for (const o of others) if (o.isPointInFill(pt)) { other.push(at(x, y)); break; }
+          }
+          const tb = [...svg.querySelectorAll(".lyr-terrain .tband")];
+          return { subj, other, bands: tb.length,
+                   fill: tb[0] ? getComputedStyle(tb[0]).fill : null,
+                   ve: tb[0] ? getComputedStyle(tb[0]).vectorEffect : null };
+        });
+        if (!info) continue;
+        seen++;
+        const shot = (await rp.screenshot({ fullPage: true })).toString("base64");
+        await rp.evaluate(() => {
+          const g = document.querySelector("figure.minimap.portrait .lyr-terrain");
+          if (g) g.remove();
+        });
+        await rp.evaluate(() => new Promise((r) =>
+          requestAnimationFrame(() => requestAnimationFrame(r))));
+        const bare = (await rp.screenshot({ fullPage: true })).toString("base64");
+        const m = await rp.evaluate(async ({ a, b, subj, other }) => {
+          const load = (d) => new Promise((r) => {
+            const i = new Image(); i.onload = () => r(i); i.src = "data:image/png;base64," + d; });
+          const grab = async (d) => {
+            const im = await load(d);
+            const c = document.createElement("canvas");
+            c.width = im.width; c.height = im.height;
+            const g = c.getContext("2d"); g.drawImage(im, 0, 0);
+            return { px: g.getImageData(0, 0, im.width, im.height), w: im.width, h: im.height };
+          };
+          const A = await grab(a), B = await grab(b);
+          const at = (o, x, y) => { const i = (o.w * y + x) << 2;
+            return [o.px.data[i], o.px.data[i + 1], o.px.data[i + 2]]; };
+          const dom = (ps) => { const t = new Map();
+            for (const [x, y] of ps) { if (x < 0 || y < 0 || x >= A.w || y >= A.h) continue;
+              const k = at(A, x, y).join(","); t.set(k, (t.get(k) || 0) + 1); }
+            const top = [...t].sort((p, q) => q[1] - p[1])[0];
+            return top ? top[0].split(",").map(Number) : null; };
+          let moved = 0;
+          for (const [x, y] of subj) {
+            if (x < 0 || y < 0 || x >= A.w || y >= A.h) continue;
+            const p1 = at(A, x, y), p2 = at(B, x, y);
+            if (Math.abs(p1[0] - p2[0]) + Math.abs(p1[1] - p2[1])
+                + Math.abs(p1[2] - p2[2]) > 6) moved++;
+          }
+          return { s: dom(subj), o: dom(other), moved };
+        }, { a: shot, b: bare, subj: info.subj, other: info.other });
+        const lum = (c) => { const f = (v) => { v /= 255;
+          return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+        if (m.s && m.o) {
+          const [hi, lo] = [lum(m.s), lum(m.o)].sort((x, y) => y - x);
+          const step = (hi + 0.05) / (lo + 0.05);
+          if (step < worstStep) { worstStep = step; worstWhere =
+            `${slug}: subject ${m.s} against neighbour ${m.o}`; }
+        }
+        if (info.bands) {
+          withRidge++;
+          ok(info.fill === "none",
+             `/europe/${slug}: the portrait's relief bands paint ` +
+             `fill: ${info.fill} — a country plate draws its ground as a RIDGE ` +
+             `and never as a wash, because the subject is told apart by being ` +
+             `LIGHTER than its neighbours and a band is darker. A fill here put ` +
+             `Switzerland's subject:neighbour step at 1.022`);
+          ok(info.ve === "non-scaling-stroke",
+             `/europe/${slug}: the relief ridge is ${info.ve} — a stroke in ` +
+             `user units is not a stroke in pixels, and this portrait's viewBox ` +
+             `is scaled to its container`);
+          ok(m.moved >= 2,
+             `/europe/${slug}: removing the relief layer changed ${m.moved} ` +
+             `sampled pixel(s) inside the subject, so the ridge is declared and ` +
+             `paints nothing a reader can see`);
+        }
+      }
+      ok(seen >= 5,
+         `the portrait relief sweep read ${seen} country plate(s), expected 5 — ` +
+         `a page whose portrait it cannot find reports no defect and passes`);
+      ok(withRidge >= 3,
+         `only ${withRidge} of the sampled country plates draw a relief ridge, ` +
+         `expected at least 3 (Switzerland, Austria and Italy all clear ` +
+         `PORTRAIT_RIDGE_M). A sweep with nothing to measure is the check that ` +
+         `examined 0 dots on a site with 130 region maps`);
+      ok(worstStep >= 1.3,
+         `the worst subject:neighbour step on a country portrait is ` +
+         `${worstStep === Infinity ? "unmeasured" : worstStep.toFixed(3)} ` +
+         `against the 1.3 docs/palette.json declares for bone-light on ` +
+         `map-land — ${worstWhere}. This is the PAINTED step, which a token ` +
+         `separation cannot see: the relief layer sits above the fill`);
+      await rp.close();
+    }
+
     /* AND THE MODEL THAT RESERVES THEM IS CHECKED AGAINST THE DRAWING.
      *
      * `LABEL_METRICS["seaname"]` is a fitted upper envelope on the width of a

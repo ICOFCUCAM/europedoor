@@ -3910,6 +3910,20 @@ def _highlight_box(land):
     return cx, cy, max(max(xs) - min(xs), max(ys) - min(ys)) / 2.0
 
 
+# THE LOWEST BAND BOUNDARY A COUNTRY PORTRAIT DRAWS AS A RIDGE. A band floor
+# out of `data/geo/terrain-lod1.json` rather than a number chosen here, and it
+# is BOTH the layer's floor and the gate: a country whose highest measured
+# crest is below it has no ridge to draw, so asking for one would be an empty
+# claim. Croatia, Cyprus, Czechia, Portugal and San Marino come out by the
+# ground rather than by a threshold anybody picked. Declared once because it
+# is read in two places, and a second copy of a constant is a second chance
+# for two of them to disagree — the dispatch cap's own lesson. The 200 m band
+# is not in this family at all: it is 0.013 of luminance from the land tone,
+# and on a plate drawing FILLS it was 36% of the layer's bytes and 67% of
+# Sweden's.
+PORTRAIT_RIDGE_M = 1200
+
+
 def countryportrait(data, c):
     """The country's own outline, as a portrait. COUNTRY = identity.
 
@@ -4008,8 +4022,79 @@ def countryportrait(data, c):
     # asking to be read. The band is a country's distance from the subject on
     # this drawing, in the drawing's own units, so it is the same judgement
     # on a plate of Luxembourg and a plate of Ukraine.
+    # THE PLATE'S id IS DERIVED ONCE AND USED FROM HERE DOWN. It used to be
+    # assigned just before the `cartography.plate` call, four hundred lines
+    # below, which is fine until something above needs it — a second
+    # derivation of one id is two ids waiting to disagree.
+    uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
+    # THE SUBJECT'S PATH TAKES AN ID, so the relief below can be clipped to
+    # it. Only the subject: `path_id` is asked of every country in frame and
+    # 43 KB of ids on a plate that uses one of them is the cost the frontier
+    # pass avoids by being a `<use>`.
+    _pid = f"{uid}-here"
     ctx, land = geo.landmass(proj, (0, 0, w, h), doc=doc, highlight=c["slug"],
-                             bands=geo.distance_bands(doc, c["slug"], proj))
+                             bands=geo.distance_bands(doc, c["slug"], proj),
+                             path_id=lambda e: (_pid if e.get("slug") == c["slug"]
+                                                else ""))
+    # RELIEF, WHERE THE COUNTRY'S OWN GROUND SAYS SO — and this was the last
+    # family that names things with no relief at all. Measured on the built
+    # site before this: 255 destination pages and six journeys draw
+    # `lyr-terrain` and not one of the fifty country plates did, so the page
+    # a reader arrives on from "Austria travel" drew Austria as one flat
+    # tone. Switzerland, Norway and Iceland with it.
+    #
+    # THE RULE IS THE FILE'S OWN TWO THRESHOLDS AND NOTHING NEW.
+    # `terrain-lod1.json` carries `min_spread: 300` and `min_crest: 600` and
+    # a [spread, crest] pair for every destination, measured by relief.py
+    # over 40 km of ground. A country's figure is the highest of its own
+    # destinations' — the same measurement, taken from the places this atlas
+    # actually writes about — and `draws_relief` is the same predicate the
+    # destination plates use, so there is no second gate to disagree with the
+    # first. 33 of 50 qualify; the 17 refused are refused by the ground, from
+    # the Netherlands at 23 m of crest to Vatican City at 522, and Norway and
+    # Türkiye qualify on the ground and are then refused by
+    # `TERRAIN_MAX_KM` because their frames are 1,879 and 1,652 km wide.
+    #
+    # A LIST OF MOUNTAINOUS COUNTRIES WOULD BE AN AUTHORED MEASUREMENT, which
+    # is the sentence the destination rule was written under and it is the
+    # same sentence here.
+    _rel = [r for r in (cartography.relief_of(
+        f'{c["slug"]}/{_r["slug"]}/{_t["slug"]}')
+        for _r in c["regions"] for _t in _r["cities"]) if r]
+    _best = max(_rel, key=lambda v: v[1]) if _rel else None
+    # AND IT IS A RIDGE RATHER THAN A WASH, BECAUSE THE HIGHLIGHT AND THE
+    # RELIEF ARE THE SAME VARIABLE AND THE ARITHMETIC SAYS NO ALPHA SERVES
+    # BOTH. A portrait tells its subject apart by being LIGHTER than its
+    # neighbours — `--atlas-here` on the nearest band, measured 1.371 on the
+    # rendered page — and relief works by making high ground DARKER.
+    # Measured with the bands laid over the subject: OPAQUE, Switzerland's
+    # subject:neighbour fell to 1.022 and all three bands came out darker
+    # than the nearest neighbour, so the hierarchy inverted and the plate
+    # stopped saying which country the page is about. TRANSLUCENT is worse
+    # rather than better — at 30% the step is 1.213 and the bands' own steps
+    # are 1.019 and 1.026, which is a relief nobody can see bought with a
+    # highlight nobody can see either. There is no value in between: *it
+    # cannot be fixed by darkening the opening*, recorded about two
+    # near-blacks and true here about two near-whites.
+    #
+    # So the BOUNDARY is read instead of the area, which is this
+    # repository's answer to that shape twice already — the aperture by its
+    # REVEAL, and the hero's ranges by a hairline on the two upper band
+    # boundaries rather than by the wash. Stroke only, no fill, so the
+    # measured 1.371 survives untouched and the ground gains its contours.
+    # AND THE FRAME CAP IS IN THE GATE RATHER THAN ONLY IN THE LAYER.
+    # `terrain()` refuses a frame wider than TERRAIN_MAX_KM and returns
+    # nothing, which is right — and with the gate blind to it, Norway (1,879
+    # km) and Türkiye (1,652) still emitted a `<clipPath>` for a layer that
+    # was never drawn. That is the `terrain` CLASS failure one attribute over,
+    # in the commit that fixed the class: a definition attached to the request
+    # rather than to the drawing. The constant is READ, never retyped.
+    _lo, _la0, _hi, _la1 = bbox
+    _km = haversine({"lat": (_la0 + _la1) / 2, "lon": _lo},
+                    {"lat": (_la0 + _la1) / 2, "lon": _hi})
+    _tdraw = (bool(_best) and cartography.draws_relief(_best)
+              and _best[1] >= PORTRAIT_RIDGE_M
+              and _km <= cartography.TERRAIN_MAX_KM)
     # THE PLACE LAYER. A shape answers "what shape is this country"; an atlas
     # answers "where are the places". Every destination the atlas holds for
     # this country, at its own coordinate, unlabelled and not a link — the
@@ -4402,7 +4487,6 @@ def countryportrait(data, c):
         labs_[i] = html
 
     namemarks = "".join(labs_)
-    uid = "cp" + "".join(ch for ch in c["slug"] if ch.isalnum())[:14]
     # CROPPING IN SILENCE IS THE THING TO AVOID. Where a country has land
     # outside this frame it is said, in the one place a reader of the figure
     # can get at it. Today that is Portugal and nowhere else.
@@ -4419,8 +4503,30 @@ def countryportrait(data, c):
     cut = lim is not None and abs(bbox[2] - lim) < 1e-6
     cutsay = (f". The outline stops at {lim:.0f} degrees east, where this "
               f"atlas's map data ends, not at a border") if cut else ""
-    cap = (f'<figcaption>The outline stops at {lim:.0f}°E, where this atlas\'s '
-           f'map data ends — not at a border.</figcaption>') if cut else ""
+    # AND A PLATE THAT DRAWS RELIEF HAS TO HAVE A CAPTION FOR THE CREDIT TO
+    # LAND IN. `credited()` takes the rendered terrain markup and appends the
+    # survey names to the figcaption — and this portrait's caption was "" on
+    # every country that is not cut at 52°E, so `credited()` returned "" and
+    # the 23 plates that draw a ridge named neither GMTED2010 nor ETOPO1.
+    # Every page that draws relief names the survey that measured it is the
+    # strictest rule in this repository about somebody else's data, and the
+    # commit that gave the portraits relief broke it on all 23 in one move:
+    # the gate said so, which is the whole reason it reads the shipped HTML
+    # for `lyr-terrain` rather than the source for `relief=True`.
+    #
+    # The sentence is what a caption is for as well — it says what the two
+    # lines ARE — and the metres are read from `terrain-lod1.json`'s own band
+    # floors rather than typed, because a figure in prose is the figure that
+    # was true when somebody typed it.
+    _floors = cartography.band_floors(PORTRAIT_RIDGE_M) if _tdraw else []
+    _ridgesay = (("The contours are the "
+                  + " and ".join(f"{m:,}" for m in _floors)
+                  + " metre lines, where the ground reaches them.")
+                 if _floors else "")
+    _cutsay = (f'The outline stops at {lim:.0f}°E, where this atlas\'s '
+               f'map data ends — not at a border.') if cut else ""
+    _parts = [t for t in (_ridgesay, _cutsay) if t]
+    cap = f'<figcaption>{" ".join(_parts)}</figcaption>' if _parts else ""
     # THE PLATE IS COMPOSED BY THE RENDERER, NOT HERE. Geography goes in as
     # projected paths and marks; the paint order, the aperture, the rim and
     # the reveal are `cartography.plate`'s, in one place, for every family
@@ -4433,6 +4539,10 @@ def countryportrait(data, c):
             uid=uid, w=w, h=h, proj=proj, view=(0, 0, w, h),
             cut_reach=dusk_reach(),
             land=land, context=ctx,
+            relief=_tdraw, frame_km=_km, relief_floor_m=PORTRAIT_RIDGE_M,
+            relief_clip=f"{uid}-ground" if _tdraw else "",
+            defs=(f'<clipPath id="{uid}-ground"><use href="#{_pid}"/></clipPath>'
+                  if _tdraw else ""),
             destinations=dotmarks, labels=namemarks,
             summits=summitmarks,
             caption=cap,
@@ -9346,8 +9456,7 @@ def minimap(data, t, span=3.2, about=None, named=None):
         land=land, context=ctx, relief=tdraw, frame_km=km_w,
         destinations="".join(dots), labels=drawnlabels + bar,
         rim=False, caption=cap,
-        figure_class=(f"minimap arched atlas{dense_class(drawnlabels)}"
-                      + (" terrain" if tdraw else "")),
+        figure_class=(f"minimap arched atlas{dense_class(drawnlabels)}"),
         aria=f"Map of {esc(t['name'])} and the places around it")
 
 
@@ -10011,8 +10120,7 @@ def pointsmap(pts, uid, caption, aria, want=2.6, pad_frac=0.18, pad_min=24,
         caption=('<figcaption><span class="capsay">' + caption + '</span>'
                  + (f'<span class="capsrc">{note}</span>' if note else "")
                  + '</figcaption>'),
-        figure_class=(f"minimap pointsmap arched atlas{dense}"
-                      + (" terrain" if relief else "")),
+        figure_class=(f"minimap pointsmap arched atlas{dense}"),
         aria=esc(aria))
 
 

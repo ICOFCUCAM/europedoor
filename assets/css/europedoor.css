@@ -6320,6 +6320,43 @@ body[data-hero] .masthead { position: sticky; }
 .minimap.arched.atlas .lyr-terrain .t1200 { fill: #cac0b0; }
 .minimap.arched.atlas .lyr-terrain .t2000 { fill: #c3b8a6; }
 
+/* AND ON A COUNTRY PORTRAIT THE BANDS ARE A RIDGE RATHER THAN A WASH, because
+   the highlight and the relief are the same variable and no alpha serves
+   both. A portrait's subject is told apart by being LIGHTER than its
+   neighbours and relief works by making high ground DARKER: measured on the
+   rendered page with the fills over the subject, Switzerland's
+   subject:neighbour step fell from 1.371 to 1.022 and all three bands came
+   out darker than the nearest neighbour, so the hierarchy inverted and the
+   plate stopped saying which country the page is about. A translucent wash is
+   worse and not better — at 30% the step is 1.213 while the bands' own steps
+   are 1.019 and 1.026, a relief nobody can see bought with a highlight nobody
+   can see either. There is no value in between; *it cannot be fixed by
+   darkening the opening* is recorded about two near-blacks and is true here
+   about two near-whites.
+
+   So the BOUNDARY is read instead of the area, which is this stylesheet's
+   answer to that shape twice already — the aperture by its REVEAL, and the
+   hero's ranges by a hairline on the two upper band boundaries rather than by
+   the wash. Stroke only: the fill hierarchy is untouched and the measured
+   1.371 survives exactly, and the subject gains its contours.
+
+   `non-scaling-stroke` because a stroke in user units is not a stroke in
+   pixels — the portrait's viewBox is 391 units high against a 416px plate at
+   one width and a third of that on a phone, and this stylesheet has paid for
+   that omission in four label families and in the aperture's own reveal. */
+/* AND IT HAS TO OUT-SPECIFY THE PER-BAND FILLS, which is the fourth
+   specificity collision in this stylesheet to render as *the thing is simply
+   not there* — measured once as `fill=rgb(202,192,176)` on the shipped page
+   with `fill: none` in the file, because `.minimap.arched.atlas .lyr-terrain
+   .t1200` is (0,4,0) and `.minimap.portrait .lyr-terrain .tband` is (0,3,0).
+   The portrait's own figure carries all four classes, so naming them is not a
+   third class invented to win a fight — it is the same selector the fills use
+   with the family on it. */
+.minimap.portrait.arched.atlas .lyr-terrain .tband {
+  fill: none; stroke-linejoin: round; stroke-width: .6;
+  vector-effect: non-scaling-stroke;
+  stroke: color-mix(in srgb, var(--atlas-hereline) 34%, transparent); }
+
 /* THE FRONTIER, RE-DRAWN ABOVE THE RELIEF. A boundary on this map is a
    stroke on the land path, so the bands paint over it: the prototype's first
    render carried a clear France/Switzerland/Italy frontier without terrain

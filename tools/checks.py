@@ -4642,7 +4642,7 @@ def c_terrain():
     for key, m in doc["relief"].items():
         if C.draws_relief(m):
             want_terrain.add(key)
-    drew, offenders = set(), []
+    drew, offenders, portraits = set(), [], 0
     for path in site_files():
         html = open(path, encoding="utf-8").read()
         if 'class="lyr lyr-terrain"' not in html:
@@ -4710,12 +4710,43 @@ def c_terrain():
             # picture's tolerance, through relief_wash(). The plate rule is
             # untouched and every assertion below still runs on it.
             continue
+        elif parts[0] == "europe" and len(parts) == 3:   # europe/<c>/index.html
+            # THE COUNTRY PORTRAIT IS THE FOURTH FAMILY, AND IT IS A RIDGE
+            # RATHER THAN A WASH. Every one of the fifty drew its land as one
+            # flat tone while 255 destination pages and six journeys carried
+            # relief, so the second-largest family here — and the page a
+            # reader arrives on from "Austria travel" — said nothing about the
+            # ground. The gate is the file's own two thresholds applied to the
+            # country's own destinations' [spread, crest] records, plus
+            # `PORTRAIT_RIDGE_M`, the lowest band boundary the ridge is drawn
+            # on: 23 of the fifty qualify.
+            #
+            # It is STROKE ONLY, and that is not a style choice. A portrait
+            # tells its subject apart by being LIGHTER than its neighbours
+            # and relief works by making high ground DARKER: with the plates'
+            # opaque FILLS over the subject, Switzerland's painted
+            # subject:neighbour step measured 1.022 and every band came out
+            # darker than the neighbour, so the plate stopped saying which
+            # country the page is about. Asserted on the pixels in
+            # browser-checks.js, because a token separation cannot see what a
+            # layer above the fill does to it.
+            portraits += 1
         elif parts[0] != "journeys":
             offenders.append("/" + r)
     assert not offenders, (
         f"relief on {len(offenders)} page(s) outside the destination, "
-        f"journey and hero families, the three it was approved for: "
-        f"{offenders[:4]}")
+        f"journey, hero and country-portrait families, the four it was "
+        f"approved for: {offenders[:4]}")
+    # AND THE FOURTH FAMILY CARRIES A FLOOR OF ITS OWN, because a family
+    # approved by name is a family that can silently stop drawing. The 23 are
+    # decided by the ground and by the frame cap, so this is a floor rather
+    # than an exact: adding a destination in a country that has none today
+    # can raise it.
+    assert portraits >= 20, (
+        f"only {portraits} country portrait(s) draw a relief ridge, and 23 "
+        f"clear both thresholds and the frame cap. A family approved by name "
+        f"and then drawing nothing is the check that examined 0 dots on a "
+        f"site with 130 region maps")
     # A destination page draws it exactly when the ground says so.
     missing = sorted(want_terrain - drew)[:4]
     extra = sorted(drew - want_terrain)[:4]
