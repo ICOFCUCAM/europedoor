@@ -4149,7 +4149,25 @@ html { scroll-padding-top: var(--mast); }
            border-radius: var(--radius); background: var(--paper-2); }
 .maplist summary { cursor: pointer; font-weight: 600; min-height: 24px; }
 .maplist h3 { margin: var(--s5) 0 var(--s2); font-size: var(--t-md); }
-.maplist .cols { columns: 1; }
+/* A MEASURE IS FOR PROSE, AND THIS IS A DIRECTORY OF 369 ENTRIES.
+ * `main ul.stack { max-width: var(--measure) }` is (0,1,1) and capped all ten
+ * of the twin's lists at 544px inside a 1,152px band — three columns of 152px
+ * each, so "Bosnia and Herzegovina" set on two lines and one destination
+ * entry, "Bacharach & the Rhine Gorge — Germany, Rhine & Moselle", set on
+ * SEVEN, 196 pixels tall, for one item in a list. Measured at 1280: the ten
+ * lists ran 15,707px of a 23,636px document, 66% of the page, with 608 pixels
+ * of the band empty beside every one of them. That is this stylesheet's own
+ * recorded finding about `.row .rowsub`, where a measure broke a middot list
+ * of place names at 544px inside a 948px column: a measure exists so the eye
+ * can find the next line of a SENTENCE, and nobody reads a directory end to
+ * start — they scan it. Lists 15,707 -> 8,660, the band 16,379 -> 9,333 and
+ * the document 23,636 -> 16,590, from one declaration.
+ *
+ * `max-width: none` is a DECLARATION rather than the absence of one, and it
+ * goes on the rule that already owns the columns rather than in a rule of its
+ * own: it is (0,2,0), it beats the prose cap, and every other `ul.stack` on
+ * the site keeps its measure, which is the point of scoping it here. */
+.maplist .cols { columns: 1; max-width: none; }
 @media (min-width: 44rem) { .maplist .cols { columns: 2; column-gap: var(--s6); } }
 @media (min-width: 64rem) { .maplist .cols { columns: 3; } }
 .maplist .cols li { break-inside: avoid; margin-bottom: var(--s2); }

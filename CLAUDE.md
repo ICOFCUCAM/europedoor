@@ -8152,6 +8152,32 @@ destinations, about forty lines — and *"two lines of markup"* is part of what
 the trigger restores rather than something to leave shipping in the meantime.
 
 
+**A MEASURE IS FOR PROSE, AND /map's TEXT TWIN IS A DIRECTORY OF 369
+ENTRIES.** `main ul.stack, main ol.stack { max-width: var(--measure) }` is
+(0,1,1) and it capped all ten of the twin's lists at 544px inside a 1,152px
+band — three columns of 152 pixels each, so "Bosnia and Herzegovina" set on
+two lines and one destination entry, *Bacharach & the Rhine Gorge — Germany,
+Rhine & Moselle*, set on **seven, 196 pixels tall, for one item in a list**.
+Measured at 1280: the ten lists ran **15,707 pixels of a 23,636-pixel
+document, 66% of the page**, with 608 pixels of the band empty beside every
+one of them. That is this stylesheet's own recorded finding about
+`.row .rowsub`, where a measure broke a middot list of place names at 544px
+inside a 948px column — *a measure exists so the eye can find the next line
+of a SENTENCE, and nobody reads a directory end to start, they scan it* — and
+it survived here because the twin spent most of its life inside a closed
+`<details>`, where nothing measures anything. The lists are **15,707 →
+8,660**, the band 16,379 → 9,333 and the document **23,636 → 16,590**, from
+one declaration, on the page the whole instrument family is named for.
+
+**And the share it is measured by went the other way, which is the honest
+report.** `density.js` read **53 of 473 slices under a fifth covered (11%)**
+before and **48 of 332 (14%)** after: five fewer poor slices and 141 fewer
+good ones, because the pixels that came off were mostly the well-covered
+first column of every list. A ratio whose denominator falls faster than its
+numerator rises, and reading the percentage alone would have called a
+7,046-pixel repair a regression. The instrument cannot be a gate for exactly
+this reason, and it says so on its own face.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
