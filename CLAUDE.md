@@ -9119,6 +9119,29 @@ keyword model — the one this file records for catching eighteen wine cellars
 with `cell` — so drawing it as a link would propagate the matcher into the
 link graph. It waits on a declared field rather than on a match.
 
+**ONE FAMILY SPELLED OUT ITS OWN KIND IN ITS TITLE, AND IT WAS THE ONE FAMILY
+WHOSE TITLES OVERFLOWED.** Every other page here is `name` or `name, parent`
+— a destination is *Bergen, Norway*, a place is *Omaha Beach, Bayeux* — and a
+region was *X, a travel region in Y*: twenty characters of grammar saying what
+the breadcrumb, the h1 and the URL already say. Measured across the built
+site, the median title is 35 characters and **64 of the 74 over sixty were
+regions, as were all eleven over seventy**, while a result shows about the
+first sixty — so the boilerplate was the part that fitted and the country was
+the part that did not. Over-sixty 74 → 11, over-seventy 11 → **1**, and the
+one that remains is a place whose own two names are long, which is data rather
+than a template.
+
+**AND THE TEMPLATE WAS HIDING A DUPLICATE TITLE.** The Vatican's region and
+its one destination are both called Vatican City, so `name, parent` gave two
+pages one title the moment the boilerplate came off — two pages competing to
+be the same answer, which nothing here had ever asked about. The template was
+doing two jobs and only the second was load-bearing: **a parent that repeats
+the name says the LEVEL instead**, on the two regions that need it rather than
+on all 130. Handle the case rather than tax every page for it, which is the
+rule a country name too wide for its own country is already broken under.
+`c_unique_titles` asserts it, proved red by giving Malta's region its
+country's title.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

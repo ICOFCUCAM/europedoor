@@ -10198,5 +10198,42 @@ def c_graph_drawn():
     return n
 
 
+@check("no two pages share a title")
+def c_unique_titles():
+    """A title is the line a result is chosen by, so two pages with one title
+    are two pages competing to be the same answer.
+
+    NOTHING HAD ASKED THIS, AND A TEMPLATE WAS HIDING ONE. Every region page
+    was titled "X, a travel region in Y" — twenty characters of grammar that
+    no other family here spends, on the one family whose titles ran past what
+    a result shows: 64 of the 74 titles over sixty characters were regions,
+    against a site median of 35. Bringing them onto the site's own `name,
+    parent` grammar took the over-sixty count to eleven AND surfaced a
+    collision the boilerplate had been masking, because the Vatican's region
+    and its one destination are both called Vatican City.
+
+    So the template was doing two jobs and only the second was load-bearing.
+    A parent that repeats the name says the LEVEL instead, on the two regions
+    that need it rather than on all 130.
+    """
+    seen = {}
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        m = re.search(r"<title>(.*?)</title>", h, re.S)
+        if not m:
+            continue
+        n += 1
+        t = " ".join(html.unescape(m.group(1)).split())
+        if t in seen:
+            fail(f"{canonical_of(f)} and {seen[t]} carry the same title "
+                 f"{t!r} — two pages competing to be one answer")
+        else:
+            seen[t] = canonical_of(f)
+    if n < 900:
+        fail(f"examined {n} titles — this check has stopped reading the site")
+    return n
+
+
 if __name__ == "__main__":
     main()

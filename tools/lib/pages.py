@@ -5287,7 +5287,27 @@ def region_page(data, c, r):
     # title is where that has to be legible when the two sit next to each
     # other in a search result.
     return f"/europe/{c['slug']}/{r['slug']}/index.html", page(
-        f"{r['name']}, a travel region in {c['name']}", body,
+        # THE ONE FAMILY THAT SPELLED OUT ITS OWN KIND IN ITS TITLE, ON THE
+        # ONE FAMILY WHOSE TITLES OVERFLOWED. Every other page here is `name`
+        # or `name, parent`: a destination is "Bergen, Norway", a place is
+        # "Omaha Beach, Bayeux". A region was "X, a travel region in Y" —
+        # twenty characters of grammar saying what the breadcrumb, the h1 and
+        # the URL already say. Measured across the built site, 64 of the 74
+        # titles over sixty characters were regions and all eleven over
+        # seventy were, where the median title here is 35. A result shows
+        # about the first sixty, so the boilerplate was the part that fitted
+        # and the country was the part that did not.
+        # AND A PARENT THAT REPEATS THE NAME SAYS THE LEVEL INSTEAD, because
+        # dropping the template surfaced a duplicate the template was hiding:
+        # the Vatican's region and its one destination are both called Vatican
+        # City, so `name, parent` gave two pages the same title. Two of the 130
+        # regions share their country's name — Malta and Vatican City — and
+        # naming the LEVEL there is what the old template was doing for all
+        # 130 to solve a problem that exists on two. Handle the case rather
+        # than tax every page for it, which is the rule a country name too
+        # wide for its own country is already broken under.
+        (f"{r['name']}, {c['name']}" if r["name"] != c["name"]
+         else f"{r['name']}, a travel region"), body,
         path=urls.region(c, r), area="countries",
         accent="territory",
         description=r["summary"],
