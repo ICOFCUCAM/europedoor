@@ -5091,7 +5091,7 @@ def country_page(data, c):
 """
     return f"/europe/{c['slug']}/index.html", page(
         c["name"], body, path=urls.country(c), area="countries",
-        description=c["summary"][:180],
+        description=c["summary"],
         og=("country:" + c["slug"], motif_for(c["interests"]),
             f"{c['name']} — {c['tagline']}"),
         ld_blocks=[
@@ -5262,7 +5262,7 @@ def region_page(data, c, r):
         f"{r['name']}, a travel region in {c['name']}", body,
         path=urls.region(c, r), area="countries",
         accent="territory",
-        description=r["summary"][:180],
+        description=r["summary"],
         og=(f"region:{c['slug']}:{r['slug']}", motif_for(r["interests"]),
             f"{r['name']}, {c['name']}"),
         ld_blocks=[
@@ -5624,7 +5624,7 @@ def city_page(data, c, r, t):
     return f"/europe/{c['slug']}/{r['slug']}/{t['slug']}/index.html", page(
         f"{t['name']}, {c['name']}", body, path=urls.city(c, r, t), area="countries",
         accent="human",
-        description=t["summary"][:180],
+        description=t["summary"],
         scripts=["/assets/js/my-europe.js"],
         og=(f"city:{c['slug']}:{t['slug']}",
             motif_for(t["interests"], t.get("city_type")) or motif_for(r["interests"]),
@@ -6913,7 +6913,7 @@ def journey_page(data, j):
     return f"/journeys/{j['slug']}/index.html", page(
         j["name"], body, path=urls.journey(j), area="journeys",
         accent="movement",
-        description=j["summary"][:180],
+        description=j["summary"],
         scripts=["/assets/js/my-europe.js"],
         og=("journey:" + j["slug"], motif_for(j["interests"]),
             f"{j['name']} — {j['strapline']}"),
@@ -10988,7 +10988,7 @@ def place_page(data, c, r, t, pl):
     return f"{urls.place(c, r, t, pl)}/index.html", page(
         f"{pl['name']}, {t['name']}", body, path=urls.place(c, r, t, pl), area="countries",
         accent="human",
-        description=pl["summary"][:180],
+        description=pl["summary"],
         scripts=["/assets/js/my-europe.js"],
         og=(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", motif_for(t["interests"]),
             f"{pl['name']}, {t['name']}"),
@@ -12398,7 +12398,7 @@ def fund_page(data, p):
 """
     return f"/fund/{p['slug']}/index.html", page(
         p["name"], body, path=urls.fund_project(p), area="fund",
-        description=p["summary"][:180],
+        description=p["summary"],
     )
 
 
@@ -13738,7 +13738,7 @@ def theme_page(data, t):
     return f"/themes/{t['slug']}/index.html", page(
         t["name"], body, path=f"/themes/{t['slug']}", area="countries",
         accent="territory",
-        description=t["summary"][:180],
+        description=t["summary"],
         scripts=["/assets/js/my-europe.js"],
     )
 
@@ -14212,7 +14212,7 @@ def story_page(data, s):
 """
     return f"/stories/{s['slug']}/index.html", page(
         s["title"], body, path=f"/stories/{s['slug']}", area="stories",
-        description=s["standfirst"][:180],
+        description=s["standfirst"],
         scripts=["/assets/js/my-europe.js"],
         # NO SOCIAL CARD, AND THAT IS THE RULE RATHER THAN AN OMISSION.
         #

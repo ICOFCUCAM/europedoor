@@ -8888,6 +8888,82 @@ commit that drew the ground beyond. *A comment claiming evidence is read as
 evidence*, arriving in a failure message, which is the one place a reader has
 nothing else to go on.
 
+
+**THE META DESCRIPTION'S CAP WAS TYPED IN EIGHT PLACES AND CUT 82 SUMMARIES
+MID-WORD.** `description=c["summary"][:180]` appeared eight times in
+`pages.py` — the country, the region, the destination, the place, the journey,
+the theme, the fund project and the story — and a raw slice does not know
+where a word ends. Measured on the built site: 89 descriptions sat at the cap
+and **82 ended mid-word**, none on a space and six on punctuation.
+/europe/andorra ended *"...Catalan is the official lan"*, /europe/armenia
+*"...Mount Ararat dominates th"*, /europe/austria *"...Everything west of it
+is mounta"*. That is the string a search engine prints and a chat client
+previews, so **the fault is visible everywhere the page is NOT**, which is why
+nothing here had ever seen it — `c_head` asked whether the description was
+under 200 characters and over 40, and all 89 were.
+
+**AND MY FIRST REPAIR WAS A WORD BOUNDARY AND AN ELLIPSIS, WHICH THIS
+REPOSITORY HAD ALREADY REFUSED IN WRITING.** `c_cut_word` fails on an ellipsis
+following a word character anywhere on a page and went red on 81 of them in
+the run that introduced them, with its reason written out: *a text cut at a
+fixed character count reads as a rendering fault; `first_sentence()` cuts at
+the one boundary that does not.* A cut at a word boundary is still a cut at a
+fixed character count. `first_sentence`'s own docstring states the principle in
+one line — *this is a DERIVATION rather than a truncation: there is no ellipsis
+and nothing is hidden, and the whole paragraph is on the page itself one click
+away* — which is exactly a meta description's situation. **Third time a
+recorded refusal has stopped a good-looking change here**, and the first where
+I had answered the question differently without reading the answer already in
+the file.
+
+**AND `first_sentence` IS DEFINED TWICE IN ONE FILE**, so Python resolves the
+later one and the earlier is dead — `country_glyph` exactly, which this file
+records as *grep before naming*, and silent this time because the two bodies
+agree. Neither answers this question: both return ONE sentence and neither
+knows about a cap, so a description built on either abandons the room it has.
+
+**SO IT IS WHOLE SENTENCES, AND THE CAP AND THE FLOOR YIELD TO EACH OTHER.**
+Take sentences in order while they fit; the cap gives way when what is held
+would otherwise be under the floor, which is what makes the two 37-character
+openings (*"Three thousand years of the same sea."*) take their second
+sentence instead of shipping a fragment `c_head` itself calls too short to be
+useful. Measured over all 805 authored records and then on the built site:
+**every description ends on a full stop, none carries an ellipsis, none is
+under the floor**, median 98, and 40 records take more than one sentence — so
+the room is used rather than abandoned at the first stop. 82 mid-word cuts to
+zero.
+
+**FOURTEEN EXCEED THE CAP AND EVERY ONE IS A WHOLE STATEMENT.** Twelve have a
+first sentence of 182–236 characters and two are the short openings above.
+Nothing is cut and nothing is hidden, and a search result shows about 160
+characters whatever we send — so the tail is unused rather than wrong, and the
+alternatives are a mid-word cut or a fragment. **The cap is a preference about
+how much is worth sending and not a truth about the field**, so `c_head`
+asserts the PROMISE rather than a number: a description ends on a sentence,
+clears the floor, and may pass the cap only where dropping its last sentence
+would put it under the floor. That is readable off the string alone — an
+instrument that recomputed the description from the record could only ever
+agree with the generator. Proved red both ways, on the raw slice that shipped
+and on a description that had room to stop and did not.
+
+**AND THE READINESS ENGINE'S BOUND IS DELIBERATELY NOT THE PRODUCT'S.**
+`render.META_DESC_MAX` bounds the TAG; `tools/seo.py`'s `SERP_VISIBLE` is a
+reading of how much of it a search result prints, which moves with the device
+and the query. Binding the second to the first would make the measurement
+agree with the product by construction. The FLOOR is the same question in both
+places and is read rather than retyped. On this one repair the readiness
+reading moved **452 READY / 366 HOLD to 500 / 318**, and *description likely
+shown whole* fell from 113 to 47.
+
+**AND `git checkout` ON A MUTATED BUILT FILE RESTORES THE COMMITTED BUILD,
+NOT THE CURRENT ONE.** Proving the check red means writing a defect into
+`site/`, and the obvious undo put /europe/austria back to the version in HEAD
+— which is the pre-fix page carrying the raw slice. The suite then failed on
+the exact defect the commit removes, naming a page nobody had touched since
+the rebuild. **A mutation of a generated file is undone by regenerating it**,
+which is the same sentence as *`site/` is deleted on every build*, arrived at
+from the other side.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

@@ -836,8 +836,36 @@ def c_structure():
     return n
 
 
-@check("every page has a title and a description under 200 characters")
+@check("every meta description is whole sentences, never a cut")
 def c_head():
+    # THIS CHECK ASKED TWO QUESTIONS AND THE ONE IT DID NOT ASK WAS THE
+    # DEFECT. It read "under 200 characters and over 40", which all 1,032
+    # pages satisfied while 82 of them ended mid-word — /europe/andorra on
+    # "Catalan is the official lan", /europe/armenia on "Mount Ararat
+    # dominates th". Eight call sites sliced `summary[:180]` and a raw slice
+    # does not know where a word ends; see render.meta_description, which is
+    # now the one implementation and lives inside page().
+    #
+    # THE LENGTH IS MEASURED ON THE STRING A READER GETS. The old test read
+    # the ESCAPED attribute, where "Ortisei & the Dolomites" costs five
+    # characters for one, so the 200 ceiling was partly paying for markup.
+    # `one normaliser, both sides`, arriving in a ceiling.
+    #
+    # AND THE CEILING IS THE PROMISE RATHER THAN A NUMBER, because the cap
+    # YIELDS. A description is whole sentences taken while they fit, and both
+    # bounds give way to each other: fourteen records have a first sentence
+    # of 182-296 characters, and two open on a 37-character sentence that
+    # this check's own floor calls too short to be useful, so they take a
+    # second one. Refusing either would be refusing a whole statement in
+    # favour of a fragment or a cut.
+    #
+    # So the test that can be read off the STRING, with no reference to the
+    # generator: it ends on a sentence, it clears the floor, and it may pass
+    # the cap only where dropping its last sentence would put it under the
+    # floor. Recomputing the description from the record instead would be an
+    # instrument re-running the model, which can only ever agree with it.
+    # Proved red by restoring the raw slice.
+    end = re.compile(r"[.!?](?=\s|$)")
     n = 0
     for f in site_files():
         s = open(f, encoding="utf-8").read()
@@ -846,11 +874,26 @@ def c_head():
         m = re.search(r'<meta name="description" content="([^"]*)"', s)
         if not m:
             fail(f"{rel(f)}: no meta description")
-        elif len(m.group(1)) > 200:
-            fail(f"{rel(f)}: description is {len(m.group(1))} chars")
-        elif len(m.group(1)) < 40:
-            fail(f"{rel(f)}: description is too short to be useful")
+            continue
+        d = " ".join(html.unescape(m.group(1)).split())
         n += 1
+        if len(d) < R.META_DESC_MIN:
+            fail(f"{rel(f)}: the description is {len(d)} chars against a floor "
+                 f"of {R.META_DESC_MIN}, too short to be useful — {d!r}")
+            continue
+        if d[-1] not in ".!?":
+            fail(f"{rel(f)}: the description ends inside a word or on bare "
+                 f"punctuation at {len(d)} chars — ...{d[-44:]!r}. It is whole "
+                 f"sentences; see render.meta_description")
+            continue
+        if len(d) > R.META_DESC_MAX:
+            cuts = [x.end() for x in end.finditer(d)]
+            without_last = cuts[-2] if len(cuts) > 1 else 0
+            if without_last >= R.META_DESC_MIN:
+                fail(f"{rel(f)}: the description is {len(d)} chars against a "
+                     f"cap of {R.META_DESC_MAX} and {without_last} without its "
+                     f"last sentence, which clears the {R.META_DESC_MIN} floor "
+                     f"— so it had room to stop and did not")
     return n
 
 
