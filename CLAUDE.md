@@ -30,6 +30,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/beyond-the-obvious — the counter-atlas, and the corner with the most quiet places is not the quietest corner** | **`docs/beyond-redesign.md`** — the source audit, the count that argues the wrong way against the share that argues the right one, the rule's three promises measured against the built site (two kept, one not built anywhere), the seven plates, and the two defects only rendering found — plus the correction of a finding this file published three commits ago |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
+| **the search layer — what is authored, what is derived, and why there is no SEO score** | **`docs/seo-architecture.md`** — the `seo` state layer. Three authored fields and nine derived ones, readiness as four groups of missing signals rather than a number, the sitemap as a decision with two gates, and the NOINDEX state that is empty, measured and exercised in memory on every run |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
 | **the transformation brief, and the three decisions waiting on the owner** | **`docs/EUROPEDOOR_2036_TRANSFORMATION.md`** — the 2036 audit, what to keep/replace/redesign, and a five-phase roadmap. Phases B and C are unblocked; A waits on a map-licensing decision |
 | **starting a session — read this first** | **`docs/audit-2026-09.md`** — the repository audit: current stack, what exists, technical debt, and the one open architectural decision (Next.js/Postgres: not yet, and why). Then **`docs/roadmap.md`** |
@@ -8963,6 +8964,68 @@ the exact defect the commit removes, naming a page nobody had touched since
 the rebuild. **A mutation of a generated file is undone by regenerating it**,
 which is the same sentence as *`site/` is deleted on every build*, arrived at
 from the other side.
+
+**THE SITEMAP WAS EVERY URL THE BUILD WROTE, AND TWO ASSERTIONS PINNED THAT
+AS THOUGH IT WERE THE PROMISE.** A sitemap's job is to say which pages are
+worth crawling; this one said *here is everything*, there was no way to
+withhold a page from search at all, and no page carried a robots meta. The
+layer that fixes it is three authored fields — `status`, `reason`,
+`last_reviewed` — in `data/seo.json`, and **nine derived ones**: a canonical,
+a title, a description, a schema block and a readiness figure are every one of
+them facts about the document the build emits, so writing any of them into a
+register is a second copy of a claim the page already makes. **The Data
+Integrity Rule applied to a publishing state**: a readiness is a MEASUREMENT
+and may not be authored; whether a route is meant to be found is a
+CLASSIFICATION and may be. `tools/lib/seo_state.py` is the one decision point
+and it has four consumers, which is the dispatch cap's own shape.
+
+**AND THE FIRST REAL USE OF THE STATE TURNED TWO GREEN ASSERTIONS RED FOR A
+SITE THAT HAD GOT BETTER.** `c_sitemap` asserted `served == listed` and §53
+asserted `len(locs) == len(routes)` — both true while the file was a LISTING
+and both false the moment it became a DECISION, and the second was written in
+this same session. **Fourteenth and fifteenth assertions here to pin a shape
+rather than a promise**, and both were LANDMINES rather than live failures,
+which is the `Accommodation & restaurants` fault word for word. `c_sitemap`
+keeps the half no gate can affect — an entry pointing at nothing is a crawl
+budget spent on a 404 — and the completeness half moved to where the register
+that decides it lives, because two checks asking one question is how a number
+ends up typed four times. §53 asserts that a route the sitemap omits is
+omitted by a DECLARED decision, which still fails on the thing it was written
+for.
+
+**NOINDEX IS EMPTY, MEASURED, AND EXERCISED ANYWAY.** No page here earns one:
+no canonical points elsewhere, one page is under the readiness word floor, and
+the lowest share of a page's own sentences is a destination sharing its
+region's grammar. That is the right answer and it leaves the whole mechanism
+unrun — *a code path nothing exercises is a code path nothing checks*, which
+this file has now paid for in a focal point the CSP forbids, two dead CSS
+rules, a PNG the pipeline could not size and a gate suite that went red the
+day the register filled. Four occurrences is enough to write the test before
+the fifth, so `c_seo_noindex_path` swaps the register **in memory** — the way
+`ad-tests.py` simulates a serving campaign, where nothing to restore is
+stronger than restoring carefully — and exercises the tag, the sitemap
+withdrawal, all three spellings of one route and **both gates**, including the
+`ready` one no build has ever run. The end-to-end path was proved once through
+a real build as well: one route declared, one tag on one page, the sitemap
+1030 of 1031, then reverted.
+
+**AND THE TAG IS EMITTED ONLY WHERE IT CHANGES SOMETHING.**
+`<meta name="robots" content="index,follow">` on every document states the
+default a browser already has with no tag at all, so it cannot be read as a
+decision and it is weight on every page — which is `ad_slot()`'s own rule,
+where an off slot emits zero bytes. `follow` rather than `none` on the ones
+that do carry it: withholding a page from search is not a reason to strand
+everything it points at.
+
+**A SITEMAP IS A RECOMMENDATION AND NOT A PERMISSION**, which is why the gate
+and the robots meta are two mechanisms. Removing a URL from the file does not
+deindex the page; only the tag does. So the gate is a question about what is
+worth crawling, it is declared in `data/seo.json` with its reason and its
+vocabulary, and it has two settings — `indexable`, which is what shipped, and
+`ready`, which is the brief's own reading. It is `indexable` today because the
+readiness report's gap is structured data and internal linking: those are
+fixes rather than withdrawals, and the order is to improve the pages before
+deciding what to expose. Moving it is a one-word edit to a registry.
 
 ## Gates
 

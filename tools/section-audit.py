@@ -2109,6 +2109,12 @@ def NO_SUBMISSION(h):
 # Every count below is DERIVED from the running data rather than typed — a
 # figure typed here is the figure that was true two hundred destinations ago —
 # and each names the file a person would edit to change it.
+def _seo_route(path):
+    """A built file as the sitemap spells it. One normaliser, both sides."""
+    r = "/" + os.path.relpath(path, OUT).replace(os.sep, "/")
+    return "/" if r == "/index.html" else r[: -len("/index.html")]
+
+
 def _admin_records():
     cs = list(DATA["countries"].values())
     tax = len(DATA["interests"]) + len(DATA["categories"]) + len(DATA["macros"])
@@ -2189,13 +2195,34 @@ def s53():
                      "An admin dashboard needs authentication"), \
         "and the report says in its own head why there is no dashboard"
 
-    # SEO is the third function, and its claim is coverage rather than
-    # existence: a sitemap that names some of the routes is the `pop_line`
-    # shape, a list that omits part of its own set reading as a policy.
-    routes = sorted(glob.glob(os.path.join(OUT, "**", "index.html"), recursive=True))
-    locs = re.findall(r"<loc>(.*?)</loc>", src("site/sitemap.xml"))
-    yield len(locs) == len(routes) and len(routes) > 0, \
-        f"SEO: the sitemap names {len(locs)} routes and the build emits {len(routes)}"
+    # SEO is the third function, and this assertion PINNED A SHAPE — written
+    # in the commit that filled this section, green because nothing was
+    # withheld from search, and red the first time the state layer was
+    # actually used. `len(locs) == len(routes)` says the sitemap is every
+    # route, which was true while the file was a listing and stopped being
+    # true the moment it became a decision. Fifteenth assertion here to
+    # protect a layout instead of a promise, and a LANDMINE rather than a
+    # live failure: it would have gone red for a site that had got better.
+    #
+    # The promise is that the sitemap is DERIVED rather than maintained: every
+    # route it names is built, and every route it omits is omitted by a
+    # declared decision in `data/seo.json` rather than by an oversight. That
+    # still fails on the thing it was written for — a sitemap naming some of
+    # the routes for no reason is the `pop_line` shape, a list that omits part
+    # of its own set reading as a policy.
+    from lib import seo_state as SEO
+    routes = {_seo_route(f) for f in
+              glob.glob(os.path.join(OUT, "**", "index.html"), recursive=True)}
+    locs = {u[len("https://europedoor.com"):]
+            for u in re.findall(r"<loc>(.*?)</loc>", src("site/sitemap.xml"))}
+    withheld = routes - locs
+    undeclared = {r for r in withheld if SEO.indexable(r)}
+    yield locs <= routes and len(routes) > 0, \
+        f"SEO: every one of the sitemap's {len(locs)} routes is a page the build emits"
+    yield not undeclared, \
+        (f"SEO: the sitemap omits {len(withheld)} of {len(routes)} routes and "
+         f"every one is declared in data/seo.json"
+         + (f" — {sorted(undeclared)[:3]} are not" if undeclared else ""))
     robots = src("site/robots.txt")
     yield "sitemap" in robots.lower() and "/sitemap.xml" in robots, \
         "SEO: robots.txt points a crawler at the sitemap"

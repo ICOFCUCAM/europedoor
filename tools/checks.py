@@ -1175,17 +1175,33 @@ def c_hierarchy():
     return n
 
 
-@check("the sitemap lists every page and nothing else")
+@check("every URL the sitemap names is a page this build serves")
 def c_sitemap():
+    """THIS ASSERTED THAT THE SITEMAP IS EVERY PAGE, AND IT WAS A LANDMINE.
+
+    `served == listed` was right while the file was a LISTING and stopped
+    being right the moment it became a DECISION — the first route declared
+    noindex in `data/seo.json` turned it red for a site that had got better,
+    which is `section-audit`'s own "Accommodation & restaurants" fault word
+    for word. Fourteenth assertion here to pin a shape rather than a promise.
+
+    What is left is the half that can never be affected by that decision and
+    is this check's real subject: a sitemap entry pointing at nothing is a
+    crawl budget spent on a 404, and no gate makes it acceptable. The
+    completeness half moved to `c_seo_shipped`, where the register that
+    decides it lives — because two checks asking one question is how a
+    dispatch cap ends up typed four times.
+    """
     s = open(os.path.join(OUT, "sitemap.xml"), encoding="utf-8").read()
     listed = set(re.findall(r"<loc>https://europedoor\.com([^<]*)</loc>", s))
     served = {canonical_of(f) for f in site_files() if f.endswith("index.html")}
-    missing = served - listed
     extra = listed - served
-    if missing:
-        fail(f"sitemap missing {len(missing)} pages, e.g. {sorted(missing)[:3]}")
     if extra:
         fail(f"sitemap lists {len(extra)} pages that do not exist, e.g. {sorted(extra)[:3]}")
+    if len(listed) < 900:
+        fail(f"the sitemap names {len(listed)} routes — this check has stopped "
+             f"reading it, and an assertion about an empty set counts exactly "
+             f"like one about a page")
     return len(listed)
 
 
@@ -9837,6 +9853,228 @@ def c_no_card_collection():
     if n < 900:
         fail(f"examined {n} pages — this check has stopped reading the site")
     return n
+
+
+@check("the SEO register authors a classification and nothing derived")
+def c_seo_register():
+    """`data/seo.json` decides what is meant to be found, and only that.
+
+    THE BRIEF FOR THIS LAYER LISTS NINE FIELDS AND SEVEN OF THEM ARE ALREADY
+    ON THE PAGE. A canonical, a title, a description, a schema block and a
+    readiness figure are every one of them facts about the document the build
+    emits, so writing any of them into a register is a second copy of a claim
+    the page already makes — which is /map printing the old projection's name
+    for a year, and `desk/registry.json` carrying 590 copies of one brief. The
+    Data Integrity Rule settles it: a readiness is a MEASUREMENT and may not
+    be authored; whether a route is meant to be found is a CLASSIFICATION and
+    may be.
+
+    So this refuses the derived keys by name, which is the same shape as the
+    seventeen refusals on an editorial record. Proved red on each.
+    """
+    from lib import seo_state as SEO
+    reg = SEO.registry()
+    n = 0
+
+    if reg["default"]["status"] not in SEO.STATUSES:
+        fail(f"data/seo.json: the default status is {reg['default']['status']!r}, "
+             f"which is not one of {SEO.STATUSES}")
+    if len(reg["default"].get("reason", "")) < 80:
+        fail("data/seo.json: the default status carries no reason. A default "
+             "nobody wrote down is a default nobody can argue with")
+    n += 1
+
+    gate = reg.get("sitemap", {})
+    if gate.get("gate") not in SEO.GATES:
+        fail(f"data/seo.json: the sitemap gate is {gate.get('gate')!r}, which is "
+             f"not one of {SEO.GATES}")
+    if len(gate.get("reason", "")) < 80:
+        fail("data/seo.json: the sitemap gate carries no reason")
+    if list(gate.get("options", [])) != list(SEO.GATES):
+        fail(f"data/seo.json: the declared options {gate.get('options')} are not "
+             f"the vocabulary seo_state accepts, {list(SEO.GATES)} — a register "
+             f"that publishes a choice the reader does not implement is the "
+             f"dispatch cap again")
+    n += 1
+
+    DERIVED = ("canonical", "title", "description", "schema", "readiness",
+               "indexable", "sitemap", "og", "keywords")
+    for route, row in reg.get("routes", {}).items():
+        n += 1
+        if not route.startswith("/"):
+            fail(f"data/seo.json: {route!r} is not a route")
+        st = row.get("status")
+        if st not in SEO.STATUSES:
+            fail(f"data/seo.json: {route} has status {st!r}, not one of {SEO.STATUSES}")
+        if st != reg["default"]["status"] and len(row.get("reason", "")) < 40:
+            fail(f"data/seo.json: {route} is {st!r} with no reason. Taking a page "
+                 f"out of search is the deliberate act this register exists to "
+                 f"make visible, and a deliberate act with no reason on it is "
+                 f"indistinguishable from an accident")
+        if st != reg["default"]["status"] and not row.get("last_reviewed"):
+            fail(f"data/seo.json: {route} is {st!r} with no last_reviewed. A "
+                 f"decision about search is a claim about a moment")
+        for k in DERIVED:
+            if k in row:
+                fail(f"data/seo.json: {route} authors {k!r}, which the page "
+                     f"already states or the readiness engine already measures. "
+                     f"This register authors a classification and nothing else")
+        target = os.path.join(OUT, route.strip("/"), "index.html")
+        if route == "/":
+            target = os.path.join(OUT, "index.html")
+        if not os.path.exists(target):
+            fail(f"data/seo.json names {route}, which the build does not emit")
+    return n
+
+
+@check("the sitemap, the robots meta and the register say one thing")
+def c_seo_shipped():
+    """Three surfaces, one decision, and they are checked against each other.
+
+    A REGISTER IS A CLAIM AND THE SHIPPED FILES ARE THE EVIDENCE. This is the
+    /for-businesses shape: a page can keep a promise the mechanism has stopped
+    keeping, and a mechanism can be quietly stricter than the page, which is
+    worse because then the published position is the looser of the two. So
+    both directions — a route in the sitemap must be built and must not carry
+    a noindex, and a noindex route must not be in the sitemap.
+
+    AND A ROBOTS META THAT STATES THE DEFAULT IS REFUSED. `index,follow` on
+    every document is a thousand copies of what a browser does with no tag at
+    all: it cannot be read as a decision, and the day somebody needs the tag
+    to mean something it will already be everywhere. The tag is emitted where
+    it CHANGES something, which is `ad_slot()`'s own rule — an off slot emits
+    zero bytes.
+    """
+    from lib import seo_state as SEO
+    sm = open(os.path.join(OUT, "sitemap.xml"), encoding="utf-8").read()
+    listed = set(re.findall(r"<loc>https://europedoor\.com([^<]*)</loc>", sm))
+    if len(listed) < 900:
+        fail(f"the sitemap names {len(listed)} routes — this check has stopped "
+             f"reading it, or the gate has withdrawn most of the site")
+    n = 0
+    tagged = set()
+    for f in site_files():
+        n += 1
+        route = canonical_of(f)
+        h = open(f, encoding="utf-8").read()
+        m = re.search(r'<meta name="robots" content="([^"]*)"', h)
+        if m:
+            tagged.add(route)
+            if "noindex" not in m.group(1):
+                fail(f"{route} carries robots={m.group(1)!r}, which states the "
+                     f"default. The tag is emitted only where it changes "
+                     f"something; see seo_state.robots_meta")
+            if SEO.indexable(route):
+                fail(f"{route} carries a noindex the register does not declare")
+        elif not SEO.indexable(route):
+            fail(f"{route} is noindex in data/seo.json and the page says nothing")
+        if route in listed and not SEO.indexable(route):
+            fail(f"{route} is in the sitemap and is noindex — the file "
+                 f"recommending a page and the page refusing it is the worst "
+                 f"of the two directions, because the recommendation is what a "
+                 f"crawler reads first")
+    missing = listed - {canonical_of(f) for f in site_files()}
+    if missing:
+        fail(f"the sitemap names {len(missing)} route(s) the build does not "
+             f"emit, e.g. {sorted(missing)[:3]}")
+    # AND THE 404 IS NOT A ROUTE, WHICH THE FIRST RUN OF THIS CHECK REPORTED
+    # AS ONE MISSING. `site_files()` is every .html and the sitemap is built
+    # from the files named index.html, so the one document that is neither is
+    # the error page — which is served with a 404 status and whose presence in
+    # a sitemap is the definition of a soft 404. It is excluded by its
+    # FILENAME rather than by its route, because "/404" is a path somebody
+    # could one day publish as a real page.
+    err = {canonical_of(f) for f in site_files() if not f.endswith("index.html")}
+    if listed & err:
+        fail(f"the sitemap names the error page ({sorted(listed & err)}), which "
+             f"is served with a 404 status — a sitemap recommending it is the "
+             f"definition of a soft 404")
+    if SEO.sitemap_gate() == "indexable":
+        # Under this gate the two sets are the same question, so the check is
+        # an equality rather than a subset — a route quietly dropped from the
+        # file is exactly as wrong as one quietly added.
+        expected = {canonical_of(f) for f in site_files()
+                    if f.endswith("index.html") and SEO.indexable(canonical_of(f))}
+        if expected != listed:
+            fail(f"under the `indexable` gate the sitemap is every indexable "
+                 f"route: {len(expected - listed)} missing "
+                 f"{sorted(expected - listed)[:3]}, {len(listed - expected)} "
+                 f"extra {sorted(listed - expected)[:3]}")
+    return n + len(listed)
+
+
+
+@check("the noindex path works, on a register no page uses")
+def c_seo_noindex_path():
+    """The state nothing declares is the state nothing has ever run.
+
+    `data/seo.json` names no noindex route, because every built page was
+    measured for the three things that earn one and none has any: no page
+    canonicals elsewhere, one page is under the readiness word floor, and the
+    lowest share of a page's own sentences is a destination sharing its
+    region's grammar rather than a duplicate. That is the right answer and it
+    leaves the whole mechanism unexercised — **a code path nothing exercises
+    is a code path nothing checks**, which this repository has now paid for in
+    a focal point the CSP forbids, two dead CSS rules, a PNG the acquisition
+    could not size and a gate suite that went red the day the register filled.
+    Four occurrences is enough to write the test before the fifth.
+
+    So the registry is swapped IN MEMORY, the way `ad-tests.py` simulates a
+    serving campaign: there is nothing to restore carefully because nothing
+    was written, which is stronger than restoring carefully. The route is a
+    real one, so the check also proves the normaliser — a register keyed on
+    "/x" and consulted with "/x/index.html" would answer the default, which is
+    this repository's most repeated fault.
+    """
+    from lib import seo_state as SEO
+    real = SEO.registry()
+    route = "/experiences/kind/workshop"
+    if not os.path.exists(os.path.join(OUT, route.strip("/"), "index.html")):
+        fail(f"{route} is not built — this check is exercising nothing")
+        return 0
+    try:
+        SEO._cache = {
+            "default": real["default"],
+            "sitemap": real["sitemap"],
+            "routes": {route: {"status": "noindex", "reason": "a simulation",
+                               "last_reviewed": "2026-09-23"}},
+        }
+        n = 0
+        for spelling in (route, route + "/", route + "/index.html"):
+            n += 1
+            if SEO.indexable(spelling):
+                fail(f"seo_state reads {spelling!r} as indexable while the "
+                     f"register declares it noindex — one normaliser, both sides")
+            if "noindex" not in SEO.robots_meta(spelling):
+                fail(f"seo_state emits no robots meta for {spelling!r}")
+            if SEO.in_sitemap(spelling):
+                fail(f"seo_state would list {spelling!r} in the sitemap while "
+                     f"the page refuses indexing")
+        n += 1
+        if SEO.robots_meta("/europe/norway") != "":
+            fail("a published route emits a robots meta. The tag is emitted "
+                 "only where it changes something")
+        if not SEO.in_sitemap("/europe/norway"):
+            fail("a published route is withheld from the sitemap under the "
+                 "`indexable` gate")
+        # And the OTHER gate, which no build has run: `ready` must consult the
+        # readiness verdict rather than ignore it, or moving the one word in
+        # data/seo.json would change nothing and look like it had.
+        n += 1
+        SEO._cache = {"default": real["default"],
+                      "sitemap": dict(real["sitemap"], gate="ready"),
+                      "routes": {}}
+        if SEO.in_sitemap("/europe/norway", ready=False):
+            fail("under the `ready` gate a page the readiness engine holds is "
+                 "still listed — the gate is a word the reader does not read")
+        if not SEO.in_sitemap("/europe/norway", ready=True):
+            fail("under the `ready` gate a READY page is not listed")
+        if SEO.in_sitemap("/europe/norway", ready=None):
+            fail("under the `ready` gate a page with no verdict is listed. An "
+                 "unmeasured page and a ready one must not look the same")
+        return n
+    finally:
+        SEO._cache = real
 
 
 if __name__ == "__main__":

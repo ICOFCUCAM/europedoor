@@ -21,6 +21,7 @@ import re
 from urllib.parse import urlsplit
 
 from . import attribution
+from . import seo_state
 from .i18n import Strings
 
 # One catalogue, loaded once. Adding a language means adding a file, not
@@ -2048,7 +2049,7 @@ def page(title, body, *, path, description, area=None, head_extra="", scripts=()
 {theme_color_meta(world)}
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(description)}">
-<link rel="canonical" href="{ORIGIN}{esc(path)}">
+{seo_state.robots_meta(path)}<link rel="canonical" href="{ORIGIN}{esc(path)}">
 <meta property="og:title" content="{esc(full_title)}">
 <meta property="og:description" content="{esc(description)}">
 <meta property="og:type" content="website">

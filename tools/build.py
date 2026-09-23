@@ -219,12 +219,22 @@ def build():
                 shutil.copy(os.path.join(root, name), dst)
                 geo_n += 1
 
+    # THE SITEMAP IS A DECISION NOW RATHER THAN A LISTING.
+    #
+    # It used to be every route the build wrote, which is the file saying
+    # "here is every URL" where what it is for is saying "here are the pages
+    # we think are worth crawling". `seo_state.in_sitemap` answers that from
+    # `data/seo.json`, where the gate and its reason are data — so a route
+    # withheld from search is withheld in one place and the robots meta on
+    # the page cannot disagree with the file that recommends it.
+    from lib import seo_state as SEO
     canonical = [
         "/" if p == "/index.html" else p[: -len("index.html")].rstrip("/")
         for p in written
         if p.endswith("index.html")
     ]
-    write("/sitemap.xml", P.sitemap(canonical))
+    listed = [u for u in canonical if SEO.in_sitemap(u)]
+    write("/sitemap.xml", P.sitemap(listed))
     write("/stories/feed.xml", P.stories_feed(d))
     # ── social cards ─────────────────────────────────────────────────
     #
@@ -280,7 +290,8 @@ def build():
     card_note = f", {len(wanted)} cards"
     if made or pruned:
         card_note += f" ({made} rendered, {pruned} pruned)"
-    print(f"{len(written)} pages + api + sitemap + feed{card_note} + {geo_n} geometry files → site/")
+    print(f"{len(written)} pages + api + sitemap ({len(listed)} of "
+          f"{len(canonical)} routes) + feed{card_note} + {geo_n} geometry files → site/")
     return d, written
 
 

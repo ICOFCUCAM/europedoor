@@ -1,0 +1,18 @@
+{
+  "_comment": "THE AUTHORED HALF OF THE SEO LAYER, AND ONLY THE AUTHORED HALF. A route's canonical, title, description, structured data and readiness are all DERIVED from the page the build emits; writing any of them here would be a second copy of a fact the page already states, which is how /map printed the old projection's name for a year. What a person decides is whether a route is meant to be found, and that decision is a CLASSIFICATION, so it may be authored. See tools/lib/seo_state.py and docs/seo-architecture.md.",
+
+  "default": {
+    "status": "published",
+    "reason": "A page this atlas publishes is meant to be found unless somebody decides otherwise. The opposite default was considered and refused: a noindex-by-default layer would take every page out of search on the commit that introduced it, and nothing here has ever been withdrawn from search by accident. NOINDEX is the deliberate act, which is the same shape as the invariant register — moving one is allowed, moving one silently is not."
+  },
+
+  "sitemap": {
+    "gate": "indexable",
+    "reason": "A SITEMAP IS A RECOMMENDATION AND NOT A PERMISSION, so removing a URL from it does not deindex the page — only the robots meta does that. The gate is therefore a question about what is worth crawling rather than about what may be seen, and it has two settings. `indexable` puts every page a reader can reach in the file, which is what shipped before this layer existed. `ready` additionally requires `tools/seo.py` to assess the page READY, which is the brief's own reading: the sitemap should say which pages we consider ready for search discovery. It is `indexable` today because the readiness engine's own report says the gap is 237 pages with no structured data and 185 reachable only one way — those are 318 fixes rather than 318 withdrawals, and the brief's order is to improve the pages before deciding what to expose. Moving this to `ready` is a one-word edit and is the owner's.",
+    "options": ["indexable", "ready"]
+  },
+
+  "routes": {
+  },
+  "_routes_note": "EMPTY, AND MEASURED RATHER THAN ASSUMED. Every built page was checked for the three things that earn a NOINDEX and none of them has one: no page's canonical points anywhere but itself, exactly one page is under the readiness engine's word floor, and the lowest share of a page's own sentences is 0.219 on a 644-word destination, which is a page sharing its region's grammar rather than a duplicate. The site serves no parameterised result page, no printer view and no tag archive — the three shapes that normally fill this list. A vocabulary entry nothing reaches is dead code that looks like vocabulary, so this one carries its trigger instead: a route whose canonical names another page, a result page built from a query string, or a page whose content is a visitor's own storage rather than this atlas's."
+}
