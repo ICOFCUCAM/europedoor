@@ -9062,6 +9062,63 @@ machine no reader can check, which is the exact thing this format invites.
 Proved red both ways. Structured data left the readiness report's missing list
 entirely and the verdict moved 500 READY / 318 HOLD to **581 / 237**.
 
+**THE KNOWLEDGE GRAPH AND THE INTERNAL LINKING ARE THE SAME CLAIM, AND
+NOTHING HAD EVER COMPARED THEM — SO THE AUDIT REFUTED THE WORK IT WAS GOING
+TO JUSTIFY.** The readiness engine reported 185 documents *reachable only one
+way*, which reads as an internal-linking gap and was about to be fixed by
+inventing sibling rails. Asking the prior question first: `/api/graph.json`
+publishes every relationship this atlas holds, and the pages draw those
+relationships as links — **2,923 of 2,926 edges between page-bearing entities
+were already drawn**, across all eight relations that have a page at both
+ends. The linking is the graph and the graph is complete. *A recorded
+measurement is evidence*, and this one stopped a plausible change.
+
+**AND THE THREE THAT WERE NOT DRAWN WERE TWO IMPLEMENTATIONS OF ONE
+MEASUREMENT, AGREEING ABOUT THE DISTANCE AND DISAGREEING ABOUT THE TIE.**
+`haversine` rounds to whole kilometres, so a tie at the sixth onward stop is
+ordinary: Bruges and Brussels are both 173 km from Amsterdam, Český ráj and
+Prague both 186 from Brno, Balestrand and Fredrikstad both 212 from
+Lillehammer. The destination page sorted by distance alone and took whatever
+dict order handed it; the graph sorted by `(km, id)`. **Both carried the same
+comment** — *the same distance function the planner uses, so the two never
+disagree about what is close* — and three destinations published an onward
+stop the reader's own page does not name. `pages.nearest_cities` is the one
+implementation, the tie-break is DECLARED rather than inherited from an
+insertion order, and the prose that says how many is interpolated from the
+constant. 2,926 of 2,926.
+
+**`c_graph_drawn` IS AN EQUALITY RATHER THAN A FLOOR.** The edge counts
+already have a floor each, which catches a relationship dropping to zero and
+says nothing about one the graph asserts and no page shows — a page drawing
+five of six onward stops is the atlas asserting a relationship a reader
+cannot follow. It derives a URL from the graph's own path-shaped ids rather
+than looking one up, so it cannot agree with the generator by construction,
+and it asserts its own reach in edges AND in relationship kinds. Proved red by
+removing one link.
+
+**AND `MIN_INBOUND = 3` WAS MY NUMBER AND THE MEASUREMENT DOES NOT SUPPORT
+IT.** It mixed CHROME with EDITORIAL — `inbound_map` reads every `href`, and
+thirty targets are linked from over 90% of the site because they are in the
+masthead and the footer, so one number meant *the whole site links this* for
+an index and *one editorial link* for a leaf. And the fragility a
+multiple-inbound signal exists for is not available here: every link is
+derived at build time from a validated hierarchy, so a facet page is linked by
+the same build that creates it. The signal is gone and the group states why.
+**READY 581 / HOLD 237 became 759 / 57, and that is a correction to the
+INSTRUMENT rather than an improvement to the site** — nothing about the
+linking changed except three onward stops.
+
+**286 non-chrome documents are linked from nowhere outside their own branch**
+— 130 regions, 100 facets, 44 experience sub-categories, 12 fund projects —
+and that is RECORDED rather than reported as a fault, because a region is a
+LEVEL and nothing in this dataset relates to it from outside its own country.
+The trigger is a relationship that crosses a branch. The nearest candidate was
+costed and refused: a destination could name the experience sub-categories its
+own invitations fall into, and that membership is decided by `matches_sub`'s
+keyword model — the one this file records for catching eighteen wine cellars
+with `cell` — so drawing it as a link would propagate the matcher into the
+link graph. It waits on a declared field rather than on a match.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

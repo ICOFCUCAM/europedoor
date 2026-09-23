@@ -53,10 +53,9 @@ MIN_WORDS = 120
 MIN_DISTINCT = 0.35
 
 # A page nothing links to cannot be crawled from the homepage, whatever its
-# content is. One inbound link is the floor for "reachable"; three is the
-# floor for "reachable more than one way", which is what survives a
-# navigation change.
-MIN_INBOUND = 3
+# content is. One inbound link is the floor, and there is no second floor —
+# see discovery_group() for the three-link version that was measured out.
+MIN_INBOUND = 1
 
 # WHAT A RESULT SHOWS AND WHAT THE FIELD MAY HOLD ARE TWO QUESTIONS, AND ONLY
 # ONE OF THEM BELONGS HERE.
@@ -212,11 +211,47 @@ def technical_group(url, p, max_kb):
 
 
 def discovery_group(url, inb):
+    """Can a crawler reach this page, and by a route that means something.
+
+    `reachable more than one way` USED TO SIT HERE AT THREE INBOUND LINKS AND
+    THE MEASUREMENT DOES NOT SUPPORT IT. It reported 185 deficient pages and
+    every one of them was a leaf correctly placed in a hierarchy — a facet
+    reachable from its own destination, a sub-category from its own category.
+    Two things were wrong with it:
+
+    First, the count MIXED CHROME WITH EDITORIAL. `inbound_map` reads every
+    `href` in the document, and thirty targets are linked from more than 90%
+    of the site because they are in the masthead and the footer. So the same
+    number meant "the whole site links this" for an index and "one editorial
+    link" for a leaf, and no threshold can be right for both.
+
+    Second, the defect a multiple-inbound signal exists for is FRAGILITY:
+    lose the one page that links it and the page is orphaned. Every link here
+    is DERIVED at build time from a validated hierarchy — a facet page is
+    linked by the same build that creates it — so that failure mode is not
+    available, and the link checker would catch it anyway.
+
+    WHAT THE SITE ACTUALLY OWED WAS ASKED SEPARATELY AND IS ANSWERED. The
+    atlas publishes every relationship it holds in `/api/graph.json`, and
+    `checks.py` now asserts that every one of those edges is a link a reader
+    can follow: 2,926 of 2,926 between page-bearing entities, an equality
+    rather than a floor. That is the internal-linking guarantee, and it is a
+    claim about relationships this atlas HOLDS rather than about a number of
+    links somebody hoped for.
+
+    286 non-chrome pages are linked from nowhere outside their own branch —
+    130 regions, 100 facets, 44 experience sub-categories, 12 fund projects.
+    That is recorded rather than reported as a fault, because a region is a
+    LEVEL and nothing in this dataset relates to it from outside its country.
+    The trigger is a relationship that crosses a branch: the day a destination
+    page names the experience sub-categories its own invitations fall into,
+    or a fund project names the region it is in, the graph will carry that
+    edge and the check above will require the link.
+    """
     n = len(inb.get(url, ()))
     parents = {u for u in inb.get(url, ()) if url.startswith(u.rstrip("/") + "/")}
     return [
-        ("linked from somewhere", n >= 1),
-        ("reachable more than one way", n >= MIN_INBOUND),
+        ("linked from somewhere", n >= MIN_INBOUND),
         ("linked from its parent", bool(parents) or url.count("/") <= 1),
     ]
 

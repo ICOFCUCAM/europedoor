@@ -15,6 +15,7 @@ comment on each explaining which.
 
 from __future__ import annotations
 
+import collections
 import glob
 import importlib
 import hashlib
@@ -10109,6 +10110,91 @@ def c_breadcrumb_published():
                  f"breadcrumb — a claim to a machine that no reader can check")
     if n < 900:
         fail(f"examined {n} pages — this check has stopped reading the site")
+    return n
+
+
+# WHICH GRAPH NODES HAVE A PAGE, AND HOW AN ID BECOMES A URL.
+#
+# The graph's ids are paths — `albania/tirana-and-the-south/tirana` — so this
+# is arithmetic rather than a lookup, which is what keeps the check from
+# agreeing with the generator by construction. The five kinds with no page of
+# their own are deliberately absent: an event, an experience and a transport
+# node are rows on somebody else's page, so "does the source page link the
+# target" is not a question about them.
+GRAPH_PAGE_KINDS = {
+    "country": lambda i: "/europe/" + i,
+    "region": lambda i: "/europe/" + i,
+    "destination": lambda i: "/europe/" + i,
+    "place": lambda i: "/europe/" + "/".join(i.split("/")[:3]) + "/place/" + i.split("/")[3],
+    "journey": lambda i: "/journeys/" + i,
+    "story": lambda i: "/stories/" + i,
+    "theme": lambda i: "/themes/" + i,
+    "macro": lambda i: "/discover/" + i,
+}
+
+
+@check("every relationship the atlas publishes is a link a reader can follow")
+def c_graph_drawn():
+    """THE KNOWLEDGE GRAPH AND THE INTERNAL LINKING ARE THE SAME CLAIM, AND
+    NOTHING HAD EVER COMPARED THEM.
+
+    `/api/graph.json` publishes every relationship this atlas holds, derived
+    at build time from relations validated elsewhere. The pages draw those
+    relationships as links. Two derivations of one fact, and the only thing
+    asserting they agree was a floor on the edge COUNT — which catches a
+    relationship dropping to zero, and says nothing about a relationship the
+    graph asserts and no page shows.
+
+    Measured the first time it was asked: 2,923 of 2,926 edges between
+    page-bearing entities were drawn, and the three that were not were all
+    `near`. `haversine` rounds to whole kilometres, so a tie at the sixth
+    onward stop is ordinary — Bruges and Brussels are both 173 km from
+    Amsterdam — and two implementations of "the six nearest" sorted that tie
+    differently: the page by distance alone, taking whatever dict order
+    handed it, and the graph by `(km, id)`. Both carried the same comment
+    saying the two could never disagree. `pages.nearest_cities` is the one
+    implementation now, with the tie-break declared rather than inherited
+    from an insertion order.
+
+    IT IS AN EQUALITY RATHER THAN A FLOOR, because a subset is exactly the
+    failure this is written for: a page showing five of six onward stops and
+    a graph publishing six is the atlas asserting a relationship a reader
+    cannot follow. Proved red by removing one link.
+    """
+    g = json.load(open(os.path.join(OUT, "api", "graph.json"), encoding="utf-8"))
+    cache = {}
+
+    def body(u):
+        if u not in cache:
+            p = os.path.join(OUT, u.strip("/"), "index.html")
+            cache[u] = open(p, encoding="utf-8").read() if os.path.exists(p) else None
+        return cache[u]
+
+    n = 0
+    seen = collections.Counter()
+    for e in g["edges"]:
+        st, si, rel, tt, ti = e[0], e[1], e[2], e[3], e[4]
+        if st not in GRAPH_PAGE_KINDS or tt not in GRAPH_PAGE_KINDS:
+            continue
+        su, tu = GRAPH_PAGE_KINDS[st](si), GRAPH_PAGE_KINDS[tt](ti)
+        h = body(su)
+        if h is None:
+            fail(f"the graph names {st} {si!r} as the source of a {rel} edge "
+                 f"and {su} is not built")
+            continue
+        n += 1
+        seen[rel] += 1
+        if f'href="{tu}"' not in h:
+            fail(f"{su} is published as {rel} {tu} in /api/graph.json and does "
+                 f"not link it. The graph and the page are two derivations of "
+                 f"one relationship; see pages.nearest_cities for the last "
+                 f"time they disagreed")
+    if n < 2000:
+        fail(f"examined {n} edges between page-bearing entities — this check "
+             f"has stopped reading the graph")
+    if len(seen) < 6:
+        fail(f"only {len(seen)} relationship kinds reached a page: {sorted(seen)}. "
+             f"A relationship that stops being drawn is what nobody notices")
     return n
 
 

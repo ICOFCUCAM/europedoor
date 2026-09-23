@@ -101,6 +101,36 @@ def haversine(a, b):
     return round(2 * R * math.asin(math.sqrt(h)))
 
 
+# HOW MANY ONWARD STOPS A DESTINATION NAMES, AND THE TIE-BREAK THAT DECIDES
+# THE LAST ONE.
+#
+# Two implementations computed this and both carried the same comment —
+# *the same distance function the planner uses, so the two never disagree
+# about what is close.* They agreed about the DISTANCE and disagreed about
+# the ORDER. `haversine` rounds to whole kilometres, so a tie at the sixth
+# position is ordinary: Bruges and Brussels are both 173 km from Amsterdam,
+# Český ráj and Prague are both 186 from Brno, Balestrand and Fredrikstad
+# both 212 from Lillehammer. The page sorted by distance alone and took
+# whatever dict order handed it; the graph sorted by `(km, id)`. So three
+# destinations published an onward stop in `/api/graph.json` that their own
+# page does not name, and named one the graph does not publish — silently,
+# because each was internally correct.
+#
+# One implementation, and the tie-break is DECLARED rather than inherited
+# from an insertion order: by id, which is stable across a rebuild and does
+# not depend on which file the loader happened to read first.
+NEAR_N = 6
+
+
+def nearest_cities(cities, cid, n=NEAR_N):
+    """The n nearest destinations to `cid`, as (id, record, km), nearest first."""
+    here = cities[cid]["city"]
+    ranked = sorted(
+        ((haversine(here, m["city"]), mid) for mid, m in cities.items() if mid != cid)
+    )
+    return [(mid, cities[mid], km) for km, mid in ranked[:n]]
+
+
 def hop_note(km):
     """A distance, and nothing that does not follow from it.
 
@@ -5353,15 +5383,16 @@ def city_page(data, c, r, t):
           data-url="{esc(urls.experience(c, r, t, e))}">Save</button></div></div>"""
         for e in t.get("experiences", [])
     )
-    # Nearby cities, computed rather than curated: the same distance function
-    # the planner uses, so the two never disagree about what is close.
-    others = [n for n in data["cities"].values() if n["city"] is not t]
-    near = sorted(others, key=lambda n: haversine(t, n["city"]))[:6]
+    # Nearby cities, computed rather than curated, through the one function
+    # the knowledge graph also calls — see nearest_cities(), where two copies
+    # of this agreed about the distance and disagreed about the tie.
+    onward = nearest_cities(data["cities"], cid)
+    near = [n for _mid, n, _km in onward]
     nearrows = "".join(
         f"""<a class="row" href="{urls.city(n['country'], n['region'], n['city'])}">
         <div><h3>{esc(n['city']['name'])}</h3><p class="rowsub">{esc(n['country']['name'])} · {esc(n['region']['name'])}</p></div>
-        <p class="rowmeta">{esc(hop_note(haversine(t, n['city'])))} away</p></a>"""
-        for n in near
+        <p class="rowmeta">{esc(hop_note(km))} away</p></a>"""
+        for _mid, n, km in onward
     )
     # What the page names, the map may link. See minimap(): six of Innsbruck's
     # twelve dots led to places that appeared nowhere else in the document.
@@ -17098,7 +17129,7 @@ def sitemap(paths):
 GRAPH_RELATIONSHIPS = {
     "part_of":      {"says": "the nesting: a country in a corner of Europe, a region in a country, a destination in a region", "floor": 400},
     "located_in":   {"says": "a place or an experience inside its destination", "floor": 400},
-    "near":         {"says": "the six nearest destinations, by the planner's own haversine", "floor": 1500},
+    "near":         {"says": f"the {NEAR_N} nearest destinations, by the planner's own haversine", "floor": 1500},
     "includes":     {"says": "a journey's legs, in order, with the nights", "floor": 100},
     "serves":       {"says": "a transport node and the destination it serves", "floor": 200},
     "gathers":      {"says": "a theme and the destinations it argues for", "floor": 50},
@@ -17219,13 +17250,9 @@ def graph_api(data):
 
     # Proximity, computed with the same function the planner uses so the
     # graph and a route can never disagree about what is close.
-    nodes = sorted(data["cities"].items())
-    for cid, n in nodes:
-        near = sorted(
-            ((haversine(n["city"], m["city"]), mid) for mid, m in nodes if mid != cid),
-        )[:6]
-        for km, mid in near:
-            edge("destination", cid, "near", "destination", mid, km=round(km))
+    for cid in sorted(data["cities"]):
+        for mid, _rec, km in nearest_cities(data["cities"], cid):
+            edge("destination", cid, "near", "destination", mid, km=km)
 
     # Seeded from the declared vocabulary, so a relationship the derivation
     # emits none of is published as 0 rather than omitted. The other
