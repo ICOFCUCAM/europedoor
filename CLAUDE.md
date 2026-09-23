@@ -30,7 +30,7 @@ Via Europa. Take their architecture and drop their branding section. See
 | **/beyond-the-obvious — the counter-atlas, and the corner with the most quiet places is not the quietest corner** | **`docs/beyond-redesign.md`** — the source audit, the count that argues the wrong way against the share that argues the right one, the rule's three promises measured against the built site (two kept, one not built anywhere), the seven plates, and the two defects only rendering found — plus the correction of a finding this file published three commits ago |
 | **the eight page families, and what each room does differently** | **`docs/non-home-redesign.md`** — the non-home redesign answered A-J. The eight rooms derived from the route, the three helpers that were forcing one grammar, the seven image scales, 1,626 declared surfaces, and the defects only rendering found |
 | **the design language — what makes a page EuropeDoor with the logo removed, and which movements each family takes** | **`docs/design-language.md`** — the ARCHITECT step. Five marks that could not have been made by anybody else, the six-movement composition grammar per family, the three head roles, what the language forbids, and how a change is proved |
-| **the search layer — what is authored, what is derived, and why there is no SEO score** | **`docs/seo-architecture.md`** — the `seo` state layer. Three authored fields and nine derived ones, readiness as four groups of missing signals rather than a number, the sitemap as a decision with two gates, and the NOINDEX state that is empty, measured and exercised in memory on every run |
+| **the search layer — what is authored, what is derived, and why there is no SEO score** | **`docs/seo-architecture.md`** — the `seo` state layer. Three authored fields and nine derived ones, readiness as four groups of missing signals rather than a number, severity declared beside each signal, the sitemap as a decision with two gates, the NOINDEX state that is empty, measured and exercised in memory on every run, and the four back-office actions mapped onto the mechanisms that already are them. **`docs/seo-queue.md`** is the queue itself, generated |
 | **anything at all — read this first, every session** | **`docs/instruction.md`** — the standing instruction. Part 1 is how work is done here (audit first, deviate with numbers, STOP on licensing, never invent data, prove every check can fail). Part 2 is the visual instruction: **European Future**, the two worlds, the palette, the 60/25/10/5 ratio and the measured contrast limits. `docs/palette.json` is the checkable form |
 | **the transformation brief, and the three decisions waiting on the owner** | **`docs/EUROPEDOOR_2036_TRANSFORMATION.md`** — the 2036 audit, what to keep/replace/redesign, and a five-phase roadmap. Phases B and C are unblocked; A waits on a map-licensing decision |
 | **starting a session — read this first** | **`docs/audit-2026-09.md`** — the repository audit: current stack, what exists, technical debt, and the one open architectural decision (Next.js/Postgres: not yet, and why). Then **`docs/roadmap.md`** |
@@ -9142,6 +9142,65 @@ rule a country name too wide for its own country is already broken under.
 `c_unique_titles` asserts it, proved red by giving Malta's region its
 country's title.
 
+
+**A DISPLAY PREFERENCE WAS HOLDING PAGES BACK FROM SEARCH, AND IT WAS THE ONE
+SIGNAL THE FILE ITSELF CALLS A GUESS.** `tools/seo.py` reports READY /
+IMPROVE / HOLD, and HOLD means *a crawler cannot reach this or cannot read
+it* — a decision rather than a draft. `verdict()` derived that from the
+GROUP a signal lives in, so every TECHNICAL signal blocked: of the 47 it held
+back, **46 were held on a description of 166 to 296 characters**, every one of
+them ending on a full stop and 32 of them inside `META_DESC_MAX` — whole
+sentences, read perfectly by a crawler. What is "not shown whole" is their
+tail, in a result, on some devices. And
+`SERP_VISIBLE`'s own comment says it *"moves with the device and the query,
+and it is a claim this file makes rather than one the site holds"* — so the
+instrument was grading pages on the one number it had already labelled a
+guess, which is "Copenhagen = 94/100" arriving through a named signal, in the
+file whose opening paragraph refuses exactly that. **Severity is declared
+beside the signal now**, and the test is which of the brief's four actions it
+calls for: a signal a writer fixes by WRITING is advisory, a signal that needs
+somebody to DECIDE is blocking. HOLD 47 → 0, IMPROVE 215 → 262, and not one
+document changed.
+
+**AND `indexable` WAS IN THE READINESS GROUPS, WHICH IS THE TWO AXES
+COLLAPSED INTO ONE.** `noindex` is not a defect a page has; it is a decision
+this atlas has recorded in `data/seo.json`. Reading it as a signal graded the
+site's own choice as a fault, so a page deliberately withheld — which the
+brief names as legitimate, LIVE IN EUROPEDOOR + NOINDEX — would have read as
+not ready for the search it is being kept out of on purpose. **Readiness is a
+measurement and may never be authored; state is a classification and may never
+be derived**, which is the Data Integrity Rule written as a queue, and the
+queue is the cross product because the cell worth looking at is the
+disagreement: published + HOLD is what a governed corpus exists to prevent.
+
+**AND THE CHECK PROVING THE AXES ARE SEPARATE PASSED FOR A REASON THAT IS NOT
+ABOUT THEM, IN THE RUN THAT WAS PROVING IT RED.** It swapped the register in
+memory and asserted the readiness did not move — and putting `indexable` back
+into `technical_group` left it green, because that signal reads `p["robots"]`,
+which comes off the SHIPPED HTML, and an in-memory register swap does not
+rebuild the site. A real declaration produces BOTH a register row and a robots
+tag, so the probe produces both. **The same fault one probe over**: the HOLD
+case was exercised on a ONE-PAGE corpus, where nothing links to anything, so
+both the blocking and the advisory case came back HOLD on `linked from
+somewhere` and neither was testing what it named. *A test about one signal has
+to own the rest of its state.* The advisory half is the only reason either was
+found.
+
+**AND THE FOUR ACTIONS WERE THREE MECHANISMS AND A QUEUE.** The brief asks for
+IMPROVE / REVIEW / PUBLISH TO SEARCH / HOLD as back-office actions. IMPROVE is
+an edit to `data/` and a rebuild, REVIEW is the pull request the photograph
+pipeline already uses as its approval boundary, PUBLISH TO SEARCH and HOLD are
+one word each in `data/seo.json` — so building buttons would be building
+twice, which is the standing instruction. What was missing is the QUEUE:
+`docs/seo-queue.md`, generated by `tools/seo.py --write`, committed and
+stale-checked like `site/`. **A document rather than a screen**, on
+`docs/content-report.md`'s own reasoning — a back office nobody can reach from
+this repository is a screen somebody has to be signed in to, and the hosted
+Media Desk is deliberately a second Vercel project off europedoor.com. And the
+file's own `--queue`, `--check` and `--floors` had been advertised in its
+docstring since it was written and implemented by none of them, which is
+`hit_radius`'s lie in an interface arriving on a command line.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on
@@ -9153,6 +9212,7 @@ the rest.
     python3 tools/build.py check              validate the data
     python3 tools/build.py                    build every page
     python3 tools/checks.py                   the static checks
+    python3 tools/seo.py --check              readiness vs the publishing decision
     node tools/browser-checks.js              Chromium, incl. accessibility and contrast
     python3 tools/section-audit.py --check    the spec sections
     python3 tools/ux-audit.py --check         the UI/UX, brand and 2036 sections

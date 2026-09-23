@@ -9729,6 +9729,12 @@ def c_generated_docs_fresh():
         ("ux-audit.py", "ux-audit.md"),
         ("content-report.py", "content-report.md"),
         ("ad-audit.py", "advertising.md"),
+        # THE FIFTH IS THE PUBLISHING QUEUE, and it is the one whose input is
+        # the BUILT SITE rather than the data. That makes it the cheapest of
+        # the five to let drift and the most misleading when it does: it
+        # states which pages this atlas considers ready for search, so a
+        # stale copy reports a corpus that no longer exists.
+        ("seo.py", "seo-queue.md"),
     )
     n = 0
     for tool, name in docs:
@@ -10232,6 +10238,48 @@ def c_unique_titles():
             seen[t] = canonical_of(f)
     if n < 900:
         fail(f"examined {n} titles — this check has stopped reading the site")
+    return n
+
+
+@check("no page the sitemap recommends is one the measurement holds")
+def c_seo_queue_governed():
+    """THE BRIEF'S SENTENCE ABOUT THE SITEMAP, AS A GATE.
+
+    *Your sitemap should represent: these are the EuropeDoor pages we
+    consider genuinely ready for search discovery. Not: here are all 1,032
+    URLs.* That is a claim about the relationship between two things this
+    repository now holds separately — what `tools/seo.py` MEASURES about a
+    page and what `data/seo.json` has DECIDED about it — and nothing was
+    comparing them.
+
+    It shells out rather than re-implementing, for the reason
+    `c_generated_docs_fresh` does: the readiness model is one instrument and
+    a second copy of it here would be a second chance to disagree with the
+    document a reader is given. What this check owns is that the answer is
+    read on every commit rather than when somebody remembers to type it.
+
+    The count is the engine's own page total rather than 1, because an
+    assertion about an empty set counts exactly like one about a page —
+    which is how two checks in this file examined nothing and reported
+    green.
+    """
+    import subprocess
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "seo.py"),
+                        "--check"], cwd=ROOT, capture_output=True, text=True)
+    out = (r.stdout or "") + (r.stderr or "")
+    m = re.search(r"(\d+) pages, (\d+) problem", out)
+    if not m:
+        fail("tools/seo.py --check produced no verdict — the readiness "
+             f"engine did not run: {out.strip()[-300:]}")
+        return 0
+    n, problems = int(m.group(1)), int(m.group(2))
+    if problems or r.returncode != 0:
+        for line in out.splitlines():
+            if line.strip().startswith("--"):
+                fail(f"seo queue: {line.strip()[3:]}")
+    if n < 900:
+        fail(f"the readiness engine assessed {n} pages — it has stopped "
+             f"reading the built site")
     return n
 
 
