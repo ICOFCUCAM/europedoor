@@ -9027,6 +9027,41 @@ readiness report's gap is structured data and internal linking: those are
 fixes rather than withdrawals, and the order is to improve the pages before
 deciding what to expose. Moving it is a one-word edit to a registry.
 
+**A HELPER WITH A TWO-CALL CONTRACT, HONOURED AT EIGHT CALL SITES AND NOWHERE
+ELSE: 237 DOCUMENTS DREW A BREADCRUMB AND PUBLISHED NOTHING.**
+`ld_breadcrumb`'s own docstring says it takes *the same list `crumbs()` is
+given, so the visible breadcrumb and the machine-readable one cannot
+disagree* — and it was reached through `ld_blocks`, which is an argument, and
+an argument is a thing a call site forgets. Measured on the built site: every
+document carrying no structured data at all drew a visible breadcrumb, so the
+one machine-readable claim this atlas already holds about its own hierarchy
+was published on three quarters of the site and withheld from the rest. That
+is the fourteen-call-sites-forgot-the-motif shape, and `head_figure`'s
+`moved_drawing` contract one helper over. **`crumbs()` emits both now** — the
+repair this file reaches for every time, which is to stop making it a call
+site's job.
+
+**AND THE ONE-BLOCK RULE IS LOAD-BEARING FOR THE INSTRUMENT RATHER THAN FOR
+THE FORMAT.** `c_structured_data` refuses more than one `ld+json` script per
+page and then reads `blocks[0]`, so a second block would be entirely
+unchecked — where Google accepts several. Adding the breadcrumb beside its
+own markup therefore turned that check red on every document that already had
+a block. **So `page()` HOISTS**: a component publishes its claim beside the
+markup it describes, the document still ships one array, and every item in it
+goes through the same scan. It parses JSON this build serialised rather than
+markup somebody wrote, and it generalises — the next component to publish
+something inherits it.
+
+**AND THE ABSENCE IS WHAT HAD TO BE TESTED, WHICH THE CHECK BESIDE IT CANNOT
+SEE.** `c_structured_data` asserts a BreadcrumbList agrees with the breadcrumb
+a reader can see, and can only ask that of a page that HAS one — so it said
+nothing about the 237, which is `c_photo_published`'s own limitation one
+format over. `c_breadcrumb_published` asks the other question in both
+directions, because a page publishing a trail it does not draw is a claim to a
+machine no reader can check, which is the exact thing this format invites.
+Proved red both ways. Structured data left the readiness report's missing list
+entirely and the verdict moved 500 READY / 318 HOLD to **581 / 237**.
+
 ## Gates
 
 Run all of these before claiming anything is done. **No counts here on

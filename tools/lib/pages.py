@@ -20,7 +20,7 @@ from . import stay as staylib
 from . import urls
 from .render import (LD_PUBLISHER, ORIGIN, SITE_NAME, SITE_TAGLINE, arch_path, arch_rim, card, chips, crumbs,
                      esc, factlist, grid, n_of,
-                     jsondata, ld_breadcrumb, ld_place, ld_within, motif_for,
+                     jsondata, ld_place, ld_within, motif_for,
                      page, photo, picture, plate, section, arch_clip, arch_edge,
                      ed_opening, ed_photo, ed_rows, ed_section_head, ed_split,
                      ed_bleed, ed_declare, ed_feature, ed_mosaic, ed_strip, held,
@@ -5095,8 +5095,6 @@ def country_page(data, c):
         og=("country:" + c["slug"], motif_for(c["interests"]),
             f"{c['name']} — {c['tagline']}"),
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
-                           (m["name"], urls.macro(m)), (c["name"], urls.country(c))]),
             ld_place("Country", name=c["name"], url=urls.country(c),
                      description=c["summary"],
                      extra={"alternateName": c.get("official") or c["name"],
@@ -5266,9 +5264,6 @@ def region_page(data, c, r):
         og=(f"region:{c['slug']}:{r['slug']}", motif_for(r["interests"]),
             f"{r['name']}, {c['name']}"),
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
-                           (m["name"], urls.macro(m)), (c["name"], urls.country(c)),
-                           (r["name"], urls.region(c, r))]),
             ld_place("TouristDestination", name=r["name"], url=urls.region(c, r),
                      description=r["summary"],
                      within=ld_within("Country", c["name"], urls.country(c)),
@@ -5630,9 +5625,6 @@ def city_page(data, c, r, t):
             motif_for(t["interests"], t.get("city_type")) or motif_for(r["interests"]),
             f"{t['name']}, {c['name']} — {t['summary'][:90]}"),
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
-                           (m["name"], urls.macro(m)), (c["name"], urls.country(c)),
-                           (r["name"], urls.region(c, r)), (t["name"], urls.city(c, r, t))]),
             ld_place("TouristDestination", name=t["name"], url=urls.city(c, r, t),
                      description=t["summary"], lat=t["lat"], lon=t["lon"],
                      within=ld_within("TouristDestination", r["name"], urls.region(c, r)),
@@ -6918,8 +6910,6 @@ def journey_page(data, j):
         og=("journey:" + j["slug"], motif_for(j["interests"]),
             f"{j['name']} — {j['strapline']}"),
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Journeys", "/journeys"),
-                           (j["name"], urls.journey(j))]),
             # TouristTrip, with the stops as its itinerary. No offers and no
             # price: the estimate is planning arithmetic from published daily
             # bands, not a quote, and serialising it as an offer would turn a
@@ -10993,10 +10983,6 @@ def place_page(data, c, r, t, pl):
         og=(f"place:{c['slug']}:{t['slug']}:{pl['slug']}", motif_for(t["interests"]),
             f"{pl['name']}, {t['name']}"),
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Countries", "/countries"),
-                           (c["name"], urls.country(c)), (r["name"], urls.region(c, r)),
-                           (t["name"], urls.city(c, r, t)),
-                           (pl["name"], urls.place(c, r, t, pl))]),
             # No openingHours, no offers, no aggregateRating. The validator
             # refuses the first, nothing is bookable, and there are no
             # reviews — see the note above ld() in render.py.
@@ -14233,8 +14219,6 @@ def story_page(data, s):
         # image, until the register holds a photograph for it.
         og=None,
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Stories", "/stories"),
-                           (s["title"], f"/stories/{s['slug']}")]),
             {"@context": "https://schema.org", "@type": "Article",
              "headline": s["title"], "description": s["standfirst"],
              "url": ORIGIN + urls.story(s),
@@ -18264,8 +18248,6 @@ def motion_page(data, m):
         og=("motion:" + m["slug"], motif_for(m.get("interests", [])),
             f"{m['name']} — {m['strapline']}"),
         ld_blocks=[
-            ld_breadcrumb([("Europe", "/discover"), ("Europe in Motion", "/europe-in"),
-                           (m["name"], f"/europe-in/{m['slug']}")]),
             {"@context": "https://schema.org", "@type": "ItemList",
              "name": m["name"], "description": m["lede"],
              "url": ORIGIN + f"/europe-in/{m['slug']}",
@@ -18640,8 +18622,6 @@ def motion_index(data):
         accent="territory", hero=True,
         description=f"A dozen ways to cut the continent — each a real query run against all {total} destinations on every build, with the query printed on the page.",
         og=("motion:index", "peaks", "Europe in Motion"),
-        ld_blocks=[ld_breadcrumb([("Europe", "/discover"),
-                                  ("Europe in Motion", "/europe-in")])],
     )
 
 

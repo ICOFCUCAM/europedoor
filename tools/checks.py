@@ -10077,5 +10077,40 @@ def c_seo_noindex_path():
         SEO._cache = real
 
 
+@check("a page that draws a breadcrumb publishes it")
+def c_breadcrumb_published():
+    """THE ABSENCE IS WHAT HAD TO BE TESTED, AND ABSENCE IS INVISIBLE TO THE
+    CHECK BESIDE IT.
+
+    `c_structured_data` asserts that a BreadcrumbList agrees with the
+    breadcrumb a reader can see — which it can only ask of a page that has
+    one, so it said nothing at all about the 237 that drew a breadcrumb and
+    published nothing. That is `c_photo_published`'s own limitation one format
+    over: a check that needs the thing to exist cannot report it missing.
+
+    So this asks the other question. Both directions, because either alone
+    goes quietly wrong: a page that draws the trail and withholds it is the
+    fault that shipped, and a page that publishes a trail it does not draw is
+    a claim to a machine that a reader cannot check, which is the exact thing
+    this format invites.
+    """
+    n = 0
+    for f in site_files():
+        h = open(f, encoding="utf-8").read()
+        drawn = 'class="crumbs"' in h
+        published = '"BreadcrumbList"' in h
+        n += 1
+        if drawn and not published:
+            fail(f"{canonical_of(f)} draws a breadcrumb and publishes none. "
+                 f"`crumbs()` emits both; a page reaching past it is a "
+                 f"forty-eighth chance to forget")
+        if published and not drawn:
+            fail(f"{canonical_of(f)} publishes a BreadcrumbList and draws no "
+                 f"breadcrumb — a claim to a machine that no reader can check")
+    if n < 900:
+        fail(f"examined {n} pages — this check has stopped reading the site")
+    return n
+
+
 if __name__ == "__main__":
     main()

@@ -1149,14 +1149,41 @@ def chips(items, interests):
 
 
 def crumbs(trail):
-    """trail: [(label, href_or_None)] — the last item is the current page."""
+    """trail: [(label, href_or_None)] — the last item is the current page.
+
+    AND IT PUBLISHES THE SAME TRAIL, BECAUSE EIGHT CALL SITES DID AND 237
+    PAGES DID NOT. `ld_breadcrumb`'s own docstring says it takes *the same
+    list crumbs() is given, so the visible breadcrumb and the
+    machine-readable one cannot disagree* — a two-call contract, honoured at
+    eight `ld_blocks=[...]` lists and nowhere else. Measured on the built
+    site: every page that carried no structured data at all drew a visible
+    breadcrumb, so the one machine-readable claim this atlas already holds
+    about its own hierarchy was published on three quarters of the site and
+    withheld from the rest. That is the fourteen-call-sites-forgot-the-motif
+    shape, and `head_figure`'s `moved_drawing` contract one helper over.
+
+    The repair is the one this repository reaches for every time: stop making
+    it a call site's job. A page that draws a breadcrumb publishes it, in one
+    function, and a new page builder inherits that instead of being a
+    forty-eighth chance to forget.
+
+    EMITTED BESIDE THE MARKUP IT DESCRIBES, AND HOISTED BY `page()` INTO THE
+    DOCUMENT'S ONE BLOCK. Beside, because that is what makes the two
+    impossible to separate — a block in the head reached by an `ld_blocks`
+    argument is exactly the arrangement that lost 237 of them. Hoisted,
+    because `c_structured_data` refuses more than one script per page and
+    reads `blocks[0]`, so a second block would be entirely unchecked.
+    """
     parts = []
     for i, (label, href) in enumerate(trail):
         if href and i < len(trail) - 1:
             parts.append(f'<a href="{esc(href)}">{esc(label)}</a>')
         else:
             parts.append(f'<span aria-current="page">{esc(label)}</span>')
-    return f'<nav class="crumbs" aria-label="{esc(T("nav.aria.breadcrumb"))}">' + '<span class="sep" aria-hidden="true">/</span>'.join(parts) + "</nav>"
+    nav = (f'<nav class="crumbs" aria-label="{esc(T("nav.aria.breadcrumb"))}">'
+           + '<span class="sep" aria-hidden="true">/</span>'.join(parts)
+           + "</nav>")
+    return nav + ld(ld_breadcrumb(trail))
 
 
 # Primary navigation, from the product specification. Seven items plus the
@@ -1882,6 +1909,33 @@ def page(title, body, *, path, description, area=None, head_extra="", scripts=()
     # mid-word, and the four dozen that did not slice were relying on being
     # short enough not to.
     description = meta_description(description)
+
+    # A COMPONENT MAY PUBLISH ITS OWN STRUCTURED DATA BESIDE ITS OWN MARKUP,
+    # AND THE DOCUMENT STILL SHIPS ONE BLOCK.
+    #
+    # `ld_blocks` is an argument, and an argument is a thing a call site
+    # forgets: `ld_breadcrumb`'s docstring promises the visible breadcrumb and
+    # the machine-readable one cannot disagree, and eight builders passed it
+    # while 237 pages drew a breadcrumb and published nothing. So `crumbs()`
+    # emits its own, which is the repair this repository reaches for every
+    # time — stop making it a call site's job.
+    #
+    # `c_structured_data` refuses more than one script per page and reads
+    # `blocks[0]`, so a second block would be entirely unchecked — the rule is
+    # load-bearing for the INSTRUMENT rather than for the format, since Google
+    # accepts several. Hoisting keeps both: the component owns its claim, the
+    # document carries one array, and every item in it goes through the same
+    # scan. Anything a component emits is our own `ld()` output, so this parses
+    # JSON we serialised rather than markup somebody wrote.
+    hoisted = []
+    if "application/ld+json" in body:
+        for m in re.finditer(r'<script type="application/ld\+json">(.*?)</script>',
+                             body, re.S):
+            payload = json.loads(m.group(1).replace("<\\/", "</"))
+            hoisted.extend(payload if isinstance(payload, list) else [payload])
+        body = re.sub(r'<script type="application/ld\+json">.*?</script>', "",
+                      body, flags=re.S)
+    ld_blocks = list(ld_blocks) + hoisted
     # SIXTEEN PAGES SHIPPED THE CONTINENT AND CLONED IT ZERO TIMES.
     #
     # `constel_defs()` inlines one thinned lod0 silhouette so that thirteen
